@@ -22,7 +22,8 @@
         "laravelcollective/html": "^6.2",
         "nwidart/laravel-modules": "^7.3",
         "owen-it/laravel-auditing": "10.0",
-        "spatie/laravel-permission": "^3.18"
+        "spatie/laravel-permission": "^3.18",
+        "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
