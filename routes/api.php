@@ -40,11 +40,11 @@ Route::group(['prefix' => 'perfil'], function () {
 
 Route::get('v1/{dni}',function(Request $request, $dni){
     if($request->header('Authorization')=="cepreuna_v1_api")
-        return DB::select("SELECT concat(pe.inicio_ciclo,' - ',pe.fin_ciclo) AS periodo,pe.estado estado_periodo ,nro_documento, paterno, materno,celular ,case sexo when 1 then 'M' when 2 then 'F' END AS sexo ,ub.departamento,ub.provincia,ub.distrito ,
+        return DB::select("SELECT concat(pe.inicio_ciclo,' - ',pe.fin_ciclo) AS periodo,pe.estado estado_periodo ,nro_documento, paterno, materno, nombres,celular ,case sexo when 1 then 'M' when 2 then 'F' END AS sexo ,ub.departamento,ub.provincia,ub.distrito ,
         anio_egreso,co.denominacion AS name_cole, co.direccion AS dir_cole, co.departamento AS dep_cole,co.provincia AS pro_cole,co.distrito AS dis_cole,tc.denominacion AS tipo_cole  FROM estudiantes es
         INNER JOIN inscripciones ins ON ins.estudiantes_id=es.id
         INNER JOIN periodos pe ON pe.id=ins.periodos_id
         INNER JOIN ubigeos ub ON es.ubigeos_id = ub.id
         INNER JOIN colegios co ON co.id = es.colegios_id
-        INNER JOIN tipo_colegios tc ON tc.id = co.tipo_colegios_id where nro_documento=?",[$dni]);
+        INNER JOIN tipo_colegios tc ON tc.id = co.tipo_colegios_id where nro_documento=? and ins.correlativo<30",[$dni]);
 });
