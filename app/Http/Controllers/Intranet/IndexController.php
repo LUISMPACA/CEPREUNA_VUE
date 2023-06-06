@@ -201,7 +201,7 @@ class IndexController extends Controller
         $response = DB::table("docente_aptos as da")
             ->select(
                 "d.id",
-                DB::raw("CONCAT(d.nro_documento,' | ',d.paterno,' ',d.materno,' ',d.nombres) as text")
+                DB::raw("CONCAT(d.nro_documento,' | ',d.paterno,' ',d.materno,' ',d.nombres, ' | ',d.celular) as text")
             )
             ->join("docentes as d", "d.id", "da.docentes_id")
             // ->where('d.nro_documento', 'like', "%$request->q%")
