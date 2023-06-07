@@ -413,7 +413,7 @@ export default {
             id: 0,
             edit: 0,
             errors: {},
-            fields: { estado: 1, sesion: "", observacion: "", cantidad_estudiantes: "", imagen: null, path_imagen: null,horas_asistidas:0,modalidad:"",fecha_tema:"",tema:"" },
+            fields: { estado: 1, sesion: "", observacion: "", cantidad_estudiantes: "", imagen: null, path_imagen: null,horas_asistidas:1,modalidad:"",fecha_tema:"",tema:"" },
             url: "",
             urlFirma: "",
             area: "",
