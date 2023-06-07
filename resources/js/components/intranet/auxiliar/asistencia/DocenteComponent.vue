@@ -298,7 +298,7 @@
                             <div class="row">
                                 <div class="form-group col-6">
                                     <label for="horas_asistidas">Horas Asistidas</label>
-                                    <input type="number" min="1" max="3" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
+                                    <input type="number" min="1" max="3" value="1" onkeydown="return false;" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
                                     <div v-if="errors && errors.horas_asistidas" class="text-danger">
                                         {{ errors.horas_asistidas[0] }}
                                     </div>
