@@ -26,6 +26,7 @@
                         >
                             Descargar excel
                         </excel-export>
+                        <a :href="ruta_rpt_docente_horas" class="btn btn-primary">descargar docentes horas</a>
 
                         <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/docente/lista">
                             <div slot="actions" slot-scope="props">
@@ -96,7 +97,7 @@ import $ from "jquery";
 // import toastr from "toastr";
 
 export default {
-    props: ["permissions"],
+    props: ["permissions","ruta_rpt_docente_horas"],
     data() {
         return {
             url: "",

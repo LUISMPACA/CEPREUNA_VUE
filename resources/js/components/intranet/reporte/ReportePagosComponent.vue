@@ -59,6 +59,7 @@
                             Descargar excel
                         </excel-export>
                         <button v-if="permissions.includes('descargar reporte pagos')" class="btn btn-danger" @click="exportarPDF">Exportar PDF</button>
+                        <a :href="ruta_rpt_pagos" class="btn btn-primary">Descargar pagos new</a>
 
                         <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/pagos/lista">
                             <div slot="estado" slot-scope="props">
@@ -154,7 +155,7 @@ import $ from "jquery";
 // import toastr from "toastr";
 
 export default {
-    props: ["permissions"],
+    props: ["permissions","ruta_rpt_pagos"],
     data() {
         return {
             url: "",

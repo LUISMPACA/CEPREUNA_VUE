@@ -1082,6 +1082,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/estudiante/lista', 'Intranet\ReporteController@rptEstudianteLista');
             Route::get('/docente', 'Intranet\ReporteController@rptDocenteIndex');
             Route::get('/docente/lista', 'Intranet\ReporteController@rptDocenteLista');
+            Route::get('/docente-horas-total','Intranet\ReporteController@rptDocenteHorasTotal')->name('intranet.reporte.docente');
 
             Route::get('/asistencia-docente', 'Intranet\ReporteController@rptAsistenciaDocenteIndex');
             Route::get('/asistencia-docente/lista', 'Intranet\ReporteController@rptAsistenciaDocenteLista');
@@ -1108,6 +1109,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/pagos/lista', 'Intranet\ReporteController@rptPagosLista');
             Route::get('/pagos/pdf', 'Intranet\ReporteController@rptPagosPdf');
             Route::get('/pagos/lista-excel', 'Intranet\ReporteController@rptPagosListaExcel');
+            Route::get('/pagos/efectuados-distincion','Intranet\ReporteController@rptPagosEfectuadosDistincion')->name('intranet.reporte.pagos');
         });
         Route::group(['prefix' => 'estadistica'], function () {
             Route::get('/', 'Intranet\EstadisticaController@index');
@@ -1122,4 +1124,5 @@ Route::group(['middleware' => ['auth']], function () {
         });
     });
     //Route::resource('products', ProductController::class);
+    Route::get('/totalHorasModalidadDocente', 'Intranet\ReporteController@totalHorasModalidadDocente');
 });

@@ -28,6 +28,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PDF;
 use Spatie\Permission\Models\Permission;
+// -----------------reportes Spreadsheet----------------------------------
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReporteController extends Controller
 {
@@ -281,7 +288,8 @@ class ReporteController extends Controller
                                 GROUP BY ad.docentes_id
                             ) AS observacion")
                 );
-            $data = $data->whereBetween('asistencia_docentes.fecha', [$request->fecha_ini, $request->fecha_fin]);
+            $data = $data->whereBetween('asistencia_docentes.fecha', 
+            [$request->fecha_ini, $request->fecha_fin]);
         } else {
             $data = AsistenciaDocente::with(['carga', 'docente', 'docenteApto'])
                 ->select(
@@ -1708,5 +1716,396 @@ class ReporteController extends Controller
         $response = $table->finish($data);
 
         return response()->json($response);
+    }
+
+
+    public function totalHorasModalidadDocente(){
+        // Crear un nuevo objeto de hoja de cálculo
+    $spreadsheet = new Spreadsheet();
+    
+    // Seleccionar la hoja activa
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Agregar datos al informe
+    $sheet->setCellValue('A1', 'Nombre');
+    $sheet->setCellValue('B1', 'Apellido');
+    $sheet->setCellValue('C1', 'Edad');
+    
+    $usuarios = User::all(); // Suponiendo que tienes un modelo User
+    
+    $row = 2;
+    
+    foreach ($usuarios as $usuario) {
+        $sheet->setCellValue('A' . $row, $usuario->nombre);
+        $sheet->setCellValue('B' . $row, $usuario->apellido);
+        $sheet->setCellValue('C' . $row, $usuario->edad);
+        
+        $row++;
+    }
+    
+    // Guardar el archivo en formato XLSX
+    $response = new StreamedResponse(function () use ($spreadsheet) {
+        // Definir el tipo de contenido y el encabezado para la descarga
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="reporte.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Crear el escritor para generar el archivo Excel
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+    });
+
+    // Devolver la respuesta de transmisión (streamed response)
+    return $response;
+    }
+
+    
+    public function rptDocenteHorasTotal(){
+   
+        // Crear un nuevo objeto Spreadsheet
+        $spreadsheet = new Spreadsheet();
+
+        // Personalizar el contenido del reporte
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('F1:G1');
+        $sheet->setCellValue('F1', 'Reporte Docentes Horas Pago Total');
+
+        // Establecer estilo y formato para el encabezado
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '3366CC'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+
+        $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
+
+        $datos = ['Nro. Documento', 'Paterno', 'Materno', 'Nombres', 'Celular', 'Email', 'Área', 'Grupo','Sede','Modalidad','Curso','Horas de Pago', 'Total Horas'];
+
+        $columnaInicial = 'A';
+        $filaInicial = 3;
+        
+        foreach ($datos as $index => $valor) {
+            $columna = chr(ord($columnaInicial) + $index);
+            $celda = $columna . $filaInicial;
+            $sheet->setCellValue($celda, $valor);
+        }
+        // Establecer estilo para las celdas de encabezado
+        $headerCellStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => '000000'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'EEEEEE'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+
+        $columnaInicial = 'A';
+        $columnaFinal = chr(ord($columnaInicial) + count($datos) - 1);
+        $rango = $columnaInicial . '3:' . $columnaFinal . '3';
+
+        $sheet->getStyle($rango)->applyFromArray($headerCellStyle);   
+
+
+        // Obtener los datos de la consulta
+        $resultados = DB::table('docentes AS d')
+        ->select('d.nro_documento', 'd.paterno', 'd.materno', 'd.nombres', 'd.celular', 'd.email',
+            'eas.denominacion as area', 'gr.denominacion as grupo', 'sed.denominacion as modalidad', 'sds.denominacion as sede','cu.denominacion as curso',
+            'ad.horas_pago', DB::raw('SUM(ad.cantidad_horas) AS total_horas'))
+        ->join('carga_academicas AS ca', 'd.id', '=', 'ca.docentes_id')
+        ->join('cursos AS cu', 'cu.id', '=', 'ca.cursos_id')
+        ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
+        ->join('grupos AS gr', 'gr.id', '=', 'ga.grupos_id')
+        ->join('asistencia_docentes AS ad', 'ad.carga_academicas_id', '=', 'ca.id')
+        ->join('docente_aptos AS apt', 'd.id', 'apt.docentes_id')
+        ->join('inscripcion_docentes AS id', 'id.docentes_id', '=', 'd.id')
+        ->join('areas AS eas', 'eas.id', '=', 'id.areas_id')
+        ->join(DB::raw('(SELECT id, sedes_id, inscripcion_docentes_id FROM disponibilidades GROUP BY inscripcion_docentes_id) disp'),
+            'disp.inscripcion_docentes_id', '=', 'id.id')
+        ->join(DB::raw("(SELECT id, 
+            CASE 
+                WHEN denominacion <> 'Virtual' THEN 'No virtual'
+                ELSE denominacion
+            END AS denominacion
+            FROM sedes) sed"), 'sed.id', '=', 'disp.sedes_id')
+        ->join('sedes AS sds', 'sds.id', '=', 'disp.sedes_id')
+        ->where('ad.estado',1)
+        ->groupBy('d.nro_documento', 'sed.denominacion')
+
+        ->get();
+
+    // Recorrer los resultados y agregarlos al archivo Excel
+    $row = 4; // Fila inicial para los datos
+    foreach ($resultados as $resultado) {
+        $sheet->setCellValue('A' . $row, $resultado->nro_documento);
+        $sheet->setCellValue('B' . $row, $resultado->paterno);
+        $sheet->setCellValue('C' . $row, $resultado->materno);
+        $sheet->setCellValue('D' . $row, $resultado->nombres);
+        $sheet->setCellValue('E' . $row, $resultado->celular);
+        $sheet->setCellValue('F' . $row, $resultado->email);
+        $sheet->setCellValue('G' . $row, $resultado->area);
+        $sheet->setCellValue('H' . $row, $resultado->grupo);
+        $sheet->setCellValue('I' . $row, $resultado->sede);
+        $sheet->setCellValue('J' . $row, $resultado->modalidad);
+        $sheet->setCellValue('K' . $row, $resultado->curso);
+        $sheet->setCellValue('L' . $row, $resultado->horas_pago);
+        $sheet->setCellValue('M' . $row, $resultado->total_horas);
+
+        $row++;
+    }
+
+    // Ajustar el ancho de las columnas automáticamente
+    foreach (range('A', 'M') as $columna) {
+        $sheet->getColumnDimension($columna)->setAutoSize(true);
+    }
+
+    $response = new StreamedResponse(function () use ($spreadsheet) {
+        // Definir el tipo de contenido y el encabezado para la descarga
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="reporte.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Crear el escritor para generar el archivo Excel
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+    });
+
+    // Devolver la respuesta de transmisión (streamed response)
+    return $response;
+
+    }
+
+
+//segunda funcion
+
+
+    public function rptPagosEfectuadosDistincion(){
+
+        // Crear un nuevo objeto Spreadsheet
+        $spreadsheet = new Spreadsheet();
+
+
+        // Personalizar el contenido del reporte
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->mergeCells('F1:G1');
+        $sheet->setCellValue('F1', 'Reporte Pagos Efectuados sin Mora');
+
+        // Establecer estilo y formato para el encabezado
+        $headerStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => 'FFFFFF'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '3366CC'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+
+        $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
+        $datos = [
+            'ID','Nro Documento','Paterno','Materno','Nombres','Sede','Area','Turno','Grupo','Descuento','Tipo Colegio','Estado','Pago Total','Pago Matricula','Primera Mensualidad','Segunda Mensualidad','Tercera Mensualidad','Cuarta Mensualidad',
+        ];
+        $columnaInicial = 'A';
+        $filaInicial = 3;
+        
+        foreach ($datos as $index => $valor) {
+            $columna = chr(ord($columnaInicial) + $index);
+            $celda = $columna . $filaInicial;
+            $sheet->setCellValue($celda, $valor);
+        }
+        // Establecer estilo para las celdas de encabezado
+        $headerCellStyle = [
+            'font' => [
+                'bold' => true,
+                'color' => ['rgb' => '000000'],
+            ],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'EEEEEE'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ];
+
+        $columnaInicial = 'A';
+        $columnaFinal = chr(ord($columnaInicial) + count($datos) - 1);
+        $rango = $columnaInicial . '3:' . $columnaFinal . '3';
+
+        $sheet->getStyle($rango)->applyFromArray($headerCellStyle); 
+
+        // Obtener los datos de la consulta
+        $resultados = DB::table('inscripciones')
+        ->select(
+            'inscripciones.id',
+            'estudiantes.nro_documento',
+            'estudiantes.paterno',
+            'estudiantes.materno',
+            'estudiantes.nombres',
+            's.denominacion AS sedes',
+            'areas.denominacion AS area',
+            'turnos.denominacion AS turno',
+            'grupos.denominacion AS grupo',
+            'tarifa_estudiantes1.monto AS monto1',
+            'tarifa_estudiantes2.monto AS monto2',
+            'tarifa_estudiantes3.monto AS monto3',
+            'tarifa_estudiantes4.monto AS monto4',
+            DB::raw("CASE
+                        WHEN inscripciones.tipo_estudiante = '1' THEN 'Normal'
+                        WHEN inscripciones.tipo_estudiante = '2' THEN 'Hijo de trabajador'
+                        WHEN inscripciones.tipo_estudiante = '3' THEN 'Descuento Trabajador UNA'
+                        WHEN inscripciones.tipo_estudiante = '4' THEN 'Hermanos'
+                        WHEN inscripciones.tipo_estudiante = '5' THEN 'Resolución Rectoral'
+                        ELSE 'Servicio Militar'
+                    END AS descuento"),
+            'tipo_colegios.denominacion AS tipo_colegio',
+            'inscripciones.estado',
+            DB::raw('SUM(tarifa_estudiantes.monto) AS pago_total'),
+            DB::raw("CONCAT_WS('|', tarifa_estudiantes0.monto, tarifa_estudiantes0.pagado, tarifa_estudiantes0.mora) AS pago_matricula"),
+            DB::raw("tarifa_estudiantes1.monto - tarifa_estudiantes1.pagado AS primera_mensualidad"),
+            DB::raw("tarifa_estudiantes2.monto - tarifa_estudiantes2.pagado AS segunda_mensualidad"),
+            DB::raw("tarifa_estudiantes3.monto - tarifa_estudiantes3.pagado AS tercera_mensualidad"),
+            DB::raw("tarifa_estudiantes4.monto - tarifa_estudiantes4.pagado AS cuarta_mensualidad")
+        )
+        ->join('estudiantes', 'estudiantes.id', '=', 'inscripciones.estudiantes_id')
+        ->leftJoin('tarifa_estudiantes', 'tarifa_estudiantes.estudiantes_id', '=', 'estudiantes.id')
+        ->leftJoin('tarifa_estudiantes AS tarifa_estudiantes0', function ($join) {
+            $join->on('tarifa_estudiantes0.nro_cuota', '=', DB::raw('0'))
+                ->on('tarifa_estudiantes0.estudiantes_id', '=', 'estudiantes.id');
+        })
+        ->leftJoin('tarifa_estudiantes AS tarifa_estudiantes1', function ($join) {
+            $join->on('tarifa_estudiantes1.nro_cuota', '=', DB::raw('1'))
+                ->on('tarifa_estudiantes1.estudiantes_id', '=', 'estudiantes.id');
+        })
+        ->leftJoin('tarifa_estudiantes AS tarifa_estudiantes2', function ($join) {
+            $join->on('tarifa_estudiantes2.nro_cuota', '=', DB::raw('2'))
+                ->on('tarifa_estudiantes2.estudiantes_id', '=', 'estudiantes.id');
+        })
+        ->leftJoin('tarifa_estudiantes AS tarifa_estudiantes3', function ($join) {
+            $join->on('tarifa_estudiantes3.nro_cuota', '=', DB::raw('3'))
+                ->on('tarifa_estudiantes3.estudiantes_id', '=', 'estudiantes.id');
+        })
+        ->leftJoin('tarifa_estudiantes AS tarifa_estudiantes4', function ($join) {
+            $join->on('tarifa_estudiantes4.nro_cuota', '=', DB::raw('4'))
+                ->on('tarifa_estudiantes4.estudiantes_id', '=', 'estudiantes.id');
+        })
+        ->join('sedes AS s', 's.id', '=', 'inscripciones.sedes_id')
+        ->leftJoin('matriculas', 'matriculas.estudiantes_id', '=', 'estudiantes.id')
+        ->leftJoin('grupo_aulas', 'grupo_aulas.id', '=', 'matriculas.grupo_aulas_id')
+        ->leftJoin('areas', 'areas.id', '=', 'grupo_aulas.areas_id')
+        ->leftJoin('grupos', 'grupos.id', '=', 'grupo_aulas.grupos_id')
+        ->leftJoin('turnos', 'turnos.id', '=', 'grupo_aulas.turnos_id')
+        ->join('colegios', 'colegios.id', '=', 'estudiantes.colegios_id')
+        ->join('tipo_colegios', 'tipo_colegios.id', '=', 'colegios.tipo_colegios_id')
+        ->groupBy('estudiantes.nro_documento')
+        ->get();
+
+    // Llenar los datos en las celdas correspondientes
+    $row = 4;
+    foreach ($resultados as $item) {
+        $sheet->setCellValue('A' . $row, $item->id)
+            ->setCellValue('B' . $row, $item->nro_documento)
+            ->setCellValue('C' . $row, $item->paterno)
+            ->setCellValue('D' . $row, $item->materno)
+            ->setCellValue('E' . $row, $item->nombres)
+            ->setCellValue('F' . $row, $item->sedes)
+            ->setCellValue('G' . $row, $item->area)
+            ->setCellValue('H' . $row, $item->turno)
+            ->setCellValue('I' . $row, $item->grupo)
+            ->setCellValue('J' . $row, $item->descuento)
+            ->setCellValue('K' . $row, $item->tipo_colegio)
+            ->setCellValue('L' . $row, $item->estado)
+            ->setCellValue('M' . $row, $item->pago_total)
+            ->setCellValue('N' . $row, $item->pago_matricula)
+            ->setCellValue('O' . $row, $item->primera_mensualidad)
+            ->setCellValue('P' . $row, $item->segunda_mensualidad)
+            ->setCellValue('Q' . $row, $item->tercera_mensualidad)
+            ->setCellValue('R' . $row, $item->cuarta_mensualidad);
+
+    // Color las celdas
+    // $greenColor = Color::COLOR_GREEN;
+    // $yellowColor = Color::COLOR_YELLOW;
+    $greenColor = '66bb6a';
+    $yellowColor = 'f4ff81';
+    $redColor = 'ef5350'; // Rojo
+    // $greenColor = '00FF00'; // Verde
+    // $yellowColor = 'FFFF00'; // Amarillo
+
+    // Colorear las celdas
+    $sheet->getStyle('O' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($item->primera_mensualidad == $item->monto1 ? $redColor : ($item->primera_mensualidad == 0 ? $greenColor : $yellowColor));
+    $sheet->getStyle('P' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($item->segunda_mensualidad == $item->monto2 ? $redColor : ($item->segunda_mensualidad == 0 ? $greenColor : $yellowColor));
+    $sheet->getStyle('Q' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($item->tercera_mensualidad == $item->monto3 ? $redColor : ($item->tercera_mensualidad == 0 ? $greenColor : $yellowColor));
+    $sheet->getStyle('R' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($item->cuarta_mensualidad == $item->monto4 ? $redColor : ($item->cuarta_mensualidad == 0 ? $greenColor : $yellowColor));
+
+    $row++;
+    }
+    // Ajustar el ancho de las columnas automáticamente
+    foreach (range('A', 'N') as $columna) {
+        $sheet->getColumnDimension($columna)->setAutoSize(true);
+    }
+
+    $response = new StreamedResponse(function () use ($spreadsheet) {
+        // Definir el tipo de contenido y el encabezado para la descarga
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="reporte.xlsx"');
+        header('Cache-Control: max-age=0');
+
+        // Crear el escritor para generar el archivo Excel
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+    });
+
+    // Devolver la respuesta de transmisión (streamed response)
+    return $response;
     }
 }
