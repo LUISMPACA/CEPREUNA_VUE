@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <i-reporte-pagos :permissions="{{ $permisos }}"></i-reporte-pagos>
+    <i-reporte-pagos :permissions="{{ $permisos }}" :ruta_rpt_pagos="{{ json_encode(route('intranet.reporte.pagos')) }}"></i-reporte-pagos>
 
 
 @endsection

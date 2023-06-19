@@ -333,7 +333,15 @@
                             <div class="row">
                                 <div class="form-group col-6">
                                     <label for="horas_asistidas">Horas Asistidas</label>
-                                    <input type="number" min="0" max="3" value="0" onkeydown="return false;" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
+                                    <div class="input-group">
+                                        <input type="number" min="0" max="3" value="0" onkeydown="return false;" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
+                                        <div class="input-group-prepend">
+                                            <button class="btn btn-danger" type="button" @click="decrementHoras">-</button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button" @click="incrementHoras">+</button>
+                                        </div>
+                                    </div>
                                     <div v-if="errors && errors.horas_asistidas" class="text-danger">
                                         {{ errors.horas_asistidas[0] }}
                                     </div>
@@ -735,7 +743,14 @@ export default {
             this.dia = [];
             $(".checksH").css("background", "none");
         },
-
+        decrementHoras(){
+            if(this.fields.horas_asistidas>0)
+                this.fields.horas_asistidas--
+        },
+        incrementHoras(){
+            if(this.fields.horas_asistidas<3)
+                this.fields.horas_asistidas++
+        },
         // checkHorario:function(dia,horario){
         //     var value = false;
         //     for (const val in horario.horario) {
