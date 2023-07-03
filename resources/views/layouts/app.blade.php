@@ -35,6 +35,16 @@
             position: fixed;
             background-color: #39f;
         }
+        #sql_editor {
+        height: 300px;
+        width: 100%;
+        border: 1px solid #ccc;
+        font-size: 1.1rem;
+        
+      }
+      #submit_button {
+        margin-top: 10px;
+      }
     </style>
 </head>
 
@@ -366,6 +376,12 @@
                                         class="c-sidebar-nav-icon"></span>Docente Ingresantes</a>
                             </li>
                         @endcan
+                        @can('ver generador de reportes')
+                        <li class="c-sidebar-nav-item">
+                                <a class="c-sidebar-nav-link" href="{{ url('intranet/reporte/personalizados') }}"><span
+                                        class="c-sidebar-nav-icon"></span>Generador de reportes</a>
+                        </li>
+                        @endcan
                     </ul>
                 </li>
             @endcan
@@ -685,7 +701,7 @@
     <!-- CoreUI and necessary plugins-->
     <script src="{{ asset('js/app.js?v=1.21082536') }}"></script>
     <script src="{{ asset('js/cepre-coreui.js') }}"></script>
-
+    @stack('scripts')
 </body>
 
 </html>

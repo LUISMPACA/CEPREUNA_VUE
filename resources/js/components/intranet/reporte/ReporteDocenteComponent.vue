@@ -26,9 +26,10 @@
                         >
                             Descargar excel
                         </excel-export>
-                        <a :href="ruta_rpt_docente_horas" class="btn btn-primary">descargar docentes horas</a>
+                        <a :href="ruta_rpt_docente_horas" class="btn btn-primary">Descargar docentes horas <span class="badge badge-light">new</span></a>
+                        
 
-                        <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/docente/lista">
+                        <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/docente/lista" class="mt-3">
                             <div slot="actions" slot-scope="props">
                                 <button class="p-0 m-0 h5 btn btn-link" @click="ficha(props.row.id)">
                                     <i class="fas fa-file-pdf"></i>
@@ -97,7 +98,7 @@ import $ from "jquery";
 // import toastr from "toastr";
 
 export default {
-    props: ["permissions","ruta_rpt_docente_horas"],
+    props: ["permissions","ruta_rpt_docente_horas","ruta_rpt_docente_sedes"],
     data() {
         return {
             url: "",

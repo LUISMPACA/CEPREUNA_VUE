@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <i-reporte-asistencia-docente :permissions="{{ $permisos }}"></i-reporte-asistencia-docente>
+    <i-reporte-asistencia-docente :permissions="{{ $permisos }}" :ruta_rpt_docente_sedes="{{json_encode(route('intranet.reporte.docenteSede'))}}"></i-reporte-asistencia-docente>
 
 
 @endsection

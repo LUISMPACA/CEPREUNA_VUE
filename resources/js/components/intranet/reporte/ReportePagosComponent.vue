@@ -59,7 +59,7 @@
                             Descargar excel
                         </excel-export>
                         <button v-if="permissions.includes('descargar reporte pagos')" class="btn btn-danger" @click="exportarPDF">Exportar PDF</button>
-                        <a :href="ruta_rpt_pagos" class="btn btn-primary">Descargar pagos new</a>
+                        <a :href="ruta_rpt_pagos" class="btn btn-primary">Descargar pagos <span class="badge badge-dark">new</span></a>
 
                         <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/pagos/lista">
                             <div slot="estado" slot-scope="props">

@@ -1083,6 +1083,8 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/docente', 'Intranet\ReporteController@rptDocenteIndex');
             Route::get('/docente/lista', 'Intranet\ReporteController@rptDocenteLista');
             Route::get('/docente-horas-total','Intranet\ReporteController@rptDocenteHorasTotal')->name('intranet.reporte.docente');
+            Route::post('/docente-horas-sede','Intranet\ReporteController@rptDocenteSede')->name('intranet.reporte.docenteSede');
+            Route::post('/docente-horas-virtual','Intranet\ReporteController@rptDocenteVirtual');
 
             Route::get('/asistencia-docente', 'Intranet\ReporteController@rptAsistenciaDocenteIndex');
             Route::get('/asistencia-docente/lista', 'Intranet\ReporteController@rptAsistenciaDocenteLista');
@@ -1110,6 +1112,8 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('/pagos/pdf', 'Intranet\ReporteController@rptPagosPdf');
             Route::get('/pagos/lista-excel', 'Intranet\ReporteController@rptPagosListaExcel');
             Route::get('/pagos/efectuados-distincion','Intranet\ReporteController@rptPagosEfectuadosDistincion')->name('intranet.reporte.pagos');
+            Route::get('/personalizados','Intranet\ReporteController@rptPersonalizado');
+            Route::post('/reportes_personalizados','Intranet\ReporteController@generadorRpt')->name('intranet.reporte.generador');
         });
         Route::group(['prefix' => 'estadistica'], function () {
             Route::get('/', 'Intranet\EstadisticaController@index');

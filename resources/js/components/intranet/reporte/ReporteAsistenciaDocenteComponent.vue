@@ -28,9 +28,12 @@
                         >
                             Descargar excel
                         </excel-export>
+
+                        <a @click="getDataHoraSede()" class="btn btn-info">Descargar horas por sede <span class="badge badge-dark">new</span></a>
+                        <a @click="getDataHorasVirtual()" class="btn btn-outline-primary">Descargar horas presencial | virtual <span class="badge badge-dark">new</span></a>
                         <button v-if="permissions.includes('descargar reporte asistencia docentes')" class="btn btn-danger" @click="exportarPDF">Exportar PDF</button>
 
-                        <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/asistencia-docente/lista">
+                        <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/reporte/asistencia-docente/lista" class="mt-3">
                             <div slot="actions" slot-scope="props">
                                 <button class="p-0 m-0 h5 btn btn-link" @click="ficha(props.row.id)">
                                     <i class="fas fa-file-pdf"></i>
@@ -48,12 +51,8 @@
                                 </template>
                             </div>
                             <div slot="docente.condicion" slot-scope="props">
-                                <template v-if="props.row.docente.condicion == '1'">
-                                    Particular
-                                </template>
-                                <template v-else>
-                                    Unap
-                                </template>
+                                <template v-if="props.row.docente.condicion == '1'"> Particular </template>
+                                <template v-else> Unap </template>
                             </div>
                         </v-server-table>
 
@@ -68,15 +67,7 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="container-fluid">
-                                            <object
-                                                class="embed-responsive-item"
-                                                type="application/pdf"
-                                                :data="url"
-                                                allowfullscreen
-                                                width="100%"
-                                                height="500"
-                                                style="height: 85vh;"
-                                            ></object>
+                                            <object class="embed-responsive-item" type="application/pdf" :data="url" allowfullscreen width="100%" height="500" style="height: 85vh"></object>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
@@ -101,7 +92,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="container-fluid">
-                            <object class="embed-responsive-item" type="application/pdf" :data="url" allowfullscreen width="100%" height="500" style="height: 85vh;"></object>
+                            <object class="embed-responsive-item" type="application/pdf" :data="url" allowfullscreen width="100%" height="500" style="height: 85vh"></object>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -119,7 +110,7 @@ import $ from "jquery";
 // import toastr from "toastr";
 
 export default {
-    props: ["permissions"],
+    props: ["permissions", "ruta_rpt_docente_sedes"],
     data() {
         return {
             url: "",
@@ -138,7 +129,7 @@ export default {
                 "horas_presente",
                 "horas_tarde",
                 "horas_falta",
-                "observacion"
+                "observacion",
             ],
             options: {
                 headings: {
@@ -154,123 +145,172 @@ export default {
                     horas_presente: "Horas Presente",
                     horas_tarde: "Horas Tarde",
                     horas_falta: "Horas Falta",
-                    observacion: "Observación"
+                    observacion: "Observación",
                 },
                 sortable: [],
                 filterable: ["docente.nro_documento", "docente.paterno", "docente.materno", "docente.nombres"],
-                filterByColumn: true
+                filterByColumn: true,
             },
             json_fields: [
                 {
                     label: "Documento",
-                    field: "docente.nro_documento"
+                    field: "docente.nro_documento",
                 },
                 {
                     label: "Apellido Paterno",
-                    field: "docente.paterno"
+                    field: "docente.paterno",
                 },
                 {
                     label: "Apellido Materno",
-                    field: "docente.materno"
+                    field: "docente.materno",
                 },
                 {
                     label: "Nombres",
-                    field: "docente.nombres"
+                    field: "docente.nombres",
                 },
                 {
                     label: "Celular",
-                    field: "docente.celular"
+                    field: "docente.celular",
                 },
                 {
                     label: "Email",
-                    field: "docente_apto.usuario"
+                    field: "docente_apto.usuario",
                 },
                 {
                     label: "Sede",
-                    field: "carga.grupo_aula.aula.local.sede.denominacion"
+                    field: "carga.grupo_aula.aula.local.sede.denominacion",
                 },
                 {
                     label: "Area",
-                    field: "carga.area.denominacion"
+                    field: "carga.area.denominacion",
                 },
                 {
                     label: "Codicion",
                     field: "carga.tipo",
-                    dataFormat: this.formatTipo
+                    dataFormat: this.formatTipo,
                 },
                 {
                     label: "Grupo",
-                    field: "carga.grupo.denominacion"
+                    field: "carga.grupo.denominacion",
                 },
                 {
                     label: "Curso",
-                    field: "carga.curso.denominacion"
+                    field: "carga.curso.denominacion",
                 },
                 {
                     label: "Horas Presente",
-                    field: "horas_presente"
+                    field: "horas_presente",
                 },
                 {
                     label: "Horas Tarde",
-                    field: "horas_tarde"
+                    field: "horas_tarde",
                 },
                 {
                     label: "Horas Falta",
-                    field: "horas_falta"
+                    field: "horas_falta",
                 },
                 {
                     label: "Observación",
-                    field: "observacion"
-                }
+                    field: "observacion",
+                },
             ],
-            json_data: []
+            json_data: [],
         };
     },
 
     methods: {
-        ficha: function(id) {
-            axios.get("/intranet/encrypt/" + id).then(response => {
+        ficha: function (id) {
+            axios.get("/intranet/encrypt/" + id).then((response) => {
                 this.url = "/intranet/inscripcion/docentes/pdf/" + response.data;
             });
             // console.log("hgols");
             $("#ModalFicha").modal("show");
         },
-        formatApto: function(value) {
+        formatApto: function (value) {
             if (value == "1") {
                 return "Si";
             }
             return "No";
         },
-        formatCondicion: function(value) {
+        formatCondicion: function (value) {
             if (value == "2") {
                 return "Unap";
             }
             return "Particular";
         },
-        getDataExcel: function() {
+        getDataExcel: function () {
             axios
                 .get("/intranet/reporte/asistencia-docente/lista", {
                     params: {
                         all: true,
                         fecha_ini: this.fecha_ini,
-                        fecha_fin: this.fecha_fin
-                    }
+                        fecha_fin: this.fecha_fin,
+                    },
                 })
-                .then(response => {
+                .then((response) => {
                     // this.url = "docentes/pdf/"+response.data;
                     this.json_data = response.data;
                     // console.log(response.data);
                 });
         },
-        exportarPDF: function() {
+
+        // ---------------------------------
+        getDataHoraSede() {
+            axios
+                .post(
+                    "/intranet/reporte/docente-horas-sede",
+                    {
+                        params: {
+                            all: true,
+                            fecha_ini: this.fecha_ini,
+                            fecha_fin: this.fecha_fin,
+                        },
+                    },
+                    { responseType: "blob" }
+                ) // Indicar responseType como 'blob' para recibir una respuesta binaria
+                .then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "nombre_del_archivo.xlsx"); // Establecer el nombre del archivo
+                    document.body.appendChild(link);
+                    link.click();
+                });
+        },
+
+        getDataHorasVirtual() {
+            axios
+                .post(
+                    "/intranet/reporte/docente-horas-virtual",
+                    {
+                        params: {
+                            all: true,
+                            fecha_ini: this.fecha_ini,
+                            fecha_fin: this.fecha_fin,
+                        },
+                    },
+                    { responseType: "blob" }
+                ) // Indicar responseType como 'blob' para recibir una respuesta binaria
+                .then((response) => {
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.setAttribute("download", "nombre_del_archivo.xlsx"); // Establecer el nombre del archivo
+                    document.body.appendChild(link);
+                    link.click();
+                });
+        },
+        // ----------------------------------
+
+        exportarPDF: function () {
             this.url = "/intranet/reporte/asistencia-docente/pdf?fecha_ini=" + this.fecha_ini + "&fecha_fin=" + this.fecha_fin;
             $("#ModalReporte").modal("show");
         },
-        changeFecha: function() {
+        changeFecha: function () {
             this.getDataExcel();
             this.$refs.table.setCustomFilters({ fecha_ini: this.fecha_ini, fecha_fin: this.fecha_fin });
         },
-        formatTipo: function(value) {
+        formatTipo: function (value) {
             if (value == "1") {
                 return "Principal";
             }
@@ -279,7 +319,7 @@ export default {
     },
     mounted() {
         this.getDataExcel();
-    }
+    },
 };
 </script>
 
