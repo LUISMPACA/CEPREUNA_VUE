@@ -125,6 +125,7 @@
                                         <div class="row justify-content-center">
                                             <div class="col-md-4 text-center">
                                                 <a :href="urlParte" class="btn btn-danger" download>Descargar Parte PDF</a>
+                                                <a :href="urlExport" class="btn btn-danger my-2" download>Exportar PDF</a>
                                                 <!-- <a :href="urlParte" class="btn btn-danger" target="_blank">Descargar Parte PDF</a> -->
                                             </div>
                                         </div>
@@ -505,6 +506,7 @@ export default {
             errors: {},
             fields: { estado: 1, sesion: "", observacion: "", cantidad_estudiantes: "", imagen: null,horas_asistidas:0,modalidad:"",fecha_tema:"",tema:"" },
             url: "",
+            urlExport: "",
             urlParte: "",
             area: "",
             turno: "",
@@ -688,6 +690,7 @@ export default {
                     this.fechaSelect = response.data.fecha;
                 });
             this.urlParte = "/intranet/reporte/docente-parte/pdf?grupo="+this.grupo+"&fecha="+this.fecha;
+            this.urlExport = "/intranet/reporte/docente-asistencia/pdf/"+this.grupo+"/"+this.fecha;
         },
         getSedes:function(){
             axios.get("/intranet/get-sedes",{
