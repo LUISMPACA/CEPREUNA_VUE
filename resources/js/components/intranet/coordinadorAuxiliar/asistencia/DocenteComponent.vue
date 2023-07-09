@@ -334,7 +334,7 @@
                                 <div class="form-group col-6">
                                     <label for="horas_asistidas">Horas Asistidas</label>
                                     <div class="input-group">
-                                        <input type="number" min="0" max="3" value="0" onkeydown="return false;" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
+                                        <input type="number" min="0" max="4" value="0" onkeydown="return false;" class="form-control" id="horas_asistidas" v-model="fields.horas_asistidas" />
                                         <div class="input-group-prepend">
                                             <button class="btn btn-danger" type="button" @click="decrementHoras">-</button>
                                         </div>
@@ -748,7 +748,7 @@ export default {
                 this.fields.horas_asistidas--
         },
         incrementHoras(){
-            if(this.fields.horas_asistidas<3)
+            if(this.fields.horas_asistidas<4)
                 this.fields.horas_asistidas++
         },
         // checkHorario:function(dia,horario){
