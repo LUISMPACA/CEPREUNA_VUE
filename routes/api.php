@@ -45,7 +45,7 @@ Route::get('v1/{dni}',function(Request $request, $dni){
         ub.provincia,ub.distrito,ub.codigo_distrito ,anio_egreso,co.denominacion AS name_cole, co.direccion AS dir_cole, 
         co.departamento AS dep_cole,co.provincia AS pro_cole,co.distrito AS dis_cole,tc.denominacion AS tipo_cole, co.tipo_colegios_id AS tipo, 
         ap.nro_documento AS apo_documento,ap.nombres AS apo_nombres,ap.paterno AS apo_paterno,ap.materno AS apo_materno,ap.celular apo_celular,
-        CASE WHEN ap.parentescos_id = 1 THEN 1 WHEN ap.parentescos_id = 2 THEN 2 ELSE 3 END AS apo_parentesco, ma.habilitado AS habilitado FROM estudiantes es
+        CASE WHEN ap.parentescos_id = 1 THEN 1 WHEN ap.parentescos_id = 2 THEN 2 ELSE 3 END AS apo_parentesco, ma.habilitado_estado AS habilitado FROM estudiantes es
         INNER JOIN inscripciones ins ON ins.estudiantes_id=es.id
         INNER JOIN periodos pe ON pe.id=ins.periodos_id
         INNER JOIN ubigeos ub ON es.ubigeos_id = ub.id
