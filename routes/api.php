@@ -51,9 +51,9 @@ Route::get('v1/{dni}',function(Request $request, $dni){
         INNER JOIN ubigeos ub ON es.ubigeos_id = ub.id
         INNER JOIN colegios co ON co.id = es.colegios_id
         INNER JOIN tipo_colegios tc ON tc.id = co.tipo_colegios_id
-        INNER JOIN estudiante_apoderados ea ON ea.estudiantes_id=es.id
-        INNER JOIN apoderados ap ON ap.id=ea.apoderados_id
-        INNER JOIN parentescos pa ON ap.parentescos_id=pa.id
-        left JOIN matriculas ma on  ma.estudiantes_id = es.id    
+        LEFT JOIN estudiante_apoderados ea ON ea.estudiantes_id=es.id
+        LEFT JOIN apoderados ap ON ap.id=ea.apoderados_id
+        LEFT JOIN parentescos pa ON ap.parentescos_id=pa.id
+        LEFT JOIN matriculas ma on  ma.estudiantes_id = es.id    
         WHERE es.nro_documento=?",[$dni]);
 });
