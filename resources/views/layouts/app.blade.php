@@ -176,6 +176,12 @@
                                 href="{{ url('intranet/administracion/cron-correo') }}"><span
                                     class="c-sidebar-nav-icon"></span> Sincronizar Correo Docente</a>
                         </li>
+                        @can('ver generador de reportes')
+                        <li class="c-sidebar-nav-item">
+                                <a class="c-sidebar-nav-link" href="{{ url('intranet/administracion/importarIngresantes') }}"><span
+                                        class="c-sidebar-nav-icon"></span>Importar Ingresantes</a>
+                        </li>
+                        @endcan
                     </ul>
                 </li>
             @endcan

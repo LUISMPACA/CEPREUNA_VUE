@@ -875,6 +875,10 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('sincronizar-correo/', function () {
                 Artisan::call('correo:task');
             });
+
+            Route::get('/importarIngresantes', 'Intranet\Ingresantes\IngresantesController@importarIngresantes');
+            Route::post('/ingresantes/import', 'Intranet\Ingresantes\IngresantesController@importar')->name('importar.ingresantes');
+
         });
         Route::group(['prefix' => 'configuracion'], function () {
             Route::resource('/sede', 'Intranet\Configuracion\SedeController');
@@ -1130,3 +1134,4 @@ Route::group(['middleware' => ['auth']], function () {
     //Route::resource('products', ProductController::class);
     Route::get('/totalHorasModalidadDocente', 'Intranet\ReporteController@totalHorasModalidadDocente');
 });
+
