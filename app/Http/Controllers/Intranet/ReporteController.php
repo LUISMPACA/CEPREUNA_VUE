@@ -1914,8 +1914,9 @@ class ReporteController extends Controller
         // Personalizar el contenido del reporte
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->mergeCells('F1:G1');
-        $sheet->setCellValue('F1', 'Reporte Docentes Horas por Sede');
+        $sheet->mergeCells('D1:I1');
+        $titulo= 'Reporte Docentes Horas por Sede: '.$request->params['fecha_ini'].' -- '.$request->params['fecha_fin'];
+        $sheet->setCellValue('D1', $titulo);
 
         // Establecer estilo y formato para el encabezado
         $headerStyle = [
@@ -1940,7 +1941,7 @@ class ReporteController extends Controller
             ],
         ];
 
-        $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
+        $sheet->getStyle('D1:I1')->applyFromArray($headerStyle);
 
         $datos = ['docentes_id','Nro. Documento', 'Paterno', 'Materno', 'Nombres', 'Celular', 'Email', 'Juliaca', 'Puno','HVirtual','Juli','Azangaro','Ilave'];
 
@@ -1981,7 +1982,7 @@ class ReporteController extends Controller
 
         $sheet->getStyle($rango)->applyFromArray($headerCellStyle);   
 
-
+    if ($request->params['fecha_ini']) {
         // Obtener los datos de la consulta
         $resultados = DB::table(function ($query) use ($request) {
             $query->select(
@@ -2033,7 +2034,58 @@ class ReporteController extends Controller
             ->orderBy('materno', 'asc')
             ->orderBy('nombres', 'asc')
             ->get();
-            
+        }else{
+            // Obtener los datos de la consulta
+        $resultados = DB::table(function ($query) use ($request) {
+            $query->select(
+                'docentes.id AS docentes_id',
+                'docentes.nro_documento',
+                'docentes.paterno',
+                'docentes.materno',
+                'docentes.nombres',
+                'docentes.celular',
+                'docentes.email',
+                's.denominacion AS sede',
+                DB::raw("SUM(CASE WHEN ad.estado = '1' THEN ad.horas_pago ELSE 0 END) AS horas_presente"),
+                DB::raw("SUM(CASE WHEN ad.estado = '2' THEN ad.horas_pago ELSE 0 END) AS horas_tarde")
+            )
+                ->from('asistencia_docentes AS ad')
+                ->join('docentes', 'docentes.id', '=', 'ad.docentes_id')
+                ->join('carga_academicas AS ca', 'ca.id', '=', 'ad.carga_academicas_id')
+                ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
+                ->join('aulas AS a', 'a.id', '=', 'ga.aulas_id')
+                ->join('locales AS l', 'l.id', '=', 'a.locales_id')
+                ->join('sedes AS s', 's.id', '=', 'l.sedes_id')
+                ->groupBy('docentes_id', 'nro_documento', 'paterno', 'materno', 'nombres', 'celular', 'email', 'sede');
+        }, 'ad')
+            ->select(
+                'docentes_id',
+                'nro_documento',
+                'paterno',
+                'materno',
+                'nombres',
+                'celular',
+                'email',
+                DB::raw("SUM(CASE WHEN sede = 'Juliaca' THEN horas_tarde ELSE 0 END) AS tardeJuliaca"),
+                DB::raw("SUM(CASE WHEN sede = 'Puno' THEN horas_tarde ELSE 0 END) AS tardePuno"),
+                DB::raw("SUM(CASE WHEN sede = 'Virtual' THEN horas_tarde ELSE 0 END) AS tardeHVirtual"),
+                DB::raw("SUM(CASE WHEN sede = 'Juli' THEN horas_tarde ELSE 0 END) AS tardeJuli"),
+                DB::raw("SUM(CASE WHEN sede = 'Azangaro' THEN horas_tarde ELSE 0 END) AS tardeAzangaro"),
+                DB::raw("SUM(CASE WHEN sede = 'Ilave' THEN horas_tarde ELSE 0 END) AS tardeIlave"),
+
+                DB::raw("SUM(CASE WHEN sede = 'Juliaca' THEN horas_presente+horas_tarde ELSE 0 END) AS Juliaca"),
+                DB::raw("SUM(CASE WHEN sede = 'Puno' THEN horas_presente+horas_tarde ELSE 0 END) AS Puno"),
+                DB::raw("SUM(CASE WHEN sede = 'Virtual' THEN horas_presente+horas_tarde ELSE 0 END) AS HVirtual"),
+                DB::raw("SUM(CASE WHEN sede = 'Juli' THEN horas_presente+horas_tarde ELSE 0 END) AS Juli"),
+                DB::raw("SUM(CASE WHEN sede = 'Azangaro' THEN horas_presente+horas_tarde ELSE 0 END) AS Azangaro"),
+                DB::raw("SUM(CASE WHEN sede = 'Ilave' THEN horas_presente+horas_tarde ELSE 0 END) AS Ilave")
+            )
+            ->groupBy('docentes_id', 'nro_documento', 'paterno', 'materno', 'nombres', 'celular', 'email')
+            ->orderBy('paterno', 'asc')
+            ->orderBy('materno', 'asc')
+            ->orderBy('nombres', 'asc')
+            ->get();
+        }    
             
         // Recorrer los resultados y agregarlos al archivo Excel
         $row = 4; // Fila inicial para los datos
@@ -2393,14 +2445,14 @@ class ReporteController extends Controller
     public function rptDocenteVirtual(Request $request){
            //  return $request->params['fecha_ini'];
         // Crear un nuevo objeto Spreadsheet
-        
+    
         $spreadsheet = new Spreadsheet();
 
         // Personalizar el contenido del reporte
         $sheet = $spreadsheet->getActiveSheet();
-
         $sheet->mergeCells('C1:G1');
-        $sheet->setCellValue('C1', 'Reporte Docentes Horas Virtual y Presencial');
+        $titulo= 'Reporte Docentes Horas Virtual y Presencial  del: '.$request->params['fecha_ini'].' -- '.$request->params['fecha_fin'];
+        $sheet->setCellValue('C1', $titulo);
 
         // Establecer estilo y formato para el encabezado
         $headerStyle = [
@@ -2466,7 +2518,7 @@ class ReporteController extends Controller
 
         $sheet->getStyle($rango)->applyFromArray($headerCellStyle);   
 
-
+    if ($request->params['fecha_ini']) {
         // Obtener los datos de la consulta
         $resultados = DB::table(function ($query) use ($request) {
             $query->select(
@@ -2477,8 +2529,10 @@ class ReporteController extends Controller
                 'docentes.nombres',
                 'docentes.celular',
                 'docentes.email',
+                's.denominacion AS sede',
                 DB::raw("CASE WHEN l.denominacion <> 'Virtual' THEN 'No virtual' ELSE l.denominacion END AS modalidad"),
-                DB::raw("SUM(CASE WHEN ad.estado = '1' THEN ad.horas_pago ELSE 0 END) AS horas_presente")
+                DB::raw("SUM(CASE WHEN ad.estado = '1' THEN ad.horas_pago ELSE 0 END) AS horas_presente"),
+                DB::raw("SUM(CASE WHEN ad.estado = '2' THEN ad.horas_pago ELSE 0 END) AS horas_tarde")
             )
             ->from('asistencia_docentes AS ad')
             ->join('docentes', 'docentes.id', '=', 'ad.docentes_id')
@@ -2486,8 +2540,9 @@ class ReporteController extends Controller
             ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
             ->join('aulas AS a', 'a.id', '=', 'ga.aulas_id')
             ->join('locales AS l', 'l.id', '=', 'a.locales_id')
+            ->join('sedes AS s', 's.id', '=', 'l.sedes_id')
             ->whereBetween('ad.fecha', [$request->params['fecha_ini'], $request->params['fecha_fin']])
-            ->groupBy('docentes_id', 'paterno', 'materno', 'nombres', 'celular', 'email', 'modalidad');
+            ->groupBy('docentes_id', 'paterno', 'materno', 'nombres', 'celular', 'email', 'modalidad','sede');
         }, 'ad')
         ->select(
             'ad.docentes_id',
@@ -2497,8 +2552,15 @@ class ReporteController extends Controller
             'ad.nombres',
             'ad.celular',
             'ad.email',
-            DB::raw("MAX(CASE WHEN ad.modalidad = 'No virtual' THEN ad.horas_presente ELSE 0 END) AS Hpresencial"),
-            DB::raw("MAX(CASE WHEN ad.modalidad = 'Virtual' THEN ad.horas_presente ELSE 0 END) AS Hvirtual")
+            DB::raw("SUM(CASE WHEN sede = 'Juliaca' THEN horas_tarde ELSE 0 END) AS tardeJuliaca"),
+            DB::raw("SUM(CASE WHEN sede = 'Puno' THEN horas_tarde ELSE 0 END) AS tardePuno"),
+            DB::raw("SUM(CASE WHEN sede = 'Virtual' THEN horas_tarde ELSE 0 END) AS tardeHVirtual"),
+            DB::raw("SUM(CASE WHEN sede = 'Juli' THEN horas_tarde ELSE 0 END) AS tardeJuli"),
+            DB::raw("SUM(CASE WHEN sede = 'Azangaro' THEN horas_tarde ELSE 0 END) AS tardeAzangaro"),
+            DB::raw("SUM(CASE WHEN sede = 'Ilave' THEN horas_tarde ELSE 0 END) AS tardeIlave"),
+
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'No virtual' THEN ad.horas_presente+horas_tarde ELSE 0 END) AS Hpresencial"),
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'Virtual' THEN ad.horas_presente+horas_tarde ELSE 0 END) AS Hvirtual")
         )
         ->groupBy('ad.docentes_id', 'ad.nro_documento', 'ad.paterno', 'ad.materno', 'ad.nombres', 'ad.celular', 'ad.email')
         ->orderBy('ad.nro_documento')
@@ -2506,7 +2568,57 @@ class ReporteController extends Controller
         ->orderBy('ad.materno')
         ->orderBy('ad.nombres')
         ->get();
-                
+    }else{
+        // Obtener los datos de la consulta
+        $resultados = DB::table(function ($query) use ($request) {
+            $query->select(
+                'docentes.id AS docentes_id',
+                'docentes.nro_documento',
+                'docentes.paterno',
+                'docentes.materno',
+                'docentes.nombres',
+                'docentes.celular',
+                'docentes.email',
+                's.denominacion AS sede',
+                DB::raw("CASE WHEN l.denominacion <> 'Virtual' THEN 'No virtual' ELSE l.denominacion END AS modalidad"),
+                DB::raw("SUM(CASE WHEN ad.estado = '1' THEN ad.horas_pago ELSE 0 END) AS horas_presente"),
+                DB::raw("SUM(CASE WHEN ad.estado = '2' THEN ad.horas_pago ELSE 0 END) AS horas_tarde")
+            )
+            ->from('asistencia_docentes AS ad')
+            ->join('docentes', 'docentes.id', '=', 'ad.docentes_id')
+            ->join('carga_academicas AS ca', 'ca.id', '=', 'ad.carga_academicas_id')
+            ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
+            ->join('aulas AS a', 'a.id', '=', 'ga.aulas_id')
+            ->join('locales AS l', 'l.id', '=', 'a.locales_id')
+            ->join('sedes AS s', 's.id', '=', 'l.sedes_id')
+
+            ->groupBy('docentes_id', 'paterno', 'materno', 'nombres', 'celular', 'email', 'modalidad','sede');
+        }, 'ad')
+        ->select(
+            'ad.docentes_id',
+            'ad.nro_documento',
+            'ad.paterno',
+            'ad.materno',
+            'ad.nombres',
+            'ad.celular',
+            'ad.email',
+            DB::raw("SUM(CASE WHEN sede = 'Juliaca' THEN horas_tarde ELSE 0 END) AS tardeJuliaca"),
+            DB::raw("SUM(CASE WHEN sede = 'Puno' THEN horas_tarde ELSE 0 END) AS tardePuno"),
+            DB::raw("SUM(CASE WHEN sede = 'Virtual' THEN horas_tarde ELSE 0 END) AS tardeHVirtual"),
+            DB::raw("SUM(CASE WHEN sede = 'Juli' THEN horas_tarde ELSE 0 END) AS tardeJuli"),
+            DB::raw("SUM(CASE WHEN sede = 'Azangaro' THEN horas_tarde ELSE 0 END) AS tardeAzangaro"),
+            DB::raw("SUM(CASE WHEN sede = 'Ilave' THEN horas_tarde ELSE 0 END) AS tardeIlave"),
+
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'No virtual' THEN ad.horas_presente+horas_tarde ELSE 0 END) AS Hpresencial"),
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'Virtual' THEN ad.horas_presente+horas_tarde ELSE 0 END) AS Hvirtual")
+        )
+        ->groupBy('ad.docentes_id', 'ad.nro_documento', 'ad.paterno', 'ad.materno', 'ad.nombres', 'ad.celular', 'ad.email')
+        ->orderBy('ad.nro_documento')
+        ->orderBy('ad.paterno')
+        ->orderBy('ad.materno')
+        ->orderBy('ad.nombres')
+        ->get();
+    }    
                        
         // Recorrer los resultados y agregarlos al archivo Excel
         $row = 4; // Fila inicial para los datos
@@ -2520,6 +2632,12 @@ class ReporteController extends Controller
             $sheet->setCellValue('G' . $row, $resultado->email);
             $sheet->setCellValue('H' . $row, $resultado->Hpresencial);
             $sheet->setCellValue('I' . $row, $resultado->Hvirtual);
+
+            //DANDO COLORES A LAS COLUMNAS H I
+            $sumatoria = $resultado->tardeJuliaca + $resultado->tardePuno + $resultado->tardeJuli + $resultado->tardeAzangaro + $resultado->tardeIlave;
+            $color = $sumatoria > 0 ? 'f4ff81' : 'ffffff';
+            $sheet->getStyle('H' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($color);
+            $sheet->getStyle('I' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($resultado->tardeHVirtual > 0 ? 'f4ff81' : 'ffffff' );
         
             $row++;
         }
@@ -2542,7 +2660,10 @@ class ReporteController extends Controller
 
     // Devolver la respuesta de transmisión (streamed response)
     return $response;
+
     }
+
+
     public function rptPersonalizado()
     {
         $permissions = [];
