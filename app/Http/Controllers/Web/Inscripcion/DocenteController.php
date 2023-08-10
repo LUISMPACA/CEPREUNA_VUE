@@ -73,6 +73,7 @@ class DocenteController extends Controller
      */
     public function store(Request $request)
     {
+        //return $request;
         // dd();
         // var_dump($request->prioridad);
         // dd($request->tipo_trabajador);
@@ -82,8 +83,9 @@ class DocenteController extends Controller
             'materno' => 'required',
             'tipo_documento' => 'required',
             'nro_documento' => 'required',
+            'ruc' => 'required|digits:11',
             'email' => 'required|email',
-            'celular' => 'required',
+            'celular' => 'required|digits:9',
             'direccion' => 'required',
             'codigo' => 'required_if:condicion,2',
             'tipo_trabajador' => 'required_if:condicion,2',
@@ -115,9 +117,17 @@ class DocenteController extends Controller
             'cursos' => 'array|min:1',
             'sede' => 'array|min:1',
             'disponibilidad' => 'required|array|min:1',
-            'foto' => 'required'
+            'foto' => 'required',
+
+            /**Datos Bancarios**/
+            'nombre_banco' => 'required',
+            'cci' => 'required|digits:20',
+            //Dicto
+            'dicto' => 'required',
+
         ], $messages = [
             'required' => '* El campo :attribute es obligatorio.',
+            'digits' => 'El campo :attribute debe tener exactamente :digits dígitos.',
             'programa.required' => "* El campo Especialidad es obligatorio.",
             'email' => '* El campo :attribute no es un correo electronico.',
             'foto.required' => '* La fotografia es obligatoria.',
@@ -191,6 +201,10 @@ class DocenteController extends Controller
                 $docente->grado_academicos_id = $request->grado;
                 // $docente->tipo_documentos_id = $request->tipo_documento;
                 $docente->foto = $this->save_image($request->foto);
+                $docente->ruc = $request->ruc;
+                $docente->nombre_banco = $request->nombre_banco;
+                $docente->cci = $request->cci;
+                $docente->dicto = $request->dicto;
                 $docente->save();
             } else {
                 $docente = new Docente;
@@ -210,6 +224,10 @@ class DocenteController extends Controller
                 $docente->grado_academicos_id =2;
                 $docente->tipo_documentos_id = $request->tipo_documento;
                 $docente->foto = $this->save_image($request->foto);
+                $docente->ruc = $request->ruc;
+                $docente->nombre_banco = $request->nombre_banco;
+                $docente->cci = $request->cci;
+                $docente->dicto = $request->dicto;
                 $docente->save();
 
             }

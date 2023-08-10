@@ -460,9 +460,9 @@
         <div v-if="errors && errors.tokens" class="text-danger">
             {{ errors.tokens[0] }}
         </div>
-        <div class="alert alert-warning" role="alert">
+        <!-- <div class="alert alert-warning" role="alert">
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
-        </div>
+        </div> -->
         <!-- <div class="row">
             <div class="col-md-6 col-xs-12">
                 <div class="form-group">
@@ -500,6 +500,7 @@
                 </div>
             </div>
         </div> -->
+        
         <p class="text-info" v-if="montoPagar != 0 && statusDocumento && !statusDescuento && statusColegio && fields.modalidad">
             <i class="fa fa-info-circle"></i> El monto total a pagar es de <b style="font-size:16px"> S/ {{ (montoPagar + 1).toFixed(2) }}</b
             >.
@@ -540,8 +541,14 @@
                             <input type="checkbox" v-model="terminos" class="form-check-input" name="condiciones" id="condiciones0" value="checkedValue" />
                             <b>Declaro bajo Juramento:</b>
                             <p>
-                                Que, a la fecha de inscripción, cuento con acceso a servicio de internet y equipo de cómputo para seguir mis estudios de preparación pre universitaria en el
-                                <b>ciclo virtual</b> actual de CEPREUNA, declaro que será mi responsabilidad el acceso.
+                                Que, a la fecha de inscripción,
+                                <ul>
+                                <li>Cuento con acceso a servicio de internet y equipo de cómputo para seguir mis estudios de preparación pre universitaria en el
+                                <b>ciclo virtual</b> actual de CEPREUNA, declaro que será mi responsabilidad el acceso.</li>
+                                <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP. o ser un estudiante que esté en proceso de finalizar la educación secundaria (Quinto de secundaria).</li>
+                                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la Universidad Nacional del Altiplano (Extraordinario 2023, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I y GENERAL 2023-II.) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
+                                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+                                </ul> 
                             </p>
                             <p>
                                 Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
@@ -562,10 +569,10 @@
                                 Que, a la fecha de inscripción.
                             </p>
                             <ul>
-                                <li>
-                                    Cuento con 2 dosis de la vacuna contra el COVID.
-                                </li>
-                                <li>Culmine el 5to de secundaria.</li>
+                                
+                                <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP. o ser un estudiante que esté en proceso de finalizar la educación secundaria (Quinto de secundaria).</li>
+                                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la Universidad Nacional del Altiplano (Extraordinario 2023, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I y GENERAL 2023-II.) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
+                                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
                                 <li>
                                     Cuento con LAPTOP para los exámenes parciales.
                                 </li>
