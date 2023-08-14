@@ -57,3 +57,27 @@ Route::get('v1/{dni}',function(Request $request, $dni){
         LEFT JOIN matriculas ma on  ma.estudiantes_id = es.id    
         WHERE es.nro_documento=?",[$dni]);
 });
+
+Route::get('v1/alumnos/inscritos',function(Request $request){
+    if($request->header('Authorization')=="cepreuna_v1_api"){
+        $response["sedes"] = DB::select("SELECT count(A.sedes_id) as cantidad, C.denominacion as sede  from inscripciones AS A
+        join areas as B ON B.id = A.areas_id
+        join sedes as C ON C.id = A.sedes_id
+        join turnos as D on D.id = A.turnos_id
+        group by A.sedes_id order by C.denominacion");
+
+        $response["areas"] = DB::select("SELECT count(A.areas_id) as cantidad, B.denominacion as areas, C.denominacion as sede  from inscripciones AS A
+        join areas as B ON B.id = A.areas_id
+        join sedes as C ON C.id = A.sedes_id
+        join turnos as D on D.id = A.turnos_id
+        group by A.sedes_id, A.areas_id order by C.denominacion");
+
+        $response["turnos"] = DB::select("SELECT count(A.turnos_id) as cantidad, D.denominacion, B.denominacion as areas, C.denominacion as sede  from inscripciones AS A
+        join areas as B ON B.id = A.areas_id
+        join sedes as C ON C.id = A.sedes_id
+        join turnos as D on D.id = A.turnos_id
+        group by A.sedes_id, A.areas_id, A.turnos_id order by C.denominacion");
+
+        return $response;
+    }
+});
