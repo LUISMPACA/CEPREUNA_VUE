@@ -173,6 +173,10 @@
                                     class="c-sidebar-nav-icon"></span> Sincronizar Docentes</a>
                         </li>
                         <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link"
+                                href="{{ url('intranet/administracion/cron-minCalificacion') }}"><span
+                                    class="c-sidebar-nav-icon"></span> Sincronizar Calificación Docentes</a>
+                        </li>
+                        <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link"
                                 href="{{ url('intranet/administracion/cron-correo') }}"><span
                                     class="c-sidebar-nav-icon"></span> Sincronizar Correo Docente</a>
                         </li>

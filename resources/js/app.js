@@ -150,6 +150,7 @@ Vue.component("i-administracion-coordinador-auxiliar", require("./components/int
 Vue.component("i-administracion-cron-matricula", require("./components/intranet/administracion/CronMatriculaComponent.vue").default);
 Vue.component("i-administracion-cron-grupo", require("./components/intranet/administracion/CronGrupoComponent.vue").default);
 Vue.component("i-administracion-cron-habilitacion", require("./components/intranet/administracion/CronHabilitacionComponent.vue").default);
+Vue.component("i-administracion-cron-mincalificacion", require("./components/intranet/administracion/CronMinCalificacionComponent.vue").default);
 Vue.component("i-administracion-cron-docente", require("./components/intranet/administracion/CronDocenteComponent.vue").default);
 Vue.component("i-administracion-cron-correo", require("./components/intranet/administracion/CronCorreoComponent.vue").default);
 Vue.component("i-administracion-cronograma-pagos", require("./components/intranet/administracion/CronogramaPagos.vue").default);

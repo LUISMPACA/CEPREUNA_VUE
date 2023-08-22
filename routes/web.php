@@ -863,8 +863,13 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('sincronizar-habilitacion/', function () {
                 Artisan::call('habilitacion:task');
             });
+            Route::get('sincronizar-minCalificacion/', function () {
+                Artisan::call('minCalificacion:task');
+            });
 
             Route::get('cron-docente/', 'Intranet\Administracion\ControlCronController@indexCronDocente');
+            Route::get('cron-minCalificacion/', 'Intranet\Administracion\ControlCronController@indexCronMinCalificacion');
+            Route::get('control-minCalificacion/', 'Intranet\Administracion\ControlCronController@controlMinCalificacion');
             Route::get('control-docente/', 'Intranet\Administracion\ControlCronController@controlDocente');
             Route::get('sincronizar-docente/', function () {
                 Artisan::call('docente:task');

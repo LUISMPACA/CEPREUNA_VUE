@@ -72,6 +72,7 @@ class ControlCronController extends Controller
         // dd($tmp->estudiante->idgsuite);
         return view('intranet.administracion.cron-docente');
     }
+    
 
     public function controlDocente()
     {
@@ -84,6 +85,22 @@ class ControlCronController extends Controller
         }
         return $response;
     }
+    
+    public function indexCronMinCalificacion(){
+        return view('intranet.administracion.cron-minCalificacion');
+    }
+    public function controlMinCalificacion()
+    {
+        $query = ControlCron::where([["estado", "0"], ["tipo", "10"]])->first();
+        if ($query) {
+            $response["query"] = $query;
+            $response["status"] = true;
+        } else {
+            $response["status"] = false;
+        }
+        return $response;
+    }
+
     public function indexCronCorreo()
     {
         // $tmp = Correo::with('estudiante')->find(1);
