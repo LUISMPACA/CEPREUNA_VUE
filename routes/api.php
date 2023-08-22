@@ -81,3 +81,9 @@ Route::get('v1/alumnos/inscritos',function(Request $request){
         return $response;
     }
 });
+Route::get('v1/resultados/{dni}',function(Request $request, $dni){
+    if($request->header('Authorization')=="cepreuna_v1_api")
+        return DB::select("SELECT d.nro_documento, d.nombres, d.paterno, d.materno, id.apto, id.puntaje, id.modalidad  
+        FROM inscripcion_docentes as id join docentes d on d.id = id.docentes_id
+        where d.nro_documento=?",[$dni]);
+});
