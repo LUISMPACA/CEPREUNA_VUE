@@ -842,6 +842,8 @@ Route::group(['middleware' => ['auth']], function () {
             Route::resource('/coordinador-auxiliar', 'Intranet\Administracion\CoordinadorAuxiliarController');
             Route::get('coordinador-auxiliar/lista/data', 'Intranet\Administracion\CoordinadorAuxiliarController@lista');
             Route::get('coordinador-auxiliar-auxiliar/lista/data', 'Intranet\Administracion\CoordinadorAuxiliarController@lista_auxiliar');
+            Route::post('/coordinador-grupo/{id}', 'Intranet\Administracion\CoordinadorAuxiliarController@AsignarGrupos');
+            Route::get('/coordinador-grupo/{id}/edit', 'Intranet\Administracion\CoordinadorAuxiliarController@GruposAsignados');
             Route::resource('/inscripciones', 'Intranet\Configuracion\InscripcionesController');
             Route::get('inscripciones/lista/data', 'Intranet\Configuracion\InscripcionesController@lista');
 
@@ -988,6 +990,7 @@ Route::group(['middleware' => ['auth']], function () {
                 Route::put('/horario/habilitar/{id}', 'Intranet\CoordinadorAuxiliar\HorarioController@habilitar');
             });
         });
+        
         // ****************************
         // *  COORDINADORES-DOCENTE
         // ****************************

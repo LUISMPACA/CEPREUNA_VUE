@@ -13,7 +13,8 @@ use App\Services\GWorkspace;
 class HorarioController extends Controller
 {
     public function index(){
-        return view("intranet.coordinadorAuxiliar.docente.horario");
+        $userId = auth()->id();
+        return view("intranet.coordinadorAuxiliar.docente.horario",compact('userId'));
     }
     public function store(Request $request){
         $rules = $request->validate([

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Auxiliar;
 use App\Models\AuxiliarCoordinador;
+use App\Models\CoordinadorGrupo;
 use App\VueTables\EloquentVueTables;
 use DB;
 
@@ -21,6 +22,7 @@ class CoordinadorAuxiliarController extends Controller
     {
         return view('intranet.administracion.coordinador-auxiliar');
     }
+    
 
     public function lista(Request $request)
     {
@@ -171,5 +173,61 @@ class CoordinadorAuxiliarController extends Controller
     public function destroy($id)
     {
         //
+    }
+    // --------------------------------------------------------------------------
+    public function AsignarGrupos(Request $request, $id)
+    {
+         //dd($request->grupos[2]);
+         //return;
+        // dd($id);
+        DB::beginTransaction();
+        try {
+            CoordinadorGrupo::where("coordinador_id", $id)->delete();
+            foreach ($request->grupos as $value) {
+
+                $Coordinadorgrupo = new CoordinadorGrupo;
+                $Coordinadorgrupo->coordinador_id = $id;
+                $Coordinadorgrupo->grupos_id= $value["id"];
+                $Coordinadorgrupo->save();
+            }
+
+            DB::commit();
+            $message = "Grupos asignados correctamente.";
+            $status = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            $message = "Error al asignar grupos, intentelo nuevamente.";
+            $status = false;
+            $error = $e;
+        }
+        $response = array(
+            "message" => $message,
+            "status" => $status,
+            "error" => isset($error) ? $error : ''
+        );
+
+        return response()->json($response);
+    }
+
+
+    public function GruposAsignados($id)
+    {
+        $gruposAsignados = CoordinadorGrupo::select("coordinador_grupos.grupos_id as id",  DB::raw("CONCAT(s.denominacion,' ',g.denominacion) as grupo") )
+        ->join("grupo_aulas as ga", "ga.id", "coordinador_grupos.grupos_id")
+        ->join("grupos as g", "g.id", "ga.grupos_id")
+        ->join("aulas as a", "a.id" , "ga.aulas_id")
+        ->join("locales as l", "l.id" , "a.locales_id") 
+        ->join("sedes as s", "s.id" , "l.sedes_id") 
+        ->where("coordinador_id", $id)->get();
+
+        // $gruposAsignados = GrupoAula::with(["aula", "grupo"])
+        //     ->select("grupo_aulas.*", "g.denominacion")
+        //     ->join("grupos as g", "g.id", "grupo_aulas.grupos_id")
+        //     ->join("auxiliar_grupos as ag", "ag.grupo_aulas_id", "grupo_aulas.id")
+        //     ->where("ag.auxiliares_id", $id)
+        //     ->orderBy("g.denominacion", "asc")
+        //     ->get();
+
+        return $gruposAsignados;
     }
 }
