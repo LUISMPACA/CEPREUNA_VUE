@@ -18,11 +18,11 @@
                 <button type="button" class="p-0 m-0 h5 btn btn-link text-info" @click="editarInscripcion(props.row.id)" data-toggle="modal" data-target="#modalEditarInscripcion">
                     <i class="fas fa-file-signature"></i>
                 </button>
-                <template v-if="props.row.apto == '1'">
+                <!-- <template v-if="props.row.apto == '1'">
                     <button v-if="props.row.docente.docente_apto.enviar_acceso == '0'" type="button" class="p-0 m-0 h5 btn btn-link text-success" @click="enviarAccesos(props.row.docentes_id)">
                         <i class="fas fa-user-check"></i>
                     </button>
-                </template>
+                </template> -->
             </div>
             <div slot="apto" slot-scope="props">
                 <template v-if="props.row.apto == '1'">
@@ -33,7 +33,7 @@
                 </template>
                 <!-- <a href="#" @click="detalles(props.row.id)"><i class="fa fa-folder big-icon text-success" aria-hidden="true"></i></a> -->
             </div>
-            <div slot="publico" slot-scope="props">
+            <!-- <div slot="publico" slot-scope="props">
                 <template v-if="props.row.apto == '1'">
                     <span class="badge badge-success" v-if="props.row.docente.docente_apto.enviar_acceso == '1'">SI</span>
                     <span class="badge badge-danger" v-else>NO</span>
@@ -41,7 +41,7 @@
                 <template v-else>
                     <span class="badge badge-danger">NO</span>
                 </template>
-            </div>
+            </div> -->
         </v-server-table>
 
         <div class="modal fade" id="ModalFicha" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -334,11 +334,11 @@ export default {
             vi: [],
             disponiblesSede: [],
             ///table//
-            columns: ["id","publico", "apto", "puntaje", "docente.nro_documento", "docente.paterno", "docente.materno", "docente.nombres", "actions"],
+            columns: ["id", "apto", "puntaje", "docente.nro_documento", "docente.paterno", "docente.materno", "docente.nombres", "actions"],
             options: {
                 headings: {
                     id: "id",
-                    publico: "publico",
+                    // publico: "publico",
                     apto: "apto",
                     puntaje: "puntaje",
                     "docente.nro_documento": "Documento",
