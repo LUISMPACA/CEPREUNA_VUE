@@ -45,11 +45,13 @@ class LocalController extends Controller
      */
     public function store(Request $request)
     {
+        //return $request;
         $rules = $request->validate([
             'denominacion' => 'required',
             'direccion' => 'required',
             'nro_aulas' => 'required',
-            'sede' => 'required'
+            'sede' => 'required',
+            'image' => 'required'
            
         ],$messages = [
             'required' => '* El campo :attribute es obligatorio.',
@@ -62,6 +64,7 @@ class LocalController extends Controller
             $data->direccion = $request->direccion;
             $data->nro_aulas = $request->nro_aulas;
             $data->sedes_id = $request->sede;
+            $data->foto = $request->image;
             $data->save();
 
 
@@ -112,23 +115,27 @@ class LocalController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //dd($request->all());
+
         $rules = $request->validate([
             'denominacion' => 'required',
             'direccion' => 'required',
             'nro_aulas' => 'required',
-            'sede' => 'required'
-           
+            'sede' => 'required',
+            'image' => 'required'
         ],$messages = [
             'required' => '* El campo :attribute es obligatorio.',
         ]);
         DB::beginTransaction();
         try {
 
+       
             $data = Locales::find($id);
             $data->denominacion = $request->denominacion;
             $data->direccion = $request->direccion;
             $data->nro_aulas = $request->nro_aulas;
             $data->sedes_id = $request->sede;
+            $data->foto = $request->image;
             $data->save();
 
 
@@ -152,6 +159,30 @@ class LocalController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function upload(Request $request)
+    {
+    //    return $request;
+        if ($request->hasFile('image')){
+            $rules = $request->validate([
+                'image' => 'image|mimes:jpeg,png,jpg|max:2048'
+            ],$messages = [
+                'required' => '* El campo :attribute es obligatorio.',
+                'image' => 'El archivo debe ser una imagen válida en formato jpeg, png, jpg.',
+                'mimes' => 'El archivo debe ser de tipo jpeg, png, jpg.',
+                'max' => 'El tamaño máximo del archivo es 2 MB.',
+            ]);
+
+            $image = $request->file('image');
+            if ($image) {
+                $imageName = uniqid() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('images/locales'), $imageName);
+                return $imageName;
+            }
+        }
+        else{
+            return "virtual.jpg";
+        }
+    }
     public function destroy($id)
     {
         //

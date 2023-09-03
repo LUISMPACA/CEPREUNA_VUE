@@ -893,7 +893,8 @@ Route::group(['middleware' => ['auth']], function () {
 
             Route::resource('/local', 'Intranet\Configuracion\LocalController');
             Route::get('local/lista/data', 'Intranet\Configuracion\LocalController@lista');
-
+            Route::post('local/upload', 'Intranet\Configuracion\LocalController@upload');
+            
             Route::resource('/aulas', 'Intranet\Configuracion\AulaController');
             Route::get('aulas/lista/data', 'Intranet\Configuracion\AulaController@lista');
 
