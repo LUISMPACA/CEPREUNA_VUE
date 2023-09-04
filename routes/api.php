@@ -87,3 +87,23 @@ Route::get('v1/resultados/{dni}',function(Request $request, $dni){
         FROM inscripcion_docentes as id join docentes d on d.id = id.docentes_id
         where d.nro_documento=?",[$dni]);
 });
+Route::get('v1/inscripciones-consulta/{dni}', function ($dni) {
+    if (request()->header('Authorization') !== "cepreuna_v1_api") {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    $results = DB::select("SELECT CONCAT(e.paterno, ' ', e.materno, ' ', e.nombres) 
+    AS nombres, e.nro_documento, s.denominacion AS sede, l.denominacion 
+    AS local, l.direccion, l.foto, a.codigo AS aula, g.denominacion AS grupo, t.denominacion 
+    AS turno, ar.denominacion AS area FROM estudiantes AS e JOIN matriculas AS m ON m.estudiantes_id = e.id 
+    JOIN grupo_aulas AS ga ON ga.id = m.grupo_aulas_id 
+    JOIN grupos AS g ON g.id = ga.grupos_id 
+    JOIN areas AS ar ON ar.id = ga.areas_id 
+    JOIN turnos AS t ON t.id = ga.turnos_id 
+    JOIN aulas AS a ON a.id = ga.aulas_id 
+    JOIN locales AS l ON l.id = a.locales_id 
+    JOIN sedes AS s ON s.id = l.sedes_id 
+    WHERE e.nro_documento = ?", [$dni]);
+
+    return response()->json($results);
+});
