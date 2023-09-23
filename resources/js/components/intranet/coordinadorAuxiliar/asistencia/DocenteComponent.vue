@@ -247,10 +247,11 @@
                                     <div v-if="errors && errors.modalidad" class="text-danger">{{ errors.modalidad[0] }}</div>
                                 </div>
                             </div>
+
                             <div class="row">
                                 <div class="col-md-4 form-group" v-if="presencial">
                                     <label for="fecha_tema">Fecha tema</label>
-                                    <input type="date" v-model="fields.fecha_tema" id="fecha_tema" class="form-control">
+                                    <input type="date" v-model="fields.fecha_tema" id="fecha_tema" class="form-control" disabled>
                                     <div v-if="errors && errors.fecha_tema" class="text-danger">{{ errors.fecha_tema[0] }}</div>
                                 </div>
                                 <div class="col-md-8 form-group" v-if="presencial">
@@ -498,13 +499,18 @@ export default {
             json_data: []
         };
     },
+    computed: {
+    presencial() {
+      return this.fields.modalidad === '2';
+    }
+  },
     methods: {
         modalAsistencia: function(carga, docente, event) {
             // console.log(carga,docente)
             this.errors = {};
             this.placeHolderImage = "Selecionar Imagen...";
             this.fields.imagen = "";
-            this.fields.fecha_tema = "";
+            this.fields.fecha_tema = this.fecha;
             this.fields.tema = "";
             this.fields.observacion = "";
             this.fields.modalidad = "";
@@ -554,7 +560,7 @@ export default {
             this.fields.sesion = "";
             this.placeHolderImage = "Selecionar Imagen...";
             this.fields.imagen = "";
-            this.fields.fecha_tema = "";
+            this.fields.fecha_tema = this.fecha;
             this.fields.tema = "";
             this.errors = {};
             axios
@@ -810,6 +816,7 @@ export default {
             }
         }
     },
+    
     mounted: function() {
         this.getAreas();
         this.getTurnos();

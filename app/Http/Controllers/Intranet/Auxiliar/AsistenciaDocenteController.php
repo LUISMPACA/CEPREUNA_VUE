@@ -44,6 +44,8 @@ class AsistenciaDocenteController extends Controller
     }
     public function store(Request $request)
     {
+        
+        
         // dd($request);
         // dd($request->file('imagen')->getClientOriginalExtension());
         $rules = $request->validate([
@@ -60,6 +62,19 @@ class AsistenciaDocenteController extends Controller
             'imagen.image' => '* Ingrese una imagen valida'
         ]);
 
+        if($request->input('fecha_tema')!=date('Y-m-d')){
+            
+            if(!auth()->user()->hasPermissionTo('registro asistencia web')){
+                return response([
+                    'errors' => [
+                        'fecha_tema' => ['No estas autorizado a validar esta fecha'],
+                        
+                    ],
+                    'message'=>'No',
+                ],422);
+            }
+        }
+        
         $id = Auth::user()->id;
         $fecha = new \DateTime($request->fecha);
         $semana = $fecha->format("N");

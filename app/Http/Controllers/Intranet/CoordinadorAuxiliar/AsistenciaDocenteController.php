@@ -11,6 +11,7 @@ use App\Models\AsistenciaDocente;
 use App\Models\CalificacionDocente;
 use App\Models\Sesiones;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
 
 class AsistenciaDocenteController extends Controller
 {
@@ -45,6 +46,21 @@ class AsistenciaDocenteController extends Controller
             'required_if' => '* El campo :attribute es obligatorio.',
             'imagen.image' => '* Ingrese una imagen valida'
         ]);
+        
+        
+        // dd($request->input('fecha_tema')==null);
+        if($request->input('fecha_tema')!=date('Y-m-d')){
+            if(!auth()->user()->hasPermissionTo('registro asistencia web')){
+                // dd("ggwp");
+                
+                return response([
+                    'errors' => [
+                        'fecha_tema' => ['No estas autorizado a validar esta fecha'],
+                        'imagen' => ['No estas autorizado a validar esta fecha'],
+                    ],
+                ],422);
+            }
+        }
         $id = Auth::user()->id;
         $fecha = new \DateTime($request->fecha);
         $semana = $fecha->format("N");
@@ -127,7 +143,23 @@ class AsistenciaDocenteController extends Controller
             'required_if' => '* El campo :attribute es obligatorio.',
             'imagen.image' => '* Ingrese una imagen valida'
         ]);
-        // dd($id);
+        // dd($request->input('fecha_tema')!=date('Y-m-d'));
+        if($request->input('fecha_tema')!=date('Y-m-d')){
+                
+                if(!auth()->user()->hasPermissionTo('registro asistencia web')){
+                    return response([
+                        'errors' => [
+                            'fecha_tema' => ['No estas autorizado a validar esta fecha'],
+                            
+                        ],
+                        'message'=>'No',
+                    ],422);
+        
+                }
+                $response["message"] = 'Asistencia Editarasasdasd';
+                $response["status"] = true;
+        }
+        
         $id_user = Auth::user()->id;
         if(isset($request->imagen)){
             $path_imagen = $this->save_file($request->file('imagen'), $request->file('imagen')->getClientOriginalExtension());

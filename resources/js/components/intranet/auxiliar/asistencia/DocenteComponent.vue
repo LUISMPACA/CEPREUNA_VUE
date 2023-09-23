@@ -49,7 +49,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="grupo">Fecha</label>
-                                    <input type="date" class="form-control" v-model="fecha" @change="changeFecha" />
+                                    <input type="date" class="form-control" v-model="fecha" @change="changeFecha" :max="fechaHoy" />
                                     <!-- <div v-if="errors && errors.grupo_aula" class="text-danger">{{ errors.grupo_aula[0] }}</div> -->
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                                                 <thead class="table-primary">
                                                     <tr>
                                                         <th scope="col">Hora</th>
-                                                        <th scope="col">
+                                                        <th scope="col" >
                                                             {{ dia }} <br />
                                                             {{ fechaSelect }}
                                                         </th>
@@ -93,8 +93,8 @@
 
                                                                 </template> -->
                                                             <template v-if="hora.horario">
-                                                                <template v-if="!hora.horario.estado">
-                                                                    <a
+                                                                <template v-if="!hora.horario.estado" >
+                                                                    <a 
                                                                         href="#"
                                                                         v-bind:style="{ background: hora.horario.curso.color }"
                                                                         :key="hora.horario.id"
@@ -237,7 +237,7 @@
                             <div class="row">
                                 <div class="col-md-4 form-group" v-if="!statusTema">
                                     <label for="fecha_tema">Fecha tema</label>
-                                    <input type="date" v-model="fields.fecha_tema" id="fecha_tema" class="form-control">
+                                    <input type="date" v-model="fields.fecha_tema" id="fecha_tema" class="form-control" >
                                     <div v-if="errors && errors.fecha_tema" class="text-danger">{{ errors.fecha_tema[0] }}</div>
                                 </div>
                                 <div class="col-md-8 form-group" v-if="!statusTema">
@@ -347,7 +347,7 @@
                     </div>
                     <div class="modal-footer" v-if="permissions.includes('validar asistencia docente')">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                        <button type="button" class="btn btn-success" @click="guardar">Guardar</button>
+                        <button v-if="fechaHoy==fields.fecha_tema && fecha==fields.fecha_tema" type="button" class="btn btn-success" @click="guardar">Guardar</button>
                     </div>
                 </div>
             </div>
@@ -554,7 +554,7 @@ export default {
             this.errors = {};
             this.placeHolderImage = "Selecionar Imagen...";
             this.fields.imagen = "";
-            this.fields.fecha_tema = "";
+            this.fields.fecha_tema = this.fecha;
             this.fields.tema = "";
             this.fields.observacion = "";
             this.fields.modalidad = "";
