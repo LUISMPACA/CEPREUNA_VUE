@@ -49,7 +49,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="grupo">Fecha</label>
-                                    <input type="date" class="form-control" v-model="fecha" @change="changeFecha" :max="fechaHoy" />
+                                    <input type="date" class="form-control" v-model="fecha" @change="changeFecha"  />
                                     <!-- <div v-if="errors && errors.grupo_aula" class="text-danger">{{ errors.grupo_aula[0] }}</div> -->
                                 </div>
                             </div>
