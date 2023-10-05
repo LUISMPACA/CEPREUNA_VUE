@@ -107,3 +107,62 @@ Route::get('v1/inscripciones-consulta/{dni}', function ($dni) {
 
     return response()->json($results);
 });
+Route::get('v1/alumnos/pagos',function(Request $request){
+    if($request->header('Authorization')=="cepreuna_v1_api"){
+        $response["sedes"] = DB::select("SELECT
+        subquery.sedes AS sede,
+        subquery.id_sede AS id_sede,
+        COUNT(*) AS cantidad,
+        CASE
+            WHEN subquery.primera_mensualidad != subquery.monto1 AND subquery.primera_mensualidad != 0 THEN 'incompleto'
+            WHEN subquery.primera_mensualidad = 0 THEN 'pagado'
+            ELSE 'deuda'
+        END AS denominacion,
+        CASE
+            WHEN subquery.primera_mensualidad != subquery.monto1 AND subquery.primera_mensualidad != 0 THEN 2
+            WHEN subquery.primera_mensualidad = 0 THEN 1
+            ELSE 3
+        END AS estado
+    FROM (
+        SELECT
+            estudiantes.nro_documento,
+            s.denominacion AS sedes,
+            s.id AS id_sede,
+            tarifa_estudiantes1.monto AS monto1,
+            SUM(tarifa_estudiantes.monto) AS pago_total,
+            (tarifa_estudiantes1.monto - tarifa_estudiantes1.pagado) AS primera_mensualidad
+        FROM inscripciones
+        JOIN estudiantes ON estudiantes.id = inscripciones.estudiantes_id
+        LEFT JOIN tarifa_estudiantes ON tarifa_estudiantes.estudiantes_id = estudiantes.id
+        LEFT JOIN tarifa_estudiantes AS tarifa_estudiantes0 ON tarifa_estudiantes0.nro_cuota = 0 AND tarifa_estudiantes0.estudiantes_id = estudiantes.id
+        LEFT JOIN tarifa_estudiantes AS tarifa_estudiantes1 ON tarifa_estudiantes1.nro_cuota = 1 AND tarifa_estudiantes1.estudiantes_id = estudiantes.id
+        LEFT JOIN tarifa_estudiantes AS tarifa_estudiantes2 ON tarifa_estudiantes2.nro_cuota = 2 AND tarifa_estudiantes2.estudiantes_id = estudiantes.id
+        LEFT JOIN tarifa_estudiantes AS tarifa_estudiantes3 ON tarifa_estudiantes3.nro_cuota = 3 AND tarifa_estudiantes3.estudiantes_id = estudiantes.id
+        LEFT JOIN tarifa_estudiantes AS tarifa_estudiantes4 ON tarifa_estudiantes4.nro_cuota = 4 AND tarifa_estudiantes4.estudiantes_id = estudiantes.id
+        JOIN sedes AS s ON s.id = inscripciones.sedes_id
+        LEFT JOIN matriculas ON matriculas.estudiantes_id = estudiantes.id
+        LEFT JOIN grupo_aulas ON grupo_aulas.id = matriculas.grupo_aulas_id
+        LEFT JOIN areas ON areas.id = grupo_aulas.areas_id
+        LEFT JOIN grupos ON grupos.id = grupo_aulas.grupos_id
+        LEFT JOIN turnos ON turnos.id = grupo_aulas.turnos_id
+        JOIN colegios ON colegios.id = estudiantes.colegios_id
+        JOIN tipo_colegios ON tipo_colegios.id = colegios.tipo_colegios_id
+        GROUP BY estudiantes.nro_documento, sedes
+    ) AS subquery
+    GROUP BY subquery.sedes, estado");
+
+        // $response["areas"] = DB::select("SELECT count(A.areas_id) as cantidad, B.denominacion as areas, C.denominacion as sede  from inscripciones AS A
+        // join areas as B ON B.id = A.areas_id
+        // join sedes as C ON C.id = A.sedes_id
+        // join turnos as D on D.id = A.turnos_id
+        // group by A.sedes_id, A.areas_id order by C.denominacion");
+
+        // $response["turnos"] = DB::select("SELECT count(A.turnos_id) as cantidad, D.denominacion, B.denominacion as areas, C.denominacion as sede  from inscripciones AS A
+        // join areas as B ON B.id = A.areas_id
+        // join sedes as C ON C.id = A.sedes_id
+        // join turnos as D on D.id = A.turnos_id
+        // group by A.sedes_id, A.areas_id, A.turnos_id order by C.denominacion");
+
+        return $response;
+    }
+});
