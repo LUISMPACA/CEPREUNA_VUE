@@ -18,6 +18,13 @@
                 <button type="button" class="p-0 m-0 h5 btn btn-link text-info" @click="editarInscripcion(props.row.id)" data-toggle="modal" data-target="#modalEditarInscripcion">
                     <i class="fas fa-file-signature"></i>
                 </button>
+
+                <template v-if="permissions.includes('ver generador de reportes')">
+                    <button type="button" class="p-0 m-0 h5 btn btn-link text-success p-1 m-0 h5" @click="agregarTarifario(props.row.estudiantes_id)">
+                        <i class="fas fa-sync"></i>
+                    </button>
+                </template>
+
                 <template v-if="permissions.includes('retirar estudiante')">
                     <button v-if="props.row.estado == '1'" class="btn btn-sm btn-link text-danger p-1 m-0 h5" title="Retirar" @click="eliminarCorreo(props.row.id)">
                         <i class="fas fa-user-minus"></i>
@@ -57,6 +64,7 @@
                 </div>
             </div>
         </div>
+        
         <!-- Modal  Editar de Inscripcion-->
         <div class="modal fade" id="modalEditarInscripcion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
@@ -338,6 +346,97 @@
                 </div>
             </div>
         </div>
+
+        <form @submit.prevent="submit">
+            <div class="modal fade" id="ModalFormulario" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">{{ titulo }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="container-fluid">
+                                <div class="card mb-1" v-for="(tarifario, key) in tarifarios" :key="tarifario.id">
+                                    <div class="card-header py-1">
+                                        <b class="text-info">{{ cuotas[tarifario.nro_cuota] }}</b>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-group col-md-4">
+                                                <label for="inicio">Monto</label>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="inputGroup-sizing-sm">S/.</span>
+                                                    </div>
+                                                    <input type="text" class="form-control" v-model="fields.monto[key]" />
+                                                </div>
+                                                <div v-if="errors && errors.inicio" class="text-danger">
+                                                    {{ errors.inicio[0] }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inicio">Pagado</label>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="inputGroup-sizing-sm">S/.</span>
+                                                    </div>
+                                                    <input type="text" class="form-control" v-model="fields.pagado[key]" />
+                                                </div>
+                                                <div v-if="errors && errors.fin" class="text-danger">
+                                                    {{ errors.fin[0] }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4">
+                                                <label for="inicio">Mora</label>
+                                                <div class="input-group input-group-sm">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="inputGroup-sizing-sm">S/.</span>
+                                                    </div>
+                                                    <input type="text" class="form-control" v-model="fields.mora[key]" />
+                                                </div>
+                                                <div v-if="errors && errors.fin" class="text-danger">
+                                                    {{ errors.fin[0] }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4 mb-0">
+                                                <label for="inicio">Modalidad</label>
+                                                <div class="input-group input-group-sm">
+                                                    <select id="" class="form-control" v-model="fields.modalidad[key]">
+                                                        <option v-for="(modalidad,index) in options.listColumns.modalidad" :key=index :value="modalidad.id">{{ modalidad.text }}</option>
+                                                    </select>
+                                                </div>
+                                                <div v-if="errors && errors.fin" class="text-danger">
+                                                    {{ errors.fin[0] }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-md-4 mb-0">
+                                                <label for="inicio">Tipo Estudiante</label>
+                                                <div class="input-group input-group-sm">
+                                                    <select id="" class="form-control" v-model="fields.tipo_estudiante[key]">
+                                                        <option v-for="(tipo,index) in options.listColumns.tipo_estudiante" :key=index :value="tipo.id">{{ tipo.text }}</option>
+                                                    </select>
+                                                </div>
+                                                <div v-if="errors && errors.fin" class="text-danger">
+                                                    {{ errors.fin[0] }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
     </div>
 </template>
 
@@ -350,6 +449,21 @@ export default {
     props: ["permissions"],
     data() {
         return {
+            edit: 0,
+            id: 0,
+            titulo: "",
+            fields: {
+                id: [],
+                monto: [],
+                pagado: [],
+                mora: [],
+                nro_cuota: [],
+                modalidad: [],
+                tipo_estudiante: []
+            },
+            errors: {},
+            tarifarios: {},
+            cuotas: {},
             url: "",
             ///table//
             columns: [
@@ -451,6 +565,25 @@ export default {
     },
 
     methods: {
+        agregarTarifario: function(id) {
+            this.edit = 1;
+            this.id = id;
+            this.errors = {};
+            this.titulo = "Editar Tarifario";
+            axios.get("/intranet/administracion/tarifario-estudiante/" + id + "/edit").then(response => {
+                this.tarifarios = response.data.tarifarios;
+                this.cuotas = response.data.cuotas;
+                this.fields.id = response.data.id;
+                this.fields.monto = response.data.monto;
+                this.fields.pagado = response.data.pagado;
+                this.fields.mora = response.data.mora;
+                this.fields.nro_cuota = response.data.nro_cuota;
+                this.fields.modalidad = response.data.modalidad;
+                this.fields.tipo_estudiante = response.data.tipo_estudiante;
+            });
+            // console.log("hgols");
+            $("#ModalFormulario").modal("show");
+        },
         ficha: function(id) {
             axios.get("/intranet/encrypt/" + id).then(response => {
                 this.url = "estudiantes/pdf/" + response.data;
@@ -619,6 +752,50 @@ export default {
                     }
                 }
             });
+        },
+        submit: function() {
+            this.errors = {};
+            if (this.edit == 0)
+                axios
+                    .post("/intranet/administracion/cronograma-pagos", this.fields)
+                    .then(response => {
+                        // $(".loader").hide();
+                        if (response.data.status) {
+                            this.$refs.table.refresh();
+                            toastr.success(response.data.message);
+                            $("#ModalFormulario").modal("hide");
+                            // window.location.replace(response.data.url);
+                        } else {
+                            toastr.warning(response.data.message, "Aviso");
+                        }
+                    })
+                    .catch(error => {
+                        // $(".loader").hide();
+                        if (error.response.status === 422) {
+                            this.errors = error.response.data.errors || {};
+                        }
+                    });
+            else {
+                axios
+                    .put("/intranet/administracion/tarifario-estudiante/" + this.id, this.fields)
+                    .then(response => {
+                        // $(".loader").hide();
+                        if (response.data.status) {
+                            this.$refs.table.refresh();
+                            toastr.success(response.data.message);
+                            $("#ModalFormulario").modal("hide");
+                            // window.location.replace(response.data.url);
+                        } else {
+                            toastr.warning(response.data.message, "Aviso");
+                        }
+                    })
+                    .catch(error => {
+                        // $(".loader").hide();
+                        if (error.response.status === 422) {
+                            this.errors = error.response.data.errors || {};
+                        }
+                    });
+            }
         }
     },
     mounted() {
