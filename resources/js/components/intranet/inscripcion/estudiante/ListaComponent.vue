@@ -520,6 +520,42 @@ export default {
                             id: "2",
                             text: "Retirado"
                         }
+                    ],
+                    tipo_estudiante: [
+                        {
+                            id: "1",
+                            text: "Normal"
+                        },
+                        {
+                            id: "2",
+                            text: "Hijo Trabajador"
+                        },
+                        {
+                            id: "3",
+                            text: "Descuento por Trabajador UNA"
+                        },
+                        {
+                            id: "4",
+                            text: "Hermanos"
+                        },
+                        {
+                            id: "5",
+                            text: "Inscripción por RR"
+                        },
+                        {
+                            id: "6",
+                            text: "Servicio Militar"
+                        }
+                    ],
+                    modalidad: [
+                        {
+                            id: "1",
+                            text: "Virtual"
+                        },
+                        {
+                            id: "2",
+                            text: "Presencial"
+                        }
                     ]
                 },
                 // customFilters: ['correlativo','num_mat']
