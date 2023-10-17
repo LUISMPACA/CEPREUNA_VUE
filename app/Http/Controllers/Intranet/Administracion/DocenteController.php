@@ -100,6 +100,9 @@ class DocenteController extends Controller
             'codigo_unap' => 'required_if:condicion,2',
             'programa' => 'required',
             'grado' => 'required',
+            'cci' => 'digits:20',
+            'ruc' => 'digits:11'
+
            
         ],$messages = [
             'required' => '* El campo :attribute es obligatorio.',
@@ -116,6 +119,8 @@ class DocenteController extends Controller
             $docente->condicion = $request->condicion;
             $docente->email = $request->email;
             $docente->celular = $request->celular;
+            $docente->ruc = $request->ruc;
+            $docente->cci = $request->cci;
             $docente->codigo_unap = $request->codigo_unap;
             $docente->programas_id = $request->programa;
             $docente->grado_academicos_id = $request->grado;

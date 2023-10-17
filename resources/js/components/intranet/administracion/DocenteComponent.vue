@@ -148,7 +148,22 @@
                                             <div v-if="errors && errors.celular" class="text-danger">{{ errors.celular[0] }}</div>
                                         </div>
                                     </div>
-
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="form-group">
+                                            <label for="ruc">Ruc</label>
+                                            <input type="text" class="form-control" name="ruc" id="ruc" v-model="fields.ruc" />
+                                            <div v-if="errors && errors.ruc" class="text-danger">{{ errors.ruc[0] }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                      <div class="col-md-8 col-xs-12">
+                                        <div class="form-group">
+                                            <label for="cci">CCI</label>
+                                            <input type="text" class="form-control" name="cci" id="cci" v-model="fields.cci" />
+                                            <div v-if="errors && errors.cci" class="text-danger">{{ errors.cci[0] }}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -188,6 +203,8 @@ export default {
             programa:null,
             email:'',
             celular:'',
+            ruc:'',
+            cci:''
             },
         tipoDocumentos:[],
         gradosAcademicos: [],
@@ -247,10 +264,11 @@ export default {
             this.id = id;
             this.errors = {};
             axios.get("docente/"+id+"/edit").then(response => {
+                console.log(response);
                 // this.fields.denominacion = response.data.denominacion;
                 // this.fields.direccion = response.data.direccion;
-                // this.fields.estado = response.data.estado;
-                // this.fields.departamento = response.data.ubigeo.codigo_departamento;
+                this.fields.ruc = response.data.ruc;
+                this.fields.cci = response.data.cci
                 this.fields.tipo_documento = response.data.tipo_documentos_id;
                 this.fields.tipo_documento = response.data.tipo_documentos_id;
                 this.fields.nro_documento = response.data.nro_documento;
