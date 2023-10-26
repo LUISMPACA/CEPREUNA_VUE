@@ -113,7 +113,7 @@ class ReporteController extends Controller
         $data = $table->get(new InscripcionDocente, ['id', 'apto', 'docentes_id'], ['docente', 'programa', 'grado']);
         $data = $data->select(
             "inscripcion_docentes.*",
-            DB::raw("(SELECT SUM(ad.cantidad_horas) FROM asistencia_docentes AS ad WHERE ad.docentes_id = inscripcion_docentes.docentes_id AND ad.estado ='1' GROUP BY ad.docentes_id) AS horas")
+            DB::raw("(SELECT SUM(ad.horas_pago) FROM asistencia_docentes AS ad WHERE ad.docentes_id = inscripcion_docentes.docentes_id AND ad.estado !='3' GROUP BY ad.docentes_id) AS horas")
         );
         $data = $data->where("apto", "1");
 
@@ -1761,16 +1761,161 @@ class ReporteController extends Controller
     }
 
     
-    public function rptDocenteHorasTotal(){
+    // public function rptDocenteHorasTotal(){
    
+    //     // Crear un nuevo objeto Spreadsheet
+    //     $spreadsheet = new Spreadsheet();
+
+    //     // Personalizar el contenido del reporte
+    //     $sheet = $spreadsheet->getActiveSheet();
+
+    //     $sheet->mergeCells('F1:G1');
+    //     $sheet->setCellValue('F1', 'Reporte Docentes Horas Pago Total');
+
+    //     // Establecer estilo y formato para el encabezado
+    //     $headerStyle = [
+    //         'font' => [
+    //             'bold' => true,
+    //             'color' => ['rgb' => 'FFFFFF'],
+    //         ],
+    //         'fill' => [
+    //             'fillType' => Fill::FILL_SOLID,
+    //             'startColor' => ['rgb' => '3366CC'],
+    //         ],
+    //         'alignment' => [
+    //             'horizontal' => Alignment::HORIZONTAL_CENTER,
+    //             'vertical' => Alignment::VERTICAL_CENTER,
+    //             'wrapText' => true,
+    //         ],
+    //         'borders' => [
+    //             'allBorders' => [
+    //                 'borderStyle' => Border::BORDER_THIN,
+    //                 'color' => ['rgb' => '000000'],
+    //             ],
+    //         ],
+    //     ];
+
+    //     $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
+
+    //     $datos = ['Nro. Documento', 'Paterno', 'Materno', 'Nombres', 'Celular', 'Email', 'Área', 'Grupo','Sede','Modalidad','Curso','Horas de Pago', 'Total Horas'];
+
+    //     $columnaInicial = 'A';
+    //     $filaInicial = 3;
+        
+    //     foreach ($datos as $index => $valor) {
+    //         $columna = chr(ord($columnaInicial) + $index);
+    //         $celda = $columna . $filaInicial;
+    //         $sheet->setCellValue($celda, $valor);
+    //     }
+    //     // Establecer estilo para las celdas de encabezado
+    //     $headerCellStyle = [
+    //         'font' => [
+    //             'bold' => true,
+    //             'color' => ['rgb' => '000000'],
+    //         ],
+    //         'fill' => [
+    //             'fillType' => Fill::FILL_SOLID,
+    //             'startColor' => ['rgb' => 'EEEEEE'],
+    //         ],
+    //         'alignment' => [
+    //             'horizontal' => Alignment::HORIZONTAL_CENTER,
+    //             'vertical' => Alignment::VERTICAL_CENTER,
+    //             'wrapText' => true,
+    //         ],
+    //         'borders' => [
+    //             'allBorders' => [
+    //                 'borderStyle' => Border::BORDER_THIN,
+    //                 'color' => ['rgb' => '000000'],
+    //             ],
+    //         ],
+    //     ];
+
+    //     $columnaInicial = 'A';
+    //     $columnaFinal = chr(ord($columnaInicial) + count($datos) - 1);
+    //     $rango = $columnaInicial . '3:' . $columnaFinal . '3';
+
+    //     $sheet->getStyle($rango)->applyFromArray($headerCellStyle);   
+
+
+    //     // Obtener los datos de la consulta
+    //     $resultados = DB::table('docentes AS d')
+    //     ->select('d.nro_documento', 'd.paterno', 'd.materno', 'd.nombres', 'd.celular', 'd.email',
+    //         'eas.denominacion as area', 'gr.denominacion as grupo', 'sed.denominacion as modalidad', 'sds.denominacion as sede','cu.denominacion as curso',
+    //         'ad.horas_pago', DB::raw('SUM(ad.cantidad_horas) AS total_horas'))
+    //     ->join('carga_academicas AS ca', 'd.id', '=', 'ca.docentes_id')
+    //     ->join('cursos AS cu', 'cu.id', '=', 'ca.cursos_id')
+    //     ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
+    //     ->join('grupos AS gr', 'gr.id', '=', 'ga.grupos_id')
+    //     ->join('asistencia_docentes AS ad', 'ad.carga_academicas_id', '=', 'ca.id')
+    //     ->join('docente_aptos AS apt', 'd.id', 'apt.docentes_id')
+    //     ->join('inscripcion_docentes AS id', 'id.docentes_id', '=', 'd.id')
+    //     ->join('areas AS eas', 'eas.id', '=', 'id.areas_id')
+    //     ->join(DB::raw('(SELECT id, sedes_id, inscripcion_docentes_id FROM disponibilidades GROUP BY inscripcion_docentes_id) disp'),
+    //         'disp.inscripcion_docentes_id', '=', 'id.id')
+    //     ->join(DB::raw("(SELECT id, 
+    //         CASE 
+    //             WHEN denominacion <> 'Virtual' THEN 'No virtual'
+    //             ELSE denominacion
+    //         END AS denominacion
+    //         FROM sedes) sed"), 'sed.id', '=', 'disp.sedes_id')
+    //     ->join('sedes AS sds', 'sds.id', '=', 'disp.sedes_id')
+    //     ->where('ad.estado',1)
+    //     ->groupBy('d.nro_documento', 'sed.denominacion')
+
+    //     ->get();
+
+    // // Recorrer los resultados y agregarlos al archivo Excel
+    // $row = 4; // Fila inicial para los datos
+    // foreach ($resultados as $resultado) {
+    //     $sheet->setCellValue('A' . $row, $resultado->nro_documento);
+    //     $sheet->setCellValue('B' . $row, $resultado->paterno);
+    //     $sheet->setCellValue('C' . $row, $resultado->materno);
+    //     $sheet->setCellValue('D' . $row, $resultado->nombres);
+    //     $sheet->setCellValue('E' . $row, $resultado->celular);
+    //     $sheet->setCellValue('F' . $row, $resultado->email);
+    //     $sheet->setCellValue('G' . $row, $resultado->area);
+    //     $sheet->setCellValue('H' . $row, $resultado->grupo);
+    //     $sheet->setCellValue('I' . $row, $resultado->sede);
+    //     $sheet->setCellValue('J' . $row, $resultado->modalidad);
+    //     $sheet->setCellValue('K' . $row, $resultado->curso);
+    //     $sheet->setCellValue('L' . $row, $resultado->horas_pago);
+    //     $sheet->setCellValue('M' . $row, $resultado->total_horas);
+
+    //     $row++;
+    // }
+
+    // // Ajustar el ancho de las columnas automáticamente
+    // foreach (range('A', 'M') as $columna) {
+    //     $sheet->getColumnDimension($columna)->setAutoSize(true);
+    // }
+
+    // $response = new StreamedResponse(function () use ($spreadsheet) {
+    //     // Definir el tipo de contenido y el encabezado para la descarga
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment;filename="reporte.xlsx"');
+    //     header('Cache-Control: max-age=0');
+
+    //     // Crear el escritor para generar el archivo Excel
+    //     $writer = new Xlsx($spreadsheet);
+    //     $writer->save('php://output');
+    // });
+
+    // // Devolver la respuesta de transmisión (streamed response)
+    // return $response;
+
+    // }
+
+    public function rptDocenteHorasTotal(Request $request){
+         //  return $request->params['fecha_ini'];
         // Crear un nuevo objeto Spreadsheet
         $spreadsheet = new Spreadsheet();
 
         // Personalizar el contenido del reporte
         $sheet = $spreadsheet->getActiveSheet();
 
-        $sheet->mergeCells('F1:G1');
-        $sheet->setCellValue('F1', 'Reporte Docentes Horas Pago Total');
+        $sheet->mergeCells('D1:I1');
+        $titulo= 'Reporte Docentes Horas por Pago Total: ';
+        $sheet->setCellValue('D1', $titulo);
 
         // Establecer estilo y formato para el encabezado
         $headerStyle = [
@@ -1795,9 +1940,9 @@ class ReporteController extends Controller
             ],
         ];
 
-        $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
+        $sheet->getStyle('D1:I1')->applyFromArray($headerStyle);
 
-        $datos = ['Nro. Documento', 'Paterno', 'Materno', 'Nombres', 'Celular', 'Email', 'Área', 'Grupo','Sede','Modalidad','Curso','Horas de Pago', 'Total Horas'];
+        $datos = ['docentes_id','Nro. Documento', 'Paterno', 'Materno', 'Nombres', 'Celular', 'Email', 'Sede', 'Area','Grupo','Curso','Horas Pago','Hpresencial','Hvirtual','tardePresencial','tardeVirtual'];
 
         $columnaInicial = 'A';
         $filaInicial = 3;
@@ -1836,56 +1981,97 @@ class ReporteController extends Controller
 
         $sheet->getStyle($rango)->applyFromArray($headerCellStyle);   
 
-
+    
         // Obtener los datos de la consulta
-        $resultados = DB::table('docentes AS d')
-        ->select('d.nro_documento', 'd.paterno', 'd.materno', 'd.nombres', 'd.celular', 'd.email',
-            'eas.denominacion as area', 'gr.denominacion as grupo', 'sed.denominacion as modalidad', 'sds.denominacion as sede','cu.denominacion as curso',
-            'ad.horas_pago', DB::raw('SUM(ad.cantidad_horas) AS total_horas'))
-        ->join('carga_academicas AS ca', 'd.id', '=', 'ca.docentes_id')
-        ->join('cursos AS cu', 'cu.id', '=', 'ca.cursos_id')
-        ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
-        ->join('grupos AS gr', 'gr.id', '=', 'ga.grupos_id')
-        ->join('asistencia_docentes AS ad', 'ad.carga_academicas_id', '=', 'ca.id')
-        ->join('docente_aptos AS apt', 'd.id', 'apt.docentes_id')
-        ->join('inscripcion_docentes AS id', 'id.docentes_id', '=', 'd.id')
-        ->join('areas AS eas', 'eas.id', '=', 'id.areas_id')
-        ->join(DB::raw('(SELECT id, sedes_id, inscripcion_docentes_id FROM disponibilidades GROUP BY inscripcion_docentes_id) disp'),
-            'disp.inscripcion_docentes_id', '=', 'id.id')
-        ->join(DB::raw("(SELECT id, 
-            CASE 
-                WHEN denominacion <> 'Virtual' THEN 'No virtual'
-                ELSE denominacion
-            END AS denominacion
-            FROM sedes) sed"), 'sed.id', '=', 'disp.sedes_id')
-        ->join('sedes AS sds', 'sds.id', '=', 'disp.sedes_id')
-        ->where('ad.estado',1)
-        ->groupBy('d.nro_documento', 'sed.denominacion')
+        $resultados = DB::table(function ($query) {
+            $query->select(
+                    'docentes.id AS docentes_id',
+                    'docentes.nro_documento',
+                    'docentes.paterno',
+                    'docentes.materno',
+                    'docentes.nombres',
+                    'docentes.celular',
+                    'docentes.email',
+                    's.denominacion AS sede',
+                    'areas.denominacion AS area',
+                    'g.denominacion AS grupo',
+                    'cu.denominacion AS curso',
+                    'ad.horas_pago',
+                    DB::raw("CASE WHEN l.denominacion <> 'Virtual' THEN 'No virtual' ELSE l.denominacion END AS modalidad"),
+                    DB::raw("SUM(CASE WHEN ad.estado = '1' THEN ad.horas_pago ELSE 0 END) AS horas_presente"),
+                    DB::raw("SUM(CASE WHEN ad.estado = '2' THEN ad.horas_pago ELSE 0 END) AS horas_tarde")
+                )
+                ->from('asistencia_docentes AS ad')
+                ->join('docentes', 'docentes.id', '=', 'ad.docentes_id')
+                ->join('carga_academicas AS ca', 'ca.id', '=', 'ad.carga_academicas_id')
+                ->join('cursos AS cu', 'cu.id', '=', 'ca.cursos_id')
+                ->join('grupo_aulas AS ga', 'ga.id', '=', 'ca.grupo_aulas_id')
+                ->join('grupos AS g', 'g.id', '=', 'ga.grupos_id')
+                ->join('aulas AS a', 'a.id', '=', 'ga.aulas_id')
+                ->join('locales AS l', 'l.id', '=', 'a.locales_id')
+                ->join('sedes AS s', 's.id', '=', 'l.sedes_id')
+                ->join('inscripcion_docentes AS id', 'id.docentes_id', '=', 'docentes.id')
+                ->join('areas', 'areas.id', '=', 'id.areas_id')
+                ->groupBy('docentes_id', 'paterno', 'materno', 'nombres', 'celular', 'email', 'modalidad', 'sede');
+        }, 'ad')
+        ->select(
+            'ad.docentes_id',
+            'ad.nro_documento',
+            'ad.paterno',
+            'ad.materno',
+            'ad.nombres',
+            'ad.celular',
+            'ad.email',
+            'ad.sede',
+            'ad.area',
+            'ad.grupo',
+            'ad.curso',
+            'ad.horas_pago',
 
-        ->get();
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'No virtual' THEN ad.horas_presente ELSE 0 END) AS Hpresencial"),
+            DB::raw("MAX(CASE WHEN ad.modalidad = 'Virtual' THEN ad.horas_presente ELSE 0 END) AS Hvirtual"),
+            DB::raw("SUM(CASE WHEN (ad.sede = 'Juliaca' OR ad.sede = 'Puno' OR ad.sede = 'Juli' OR ad.sede = 'Azangaro' OR ad.sede = 'Ilave' OR ad.sede = 'Huancané') THEN ad.horas_tarde ELSE 0 END) AS tardePresencial"),
+            DB::raw("SUM(CASE WHEN ad.sede = 'Virtual' THEN ad.horas_tarde ELSE 0 END) AS tardeVirtual")
+        )
+        ->groupBy(
+            'ad.docentes_id',
+            'ad.nro_documento',
+            'ad.paterno',
+            'ad.materno',
+            'ad.nombres',
+            'ad.celular',
+            'ad.email'
+        )->orderBy('ad.docentes_id')->get();
+        
+        dd($resultados);
+            
+        // Recorrer los resultados y agregarlos al archivo Excel
+        $row = 4; // Fila inicial para los datos
+        foreach ($resultados as $resultado) {
+            $sheet->setCellValue('A' . $row, $resultado->docentes_id);
+            $sheet->setCellValue('B' . $row, $resultado->nro_documento);
+            $sheet->setCellValue('C' . $row, $resultado->paterno);
+            $sheet->setCellValue('D' . $row, $resultado->materno);
+            $sheet->setCellValue('E' . $row, $resultado->nombres);
+            $sheet->setCellValue('F' . $row, $resultado->celular);
+            $sheet->setCellValue('G' . $row, $resultado->email);
+            $sheet->setCellValue('H' . $row, $resultado->sede);
+            $sheet->setCellValue('I' . $row, $resultado->area);
+            $sheet->setCellValue('J' . $row, $resultado->grupo);
+            $sheet->setCellValue('K' . $row, $resultado->curso);
+            $sheet->setCellValue('L' . $row, $resultado->horas_pago);
+            $sheet->setCellValue('M' . $row, $resultado->Hpresencial);
+            $sheet->setCellValue('N' . $row, $resultado->Hvirtual);
+            $sheet->setCellValue('O' . $row, $resultado->tardePresencial);
+            $sheet->setCellValue('P' . $row, $resultado->tardeVirtual);
 
-    // Recorrer los resultados y agregarlos al archivo Excel
-    $row = 4; // Fila inicial para los datos
-    foreach ($resultados as $resultado) {
-        $sheet->setCellValue('A' . $row, $resultado->nro_documento);
-        $sheet->setCellValue('B' . $row, $resultado->paterno);
-        $sheet->setCellValue('C' . $row, $resultado->materno);
-        $sheet->setCellValue('D' . $row, $resultado->nombres);
-        $sheet->setCellValue('E' . $row, $resultado->celular);
-        $sheet->setCellValue('F' . $row, $resultado->email);
-        $sheet->setCellValue('G' . $row, $resultado->area);
-        $sheet->setCellValue('H' . $row, $resultado->grupo);
-        $sheet->setCellValue('I' . $row, $resultado->sede);
-        $sheet->setCellValue('J' . $row, $resultado->modalidad);
-        $sheet->setCellValue('K' . $row, $resultado->curso);
-        $sheet->setCellValue('L' . $row, $resultado->horas_pago);
-        $sheet->setCellValue('M' . $row, $resultado->total_horas);
-
-        $row++;
-    }
-
+            $sheet->getStyle('O' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($resultado->tardePresencial > 0 ? 'f4ff81' : 'ffffff' );
+            $sheet->getStyle('P' . $row)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB($resultado->tardeVirtual > 0 ? 'f4ff81' : 'ffffff' );
+            $row++;
+        }
+        
     // Ajustar el ancho de las columnas automáticamente
-    foreach (range('A', 'M') as $columna) {
+    foreach (range('A', 'P') as $columna) {
         $sheet->getColumnDimension($columna)->setAutoSize(true);
     }
 
@@ -1902,7 +2088,6 @@ class ReporteController extends Controller
 
     // Devolver la respuesta de transmisión (streamed response)
     return $response;
-
     }
 
 
