@@ -157,11 +157,18 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                      <div class="col-md-8 col-xs-12">
+                                    <div class="col-md-8 col-xs-12">
                                         <div class="form-group">
                                             <label for="cci">CCI</label>
                                             <input type="text" class="form-control" name="cci" id="cci" v-model="fields.cci" />
                                             <div v-if="errors && errors.cci" class="text-danger">{{ errors.cci[0] }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-xs-12">
+                                        <div class="form-group">
+                                            <label for="gsuite">GSUIT</label>
+                                            <input type="text" class="form-control" name="gsuite" id="gsuite" v-model="fields.gsuite" />
+                                            <div v-if="errors && errors.gsuite" class="text-danger">{{ errors.gsuite[0] }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -204,7 +211,8 @@ export default {
             email:'',
             celular:'',
             ruc:'',
-            cci:''
+            cci:'',
+            gsuite:''
             },
         tipoDocumentos:[],
         gradosAcademicos: [],
@@ -281,7 +289,7 @@ export default {
                 this.fields.programa = response.data.programas_id;
                 this.fields.email = response.data.email;
                 this.fields.celular = response.data.celular;
-                // this.fields.distrito = response.data.ubigeo.id;
+                this.fields.gsuite = response.data.gsuite;
                 // this.fields.ubigeo = response.data.ubigeo.id;
                 // this.disabledProvincia = false;
                 // this.disabledDistrito = false;

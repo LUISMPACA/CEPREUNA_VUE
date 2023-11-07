@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\VueTables\EloquentVueTables;
 use App\Models\Docente;
+use App\Models\DocenteApto;
 use DB;
 
 class DocenteController extends Controller
@@ -76,7 +77,11 @@ class DocenteController extends Controller
      */
     public function edit($id)
     {
-        $response = Docente::find($id);
+        $response = Docente::from('docentes as d')
+        ->selectRaw('d.*,da.idgsuite as gsuite')
+        ->leftjoin('docente_aptos as da', 'd.id', '=', 'da.docentes_id')
+        ->where('d.id', $id)
+        ->first();
         return $response;
     }
 
@@ -127,7 +132,14 @@ class DocenteController extends Controller
             $docente->tipo_documentos_id = $request->tipo_documento;
             $docente->save();
 
+            $docenteApto = DocenteApto::where('docentes_id', $id)->first();
 
+            if ($docenteApto) {
+
+                $docenteApto->idgsuite = $request->gsuite;
+                $docenteApto->save();
+            }
+         
 
             DB::commit();
             $response["message"] = 'Guardado';
