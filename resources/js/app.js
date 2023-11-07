@@ -234,6 +234,8 @@ Vue.component("i-ciclo", require("./components/intranet/administrarNosotros/Cicl
 Vue.component("i-usuario", require("./components/intranet/administrarUsuario/UsuarioComponent.vue").default);
 Vue.component("i-permisos", require("./components/intranet/administrarUsuario/PermisosComponent.vue").default);
 Vue.component("i-roles", require("./components/intranet/administrarUsuario/RolesComponent.vue").default);
+Vue.component("i-contabilidad-solicitud", require("./components/intranet/Contabilidad/ContabilidadComponent.vue").default);
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
