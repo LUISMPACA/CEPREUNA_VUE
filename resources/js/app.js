@@ -78,6 +78,9 @@ Vue.component("example-component", require("./components/ExampleComponent.vue").
 Vue.component("example-chart", require("./components/intranet/estadistica/ChartComponent.vue").default);
 
 Vue.component("w-form-inscripcion-estudiante", require("./components/web/estudiante/FormInscripcionComponent.vue").default);
+Vue.component("w-simulacro-inscripcion-estudiante", require("./components/web/estudiante/SimulacroInscripcionComponent.vue").default);
+
+
 Vue.component("w-pago", require("./components/web/PagoComponent.vue").default);
 
 Vue.component("upload-imagen", require("./components/web/estudiante/UploadImagen.vue").default);
@@ -234,7 +237,7 @@ Vue.component("i-ciclo", require("./components/intranet/administrarNosotros/Cicl
 Vue.component("i-usuario", require("./components/intranet/administrarUsuario/UsuarioComponent.vue").default);
 Vue.component("i-permisos", require("./components/intranet/administrarUsuario/PermisosComponent.vue").default);
 Vue.component("i-roles", require("./components/intranet/administrarUsuario/RolesComponent.vue").default);
-Vue.component("i-contabilidad-solicitud", require("./components/intranet/Contabilidad/ContabilidadComponent.vue").default);
+
 
 
 /**
