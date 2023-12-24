@@ -1173,7 +1173,8 @@ class EstudianteController extends Controller
         $pdf::AddPage();
         $pdf::SetMargins(0, 0, 0);
         $pdf::SetAutoPageBreak(true, 0);
-        $pdf::Image('images/fondo-constancia.png', 0, 0, 210, "", 'PNG');
+        $pdf::Image('images/fondo-constancia.png', 0, 0, 210, "", 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
+        //$pdf::Image('images/UNAPUNO.png', 0, 0, 210, 297, '', '', '', false, 300, '', false, false, 0);
         $pdf::SetMargins(20, 40, 20, true);
         $pdf::setCellHeightRatio(1.5);
         if (isset($matricula)) {
@@ -1219,7 +1220,8 @@ class EstudianteController extends Controller
             $pdf::ln();
             $pdf::SetFont('helvetica', '', 13);
             if ($inscripcion->tipo_estudiante == '5') {
-                $html = '<p style="text-align:justify">Esta Apto para la inscripcion al examen de CEPREUNA ciclo ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . ', Segun RESOLUCION RECTORAL Nº: <b>2732-2022-R-UNA</b>';
+                // $html = '<p style="text-align:justify">Esta Apto para la inscripcion al examen de CEPREUNA ciclo ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . ', Segun RESOLUCION RECTORAL Nº: <b>2732-2022-R-UNA</b>';
+                $html = '<p style="text-align:justify">Esta Apto para la inscripcion al examen de CEPREUNA ciclo ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . '.';
             } else {
                 $html = '<p style="text-align:justify"><b>NO ADEUDA A CEPREUNA</b> en el ciclo ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . ', tal como consta en los archivos de esta dependencia.';
             }
@@ -1296,7 +1298,7 @@ class EstudianteController extends Controller
 
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), '', '', 45, 55, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
 
-            $pdf::Image('images/firma2.png', 27, 244, 57.5, 24, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/firma3cc.png', 33, 228, 45, 45, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), 156, 49, 44, 52, 'PNG', '', '', true, 150, '', false, false, 1, false, false, false);
         } else {
             $pdf::SetFont('helvetica', '', 15);

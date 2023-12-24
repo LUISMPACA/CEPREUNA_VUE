@@ -166,3 +166,5 @@ Route::get('v1/alumnos/pagos',function(Request $request){
         return $response;
     }
 });
+
+Route::get('examen-simulacro/asistencia', 'Web\Inscripcion\SimulacroController@tomarAsistencia');

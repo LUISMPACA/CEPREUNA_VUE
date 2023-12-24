@@ -652,4 +652,29 @@ class SimulacroController extends Controller
         $pdf::SetAutoPageBreak(TRUE, 0);
         $pdf::Output('inscripcion.pdf', 'I');
     }
+
+    public function tomarAsistencia(Request $request)
+    {
+        if ($request->header("Authorization") == "cepreuna_v2_api_XHR2InL71HMCVE3NvNSNacGvy") {
+            $dni = $request->input("dni");
+            if ($request->filled("dni")) {
+                $result = InscripcionSimulacro::where("nro_documento", $dni)->get();
+                if ($result->count() >= 1) {
+                    if ($result->where("asistencia", true)->count() >= 1) {
+                        $message = "El DNI " . $dni . " ya registro su asistencia";
+                        return response()->json(["message" => $message], 403);
+                    }
+                    InscripcionSimulacro::where("nro_documento", $dni)->update([
+                        'asistencia' => true
+                    ]);
+                    return     response()->json(["message" => "El DNI " . $dni . " ha sido registrado"], 200);
+                } else {
+                    return  response()->json(["message" => "No existe el estudiante"], 401);
+                }
+            } else {
+                return response()->json(["message" => "No existe el dni consultado"], 401);
+            }
+        }
+        return response()->json(["message" => "No autorizado"], 404);
+    }
 }
