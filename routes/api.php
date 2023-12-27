@@ -38,8 +38,8 @@ Route::group(['prefix' => 'perfil'], function () {
     Route::get('/encrypt/{id}', 'Api\Estudiante\PerfilController@encrypt');
 });
 
-Route::get('v1/{dni}',function(Request $request, $dni){
-    if($request->header('Authorization')=="cepreuna_v1_api")
+Route::get('v1/{dni}', function (Request $request, $dni) {
+    if ($request->header('Authorization') == "cepreuna_v1_api")
         return DB::select("SELECT concat(pe.inicio_ciclo,' - ',pe.fin_ciclo) AS periodo,pe.estado estado_periodo,
         es.nro_documento,es.nombres, es.paterno, es.materno,es.celular , sexo ,ub.departamento,
         ub.provincia,ub.distrito,ub.codigo_distrito ,anio_egreso,co.denominacion AS name_cole, co.direccion AS dir_cole, 
@@ -55,11 +55,11 @@ Route::get('v1/{dni}',function(Request $request, $dni){
         LEFT JOIN apoderados ap ON ap.id=ea.apoderados_id
         LEFT JOIN parentescos pa ON ap.parentescos_id=pa.id
         LEFT JOIN matriculas ma on  ma.estudiantes_id = es.id    
-        WHERE es.nro_documento=?",[$dni]);
+        WHERE es.nro_documento=?", [$dni]);
 });
 
-Route::get('v1/alumnos/inscritos',function(Request $request){
-    if($request->header('Authorization')=="cepreuna_v1_api"){
+Route::get('v1/alumnos/inscritos', function (Request $request) {
+    if ($request->header('Authorization') == "cepreuna_v1_api") {
         $response["sedes"] = DB::select("SELECT count(A.sedes_id) as cantidad, C.denominacion as sede  from inscripciones AS A
         join areas as B ON B.id = A.areas_id
         join sedes as C ON C.id = A.sedes_id
@@ -81,11 +81,11 @@ Route::get('v1/alumnos/inscritos',function(Request $request){
         return $response;
     }
 });
-Route::get('v1/resultados/{dni}',function(Request $request, $dni){
-    if($request->header('Authorization')=="cepreuna_v1_api")
+Route::get('v1/resultados/{dni}', function (Request $request, $dni) {
+    if ($request->header('Authorization') == "cepreuna_v1_api")
         return DB::select("SELECT d.nro_documento, d.nombres, d.paterno, d.materno, id.apto, id.puntaje, id.modalidad  
         FROM inscripcion_docentes as id join docentes d on d.id = id.docentes_id
-        where d.nro_documento=?",[$dni]);
+        where d.nro_documento=?", [$dni]);
 });
 Route::get('v1/inscripciones-consulta/{dni}', function ($dni) {
     if (request()->header('Authorization') !== "cepreuna_v1_api") {
@@ -107,8 +107,8 @@ Route::get('v1/inscripciones-consulta/{dni}', function ($dni) {
 
     return response()->json($results);
 });
-Route::get('v1/alumnos/pagos',function(Request $request){
-    if($request->header('Authorization')=="cepreuna_v1_api"){
+Route::get('v1/alumnos/pagos', function (Request $request) {
+    if ($request->header('Authorization') == "cepreuna_v1_api") {
         $response["sedes"] = DB::select("SELECT
         subquery.sedes AS sede,
         subquery.id_sede AS id_sede,
@@ -168,3 +168,14 @@ Route::get('v1/alumnos/pagos',function(Request $request){
 });
 
 Route::get('examen-simulacro/asistencia', 'Web\Inscripcion\SimulacroController@tomarAsistencia');
+
+Route::get('v1/resultados_simulacro/{dni}', function (Request $request, $dni) {
+    if ($request->header('Authorization') == "cepreuna_v1_api") {
+        $fecha = '2023-12-30';
+        $resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$fecha, $dni]);
+
+        return response()->json($resultados);
+    } else {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+});

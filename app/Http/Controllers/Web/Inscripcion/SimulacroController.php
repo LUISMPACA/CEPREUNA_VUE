@@ -659,20 +659,44 @@ class SimulacroController extends Controller
             $dni = $request->input("dni");
             if ($request->filled("dni")) {
                 $result = InscripcionSimulacro::where("nro_documento", $dni)->get();
+                $estudiante = DB::table('estudiantes')
+                    ->join('inscripcion_simulacros', 'estudiantes.nro_documento', '=', 'inscripcion_simulacros.nro_documento')
+                    ->join('inscripciones', 'inscripciones.estudiantes_id', '=', 'estudiantes.id')
+                    ->leftJoin('areas', 'areas.id', '=', 'inscripciones.areas_id')
+                    ->where('estudiantes.nro_documento', '=', $dni)
+                    ->select('estudiantes.nombres', 'estudiantes.paterno', 'estudiantes.materno', 'areas.denominacion', 'inscripcion_simulacros.path')
+                    ->first();
                 if ($result->count() >= 1) {
                     if ($result->where("asistencia", true)->count() >= 1) {
-                        $message = "El DNI " . $dni . " ya registro su asistencia";
-                        return response()->json(["message" => $message], 403);
+                        $nombres = $estudiante->paterno . " " . $estudiante->materno . ", " . $estudiante->nombres;
+                        $area = $estudiante->denominacion;
+                        $path = $estudiante->path;
+                        // $message = "El estudiante: " . $estudiante->paterno . " " . $estudiante->materno . ", " . $estudiante->nombres . "  con DNI " . $dni  . " ya registro su asistencia.";
+                        return response()->json([
+                            "nombres" => $nombres,
+                            "dni" => $dni,
+                            "area" => $area,
+                            "path" => $path,
+                        ], 403);
                     }
                     InscripcionSimulacro::where("nro_documento", $dni)->update([
                         'asistencia' => true
                     ]);
-                    return     response()->json(["message" => "El DNI " . $dni . " ha sido registrado"], 200);
+                    $nombres = $estudiante->paterno . " " . $estudiante->materno . ", " . $estudiante->nombres;
+                    $area = $estudiante->denominacion;
+                    $path = $estudiante->path;
+                    // return     response()->json(["message" => "El estudiante " . $estudiante->paterno . " " . $estudiante->materno . ", " . $estudiante->nombres . " con número de documento " . $dni . ", ha sido registrado exitosamente."], 200);
+                    return     response()->json([
+                        "nombres" => $nombres,
+                        "dni" => $dni,
+                        "area" => $area,
+                        "path" => $path,
+                    ], 200);
                 } else {
-                    return  response()->json(["message" => "No existe el estudiante"], 401);
+                    return  response()->json(["message" => "El número de documento " . $dni . " no existe o es incorrecto."], 401);
                 }
             } else {
-                return response()->json(["message" => "No existe el dni consultado"], 401);
+                return response()->json(["message" => "No existe el número de documento consultado"], 401);
             }
         }
         return response()->json(["message" => "No autorizado"], 404);
