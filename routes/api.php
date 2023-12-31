@@ -171,8 +171,9 @@ Route::get('examen-simulacro/asistencia', 'Web\Inscripcion\SimulacroController@t
 
 Route::get('v1/resultados_simulacro/{dni}', function (Request $request, $dni) {
     if ($request->header('Authorization') == "cepreuna_v1_api") {
-        $fecha = '2023-12-30';
-        $resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$fecha, $dni]);
+        // $fecha = '2023-12-30';
+
+        $resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$request->fecha, $dni]);
 
         return response()->json($resultados);
     } else {
