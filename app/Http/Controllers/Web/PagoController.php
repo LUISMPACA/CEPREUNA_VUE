@@ -76,7 +76,7 @@ class PagoController extends Controller
     
                         $nuevoPago = new Pago();
                         $nuevoPago->monto = $request->monto;
-                        $nuevoPago->secuencia = $request->secuencia;
+                        $nuevoPago->secuencia = $bancoPago->secuencia;
                         $nuevoPago->fecha = $request->fecha;
                         $nuevoPago->nro_documento = $request->documento;
                         $nuevoPago->tipo_pago = "1";
