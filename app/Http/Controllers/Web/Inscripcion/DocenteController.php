@@ -513,13 +513,13 @@ class DocenteController extends Controller
         PDF::setHeaderCallback(function ($pdf) {
             $pdf->SetY(10);
             $pdf->Image('images/UNAPUNO.png', 10, 6, 20, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-            $pdf::Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
+            $pdf->Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);
-            $pdf->Cell(0, 6, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
+            $pdf->Cell(0, 6, "Centro de Estudios Preuniversitario", 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, 'Jr Acora #235 - Telefono 051-363684', 0, 1, 'C', 0, '', 0);
+            $pdf->Cell(0, 6, 'Jr Acora #235', 0, 1, 'C', 0, '', 0);
         });
         $pdf::SetTitle('Inscripcion');
         $pdf::AddPage();
@@ -531,7 +531,7 @@ class DocenteController extends Controller
 
         $pdf::SetFont('helvetica', 'b', 14);
         // $pdf::Cell(0, 6, 'FICHA DE INSCRIPCION DOCENTE CEPREUNA CICLO '.$periodo->inicio_ciclo.' - '.$periodo->fin_ciclo, 0, 1, 'C', 0, '', 0);
-        $pdf::MultiCell(0, 18, 'FICHA DE INSCRIPCION DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
+        $pdf::MultiCell(0, 18, 'FICHA DE INSCRIPCIÓN DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
 
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
@@ -566,7 +566,7 @@ class DocenteController extends Controller
         // ********
         if ($docente->condicion == '2') {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(40, 6, "UNAP", 0, 0, 'L', 0, '', 1);
 
@@ -586,7 +586,7 @@ class DocenteController extends Controller
             $pdf::Cell(40, 6, $docente->contrato == "1" ? "CONTRATO" : "NOMBRADO", 0, 1, 'L', 0, '', 1);
         } else {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(40, 6, "PARTICULAR", 0, 1, 'L', 0, '', 1);
         }
@@ -636,7 +636,7 @@ class DocenteController extends Controller
         $pdf::ln();
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
-        $pdf::Cell(190, 6, 'FORMACION ACADEMICA', 1, 1, 'C', 0, '', 0);
+        $pdf::Cell(190, 6, 'FORMACIÓN ACADÉMICA', 1, 1, 'C', 0, '', 0);
         // ********
         foreach ($formacion as $key => $value) {
             # code..
@@ -652,7 +652,7 @@ class DocenteController extends Controller
                 $pdf::Cell(40, 6, $value->programa->denominacion, 0, 1, 'L', 0, '', 1);
             } else {
                 $pdf::SetFont('helvetica', '', 8);
-                $pdf::Cell(30, 6, 'GRADO ACADEMICO:', 0, 0, 'L', 0, '', 1);
+                $pdf::Cell(30, 6, 'GRADO ACADÉMICO:', 0, 0, 'L', 0, '', 1);
                 $pdf::SetFont('helvetica', 'b', 8);
                 $pdf::Cell(40, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
 
@@ -664,7 +664,7 @@ class DocenteController extends Controller
         }
         // ***********************DATOS DE POSTULACION****************
         $pdf::SetFont('helvetica', 'b', 10);
-        $pdf::Cell(190, 6, 'DATOS DE POSTULACION', 1, 1, 'C', 0, '', 0);
+        $pdf::Cell(190, 6, 'DATOS DE POSTULACIÓN', 1, 1, 'C', 0, '', 0);
 
         $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(60, 6, 'SEDE:', 0, 0, 'L', 0, '', 1);
@@ -704,7 +704,7 @@ class DocenteController extends Controller
         // $pdf::SetY($y+16);
         $pdf::SetXY(10, $y + 20);
         $pdf::SetFont('helvetica', '', 9);
-        $text = 'Nota: LA PRESENTE FICHA DE INSCRIPCIÓN TIENE VALOR LEGAL DE UNA DECLARACIÓN JURADA Esta inscripción no es completa si no ha sido CONFIRMADA por el CEPREUNA, por favor acercarse a la sede central del CEPREUNA, portando una copia de DNI, este formato.';
+        $text = 'Nota: LA PRESENTE FICHA DE INSCRIPCIÓN TIENE VALOR LEGAL DE UNA DECLARACIÓN JURADA Esta inscripción no es completa si no ha sido CONFIRMADA por el CEPREUNA, por favor acercarse a la sede central del CEPREUNA, portando una copia de DNI.';
         $pdf::MultiCell(190, 6, $text, 0, 'L', 0, 0, '', '', true);
 
         $pdf::AddPage();
@@ -726,7 +726,7 @@ class DocenteController extends Controller
         // *******
         if ($docente->condicion == '2') {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 1, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 1, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(65, 6, 'UNAP', 1, 0, 'L', 0, '', 1);
 
@@ -736,7 +736,7 @@ class DocenteController extends Controller
             $pdf::Cell(65, 6, $docente->codigo_unap, 1, 1, 'L', 0, '', 1);
         } else {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 1, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 1, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(160, 6, 'PARTICULAR', 1, 1, 'L', 0, '', 1);
         }
@@ -1157,9 +1157,9 @@ class DocenteController extends Controller
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);
-            $pdf->Cell(0, 6, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
+            $pdf->Cell(0, 6, "Centro de Estudios Preuniversitario", 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', '', 9);
-            $pdf->Cell(0, 6, 'Jr Acora #235 - Telefono 051-363684', 0, 1, 'C', 0, '', 0);
+            $pdf->Cell(0, 6, 'Jr Acora #235', 0, 1, 'C', 0, '', 0);
         });
         $pdf::SetTitle('Inscripcion');
         $pdf::AddPage();
@@ -1171,7 +1171,7 @@ class DocenteController extends Controller
 
         $pdf::SetFont('helvetica', 'b', 14);
         // $pdf::Cell(0, 6, 'FICHA DE INSCRIPCION DOCENTE CEPREUNA CICLO '.$periodo->inicio_ciclo.' - '.$periodo->fin_ciclo, 0, 1, 'C', 0, '', 0);
-        $pdf::MultiCell(0, 18, 'FICHA DE INSCRIPCION DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
+        $pdf::MultiCell(0, 18, 'FICHA DE INSCRIPCIÓN DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
 
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
@@ -1206,7 +1206,7 @@ class DocenteController extends Controller
         // ********
         if ($docente->condicion == '2') {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(40, 6, "UNAP", 0, 0, 'L', 0, '', 1);
 
@@ -1216,13 +1216,13 @@ class DocenteController extends Controller
             $pdf::Cell(40, 6, $docente->codigo_unap, 0, 1, 'L', 0, '', 1);
         } else {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(40, 6, "PARTICULAR", 0, 1, 'L', 0, '', 1);
         }
         // ********
         $pdf::SetFont('helvetica', 'b', 8);
-        $pdf::Cell(30, 6, 'GRADO ACADEMICO:', 0, 0, 'L', 0, '', 1);
+        $pdf::Cell(30, 6, 'GRADO ACADÉMICO:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 6, $docente->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
 
@@ -1251,7 +1251,7 @@ class DocenteController extends Controller
         $pdf::ln();
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
-        $pdf::Cell(190, 6, 'DATOS DE POSTULACION', 1, 1, 'C', 0, '', 0);
+        $pdf::Cell(190, 6, 'DATOS DE POSTULACIÓN', 1, 1, 'C', 0, '', 0);
 
         $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(60, 6, 'SEDE:', 0, 0, 'L', 0, '', 1);
@@ -1291,7 +1291,7 @@ class DocenteController extends Controller
         // $pdf::SetY($y+16);
         $pdf::SetXY(10, $y + 20);
         $pdf::SetFont('helvetica', '', 9);
-        $text = 'Nota: LA PRESENTE FICHA DE INSCRIPCIÓN TIENE VALOR LEGAL DE UNA DECLARACIÓN JURADA Esta inscripción no es completa si no ha sido CONFIRMADA por el CEPREUNA, por favor acercarse a la sede central del CEPREUNA, portando una copia de DNI, este formato.';
+        $text = 'Nota: LA PRESENTE FICHA DE INSCRIPCIÓN TIENE VALOR LEGAL DE UNA DECLARACIÓN JURADA Esta inscripción no es completa si no ha sido CONFIRMADA por el CEPREUNA, por favor acercarse a la sede central del CEPREUNA, portando una copia de DNI.';
         $pdf::MultiCell(190, 6, $text, 0, 'L', 0, 0, '', '', true);
 
         $pdf::AddPage();
@@ -1313,7 +1313,7 @@ class DocenteController extends Controller
         // *******
         if ($docente->condicion == '2') {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 1, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 1, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(65, 6, 'UNAP', 1, 0, 'L', 0, '', 1);
 
@@ -1323,7 +1323,7 @@ class DocenteController extends Controller
             $pdf::Cell(65, 6, $docente->codigo_unap, 1, 1, 'L', 0, '', 1);
         } else {
             $pdf::SetFont('helvetica', 'b', 8);
-            $pdf::Cell(30, 6, 'CONDICION:', 1, 0, 'L', 0, '', 1);
+            $pdf::Cell(30, 6, 'CONDICIÓN:', 1, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(160, 6, 'PARTICULAR', 1, 1, 'L', 0, '', 1);
         }
