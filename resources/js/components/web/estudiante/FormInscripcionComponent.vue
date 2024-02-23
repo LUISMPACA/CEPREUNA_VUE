@@ -166,6 +166,24 @@
             </div>
         </div>
         <div class="row">
+            <div class="col-md-8 col-xs-12">
+                <div class="row form-group">
+                    <label class="col-md-12 col-xs-12 control-label">Subir certificado de estudios o constancia de logros(formato .pdf .jpg .png max 5MB): </label>
+                    <div class="col-md-12 col-xs-12 ">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" id="certificado" name="certificado" accept=".jpg, .jpeg, .png, .pdf" @change="filesChangeCertificado"  class="custom-file-input " />
+                                <label class="custom-file-label" for="exampleInputFile">{{ selectFileCertificado.substr(0, 30) }}...</label>
+                            </div>
+                        </div>
+                        <div v-if="errors && errors.certificado" class="text-danger">
+                            {{ errors.certificado[0] }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="departamento">Departamento de nacimiento</label>
@@ -620,7 +638,8 @@ export default {
                 nro_documento_hermano: ""
             },
             errors: {
-                file_dni: { 0: "" }
+                file_dni: { 0: "" },
+                certificado: { 0: "" }
             },
             tipoDocumentos: [],
             paises: [],
@@ -664,6 +683,7 @@ export default {
             // ],
             modalidades: [],
             selectFileDni: "Selecione",
+            selectFileCertificado: "Selecione",
             showEstadoUniversidad: false,
             showEstadoDiscapacidad: false,
             vacantes: []
@@ -689,10 +709,28 @@ export default {
                 }
             }
         },
+        filesChangeCertificado(e) {
+            this.selectFileCertificado = "Selecione";
+            let file = e.target.files[0];
+
+            if (file === undefined) {
+                this.selectFileCertificado = "Selecione";
+            } else {
+                if (file.size > 1024 * (1024 * 5)) {
+                    this.errors.certificado[0] = "El tamaño del archivo excede el limite de 5 MB permitido.";
+                    this.selectFileCertificado = "Selecione";
+                    this.fields.certificado = null;
+                } else {
+                    this.errors.certificado[0] = "";
+                    this.selectFileCertificado = file.name;
+                    this.fields.certificado = file;
+                }
+            }
+        },
         submit() {
             $(".loader").show();
             // if (this.fields.file_dni) {
-            this.errors = { file_dni: { 0: "" } };
+            this.errors = { file_dni: { 0: "" }, certificado: { 0: "" } };
             // }
 
             let tokens = [];
@@ -748,6 +786,7 @@ export default {
             formData.append("tipo_descuento", typeof this.fields.tipo_descuento !== "undefined" ? this.fields.tipo_descuento : "");
             formData.append("nro_documento_hermano", typeof this.fields.nro_documento_hermano !== "undefined" ? this.fields.nro_documento_hermano : "");
             formData.append("file_dni", typeof this.fields.file_dni !== "undefined" ? this.fields.file_dni : "");
+            formData.append("certificado", typeof this.fields.certificado !== "undefined" ? this.fields.certificado : "");
 
             // if (this.fields.turno != null) {
             //     axios

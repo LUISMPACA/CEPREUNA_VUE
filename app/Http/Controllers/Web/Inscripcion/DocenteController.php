@@ -95,13 +95,13 @@ class DocenteController extends Controller
             'ubigeo' => 'required',
             'prioridad' => 'required',
 
-            'file_titulo'=>'max:2000|required_with:programa_titulo',
+            'file_titulo' => 'max:2000|required_with:programa_titulo',
 
             'grado_tipo.*' => 'required',
             'grado_programa.*' => 'required',
             'grado_archivo.*' => 'max:2000|required',
 
-            'file_experiencia'=>'max:5000|required_with:experiencia',
+            'file_experiencia' => 'max:5000|required_with:experiencia',
             // 'file_experiencia'=> 'max:3000',
 
             'capacitacion_tipo.*' => 'required',
@@ -138,26 +138,26 @@ class DocenteController extends Controller
 
             'file_titulo.required_with' => '* El campo archivo título es obligatorio.',
 
-            'file_titulo.mines' =>'Solo se acepta archivos pdf.',
-            'file_titulo.max' =>'Tamaño maximo de archivo no mayor 1M.',
+            'file_titulo.mines' => 'Solo se acepta archivos pdf.',
+            'file_titulo.max' => 'Tamaño maximo de archivo no mayor 1M.',
 
             'grado_tipo.*.required' => 'El campo tipo es obligatorio',
             'grado_programa.*.required' => 'El campo es obligatorio',
-            'grado_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
-            'grado_archivo.*.required' =>'El archivo es obligatorio.',
+            'grado_archivo.*.max' => 'Tamaño maximo de archivo no mayor 1M.',
+            'grado_archivo.*.required' => 'El archivo es obligatorio.',
 
-            'file_experiencia.max' =>'Tamaño maximo de archivo no mayor 3M.',
-            'file_experiencia.required_with' =>'* El campo archivo es obligatorio.',
+            'file_experiencia.max' => 'Tamaño maximo de archivo no mayor 3M.',
+            'file_experiencia.required_with' => '* El campo archivo es obligatorio.',
 
             'capacitacion_tipo.*.required' => 'El campo tipo es obligatorio',
             'capacitacion_titulo.*.required' => 'El campo título es obligatorio',
-            'capacitacion_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
-            'capacitacion_archivo.*.required' =>'El archivo es obligatorio.',
+            'capacitacion_archivo.*.max' => 'Tamaño maximo de archivo no mayor 1M.',
+            'capacitacion_archivo.*.required' => 'El archivo es obligatorio.',
 
             'produccion_tipo.*.required' => 'El campo tipo es obligatorio',
             'produccion_titulo.*.required' => 'El campo título es obligatorio',
-            'produccion_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
-            'produccion_archivo.*.required' =>'El archivo es obligatorio.',
+            'produccion_archivo.*.max' => 'Tamaño maximo de archivo no mayor 1M.',
+            'produccion_archivo.*.required' => 'El archivo es obligatorio.',
 
             // 'produccion_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
             // 'grado_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
@@ -221,7 +221,7 @@ class DocenteController extends Controller
                 $docente->contrato = $request->contrato;
                 $docente->ubigeos_id = $request->ubigeo;
                 $docente->programas_id = 1;
-                $docente->grado_academicos_id =2;
+                $docente->grado_academicos_id = 2;
                 $docente->tipo_documentos_id = $request->tipo_documento;
                 $docente->foto = $this->save_image($request->foto);
                 $docente->ruc = $request->ruc;
@@ -229,7 +229,6 @@ class DocenteController extends Controller
                 $docente->cci = $request->cci;
                 $docente->dicto = $request->dicto;
                 $docente->save();
-
             }
 
 
@@ -240,9 +239,9 @@ class DocenteController extends Controller
             $inscripcion->modalidad = $request->modalidad;
             $inscripcion->save();
 
-            if($request->programa_titulo!=NULL&&$request->file_titulo!=NULL){
+            if ($request->programa_titulo != NULL && $request->file_titulo != NULL) {
 
-                $pdf_grado = $this->save_file("grado",$request->file_titulo, $request->file('file_titulo')->getClientOriginalExtension(), 'inscripcion');
+                $pdf_grado = $this->save_file("grado", $request->file_titulo, $request->file('file_titulo')->getClientOriginalExtension(), 'inscripcion');
                 $grado = new AdjuntoGrado;
                 $grado->path = $pdf_grado;
                 $grado->grado_academicos_id = 2;
@@ -252,9 +251,9 @@ class DocenteController extends Controller
             }
 
             //Grados
-            if(isset($request->grado_tipo)){
+            if (isset($request->grado_tipo)) {
                 foreach ($request->grado_tipo as $key => $value) {
-                    $pdf_grado = $this->save_file("grado",$request->grado_archivo[$key], 'pdf', 'inscripcion');
+                    $pdf_grado = $this->save_file("grado", $request->grado_archivo[$key], 'pdf', 'inscripcion');
                     $grado = new AdjuntoGrado;
                     $grado->path = $pdf_grado;
                     $grado->grado_academicos_id = $value;
@@ -265,8 +264,8 @@ class DocenteController extends Controller
             }
 
             //Experiencias
-            if($request->experiencia!=NULL&&$request->file_experiencia!=NULL){
-                $pdf_experiencia = $this->save_file("experiencia",$request->file_experiencia, $request->file('file_experiencia')->getClientOriginalExtension(), 'inscripcion');
+            if ($request->experiencia != NULL && $request->file_experiencia != NULL) {
+                $pdf_experiencia = $this->save_file("experiencia", $request->file_experiencia, $request->file('file_experiencia')->getClientOriginalExtension(), 'inscripcion');
                 $experiencia = new AdjuntoExperiencia;
                 $experiencia->path = $pdf_experiencia;
                 $experiencia->experiencias_id = $request->experiencia;
@@ -274,9 +273,9 @@ class DocenteController extends Controller
                 $experiencia->save();
             }
             //Capacitaciones
-            if(isset($request->capacitacion_tipo)){
+            if (isset($request->capacitacion_tipo)) {
                 foreach ($request->capacitacion_tipo as $key => $value) {
-                    $pdf_capacitacion = $this->save_file("capacitacion",$request->capacitacion_archivo[$key], 'pdf', 'inscripcion');
+                    $pdf_capacitacion = $this->save_file("capacitacion", $request->capacitacion_archivo[$key], 'pdf', 'inscripcion');
                     $capacitacion = new AdjuntoCapacitaciones;
                     $capacitacion->titulo = $request->capacitacion_titulo[$key];
                     $capacitacion->path = $pdf_capacitacion;
@@ -285,9 +284,9 @@ class DocenteController extends Controller
                     $capacitacion->save();
                 }
             }
-            if(isset($request->produccion_tipo)){
+            if (isset($request->produccion_tipo)) {
                 foreach ($request->produccion_tipo as $key => $value) {
-                    $pdf_produccion = $this->save_file("produccion",$request->produccion_archivo[$key], 'pdf', 'inscripcion');
+                    $pdf_produccion = $this->save_file("produccion", $request->produccion_archivo[$key], 'pdf', 'inscripcion');
                     $produccion = new AdjuntoProducciones;
                     $produccion->titulo = $request->produccion_titulo[$key];
                     $produccion->path = $pdf_produccion;
@@ -427,8 +426,8 @@ class DocenteController extends Controller
         )
             ->where("id", $id)
             ->first();
-        $formacion = AdjuntoGrado::with(["gradoAcademico", "programa"])->where("inscripcion_docentes_id",$inscripcion->id)->get();
-        $docente = Docente::with(["tipoDocumento", "gradoAcademico", "programa","ubigeo"])->find($inscripcion->docentes_id);
+        $formacion = AdjuntoGrado::with(["gradoAcademico", "programa"])->where("inscripcion_docentes_id", $inscripcion->id)->get();
+        $docente = Docente::with(["tipoDocumento", "gradoAcademico", "programa", "ubigeo"])->find($inscripcion->docentes_id);
         // dd($docente);
         $periodo = Periodo::find($inscripcion->periodos_id);
         $sedes = Disponibilidades::with("sede")->select("sedes_id", "prioridad")->where("inscripcion_docentes_id", $id)
@@ -514,7 +513,7 @@ class DocenteController extends Controller
         PDF::setHeaderCallback(function ($pdf) {
             $pdf->SetY(10);
             $pdf->Image('images/UNAPUNO.png', 10, 6, 20, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-            $pdf->Image('images/logo.png', 170, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);
@@ -579,12 +578,12 @@ class DocenteController extends Controller
             $pdf::SetFont('helvetica', 'b', 8);
             $pdf::Cell(30, 6, 'TIPO TRABAJADOR:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
-            $pdf::Cell(40, 6, $docente->tipo_trabajador=="1"?"ADMINISTRATIVO":"DOCENTE", 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(40, 6, $docente->tipo_trabajador == "1" ? "ADMINISTRATIVO" : "DOCENTE", 0, 0, 'L', 0, '', 1);
 
             $pdf::SetFont('helvetica', 'b', 8);
             $pdf::Cell(30, 6, 'CONTRATO:', 0, 0, 'L', 0, '', 1);
             $pdf::SetFont('helvetica', '', 8);
-            $pdf::Cell(40, 6, $docente->contrato=="1"?"CONTRATO":"NOMBRADO", 0, 1, 'L', 0, '', 1);
+            $pdf::Cell(40, 6, $docente->contrato == "1" ? "CONTRATO" : "NOMBRADO", 0, 1, 'L', 0, '', 1);
         } else {
             $pdf::SetFont('helvetica', 'b', 8);
             $pdf::Cell(30, 6, 'CONDICION:', 0, 0, 'L', 0, '', 1);
@@ -638,10 +637,10 @@ class DocenteController extends Controller
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(190, 6, 'FORMACION ACADEMICA', 1, 1, 'C', 0, '', 0);
-          // ********
+        // ********
         foreach ($formacion as $key => $value) {
             # code..
-            if($value->grado_academicos_id==2){
+            if ($value->grado_academicos_id == 2) {
                 $pdf::SetFont('helvetica', 'b', 8);
                 $pdf::Cell(30, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
                 $pdf::SetFont('helvetica', '', 8);
@@ -651,7 +650,7 @@ class DocenteController extends Controller
                 $pdf::Cell(30, 6, 'ESPECIALIDAD:', 0, 0, 'L', 0, '', 1);
                 $pdf::SetFont('helvetica', 'b', 8);
                 $pdf::Cell(40, 6, $value->programa->denominacion, 0, 1, 'L', 0, '', 1);
-            }else{
+            } else {
                 $pdf::SetFont('helvetica', '', 8);
                 $pdf::Cell(30, 6, 'GRADO ACADEMICO:', 0, 0, 'L', 0, '', 1);
                 $pdf::SetFont('helvetica', 'b', 8);
@@ -1023,20 +1022,20 @@ class DocenteController extends Controller
 
         return $image;
     }
-    public function save_file($tipo ,$file, $extension, $disk)
+    public function save_file($tipo, $file, $extension, $disk)
     {
         $date = date('Ymd_His');
         $first = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4);
-        $file_name = $tipo.'-' . $date . $first . '.' . $extension;
+        $file_name = $tipo . '-' . $date . $first . '.' . $extension;
         $name_complete = $this->dateTimePartial . '/' . $file_name;
         Storage::disk($disk)->putFileAs($this->dateTimePartial, $file, $file_name);
         return $name_complete;
     }
-    public function download_pdf(){
+    public function download_pdf()
+    {
         $docentes = InscripcionDocente::get();
-        foreach($docentes as $value){
+        foreach ($docentes as $value) {
             $this->pdf_temporal($value->id);
-
         }
         // dd($docentes);
     }
@@ -1154,7 +1153,7 @@ class DocenteController extends Controller
         PDF::setHeaderCallback(function ($pdf) {
             $pdf->SetY(10);
             $pdf->Image('images/UNAPUNO.png', 10, 6, 20, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-            $pdf->Image('images/logo.png', 170, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);
@@ -1587,10 +1586,10 @@ class DocenteController extends Controller
 
 
         $pdf::SetAutoPageBreak(TRUE, 0);
-        $nombre_archivo = $docente->nro_documento."-".$docente->paterno." ".$docente->materno." ".$docente->nombres;
+        $nombre_archivo = $docente->nro_documento . "-" . $docente->paterno . " " . $docente->materno . " " . $docente->nombres;
         $file = $pdf::Output('', 'S');
         // Storage::disk("inscripcion")->putFileAs('fichas', $file,$nombre_archivo.'.pdf');
-        Storage::disk('inscripcion')->put('fichas/'.$nombre_archivo.'.pdf', $file);
+        Storage::disk('inscripcion')->put('fichas/' . $nombre_archivo . '.pdf', $file);
         // $pdf::Output($nombre_archivo.'.pdf', 'D');
     }
 }
