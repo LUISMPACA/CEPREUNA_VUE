@@ -82,6 +82,7 @@ class EstudianteController extends Controller
             'celular' => 'required',
             'colegio' => 'required',
             'egreso' => 'required|integer|min:1900',
+            'certificado' => 'required|mimes:png,jpg,jpeg,pdf|max:5120',
             'pais' => 'required',
             'departamento' => 'required_if:pais,1',
             'provincia' => 'required_if:pais,1',
@@ -117,6 +118,8 @@ class EstudianteController extends Controller
             'email.email' => '* El formato del correo no es el correcto',
             // 'email.regex' => '* El formato del correo no es el correcto',
             'egreso.min' => '* El año ingresado no es valido',
+            'certificado.max' => 'El tamaño del certificado no debe ser mayor a 5 MB.',
+            'certificado.mimes' => 'El archivo debe ser una imagen PNG, JPG/JPEG, o un archivo PDF.',
             'fecha_nac.required' => '* La fecha de nacimiento es obligatorio',
             'nro_documento_apoderado.required' => '* El DNI del apoderado es obligatorio',
             'escuela.required' => '* La escuela profesional es obligatoria',
@@ -242,6 +245,7 @@ class EstudianteController extends Controller
                                         $controlEstudiante->save();
                                     } else {
                                         $pdf_dni = $this->save_file("DNI", $request->file_dni, $request->file('file_dni')->getClientOriginalExtension(), 'inscripcion');
+                                        $certificado = $this->save_file("certificado", $request->certificado, $request->file('certificado')->getClientOriginalExtension(), 'inscripcion');
                                         $estudiante = new Estudiante();
                                         $estudiante->nombres = mb_strtoupper($request->nombres);
                                         $estudiante->paterno = mb_strtoupper($request->paterno);
@@ -257,6 +261,7 @@ class EstudianteController extends Controller
                                         $estudiante->ubigeos_nacimiento = $request->ubigeon;
                                         $estudiante->tipo_documentos_id = $request->tipo_documento;
                                         $estudiante->colegios_id = $request->colegio;
+                                        $estudiante->pathCertificado = $certificado;
                                         $estudiante->foto = $this->save_image($request->foto);
                                         $estudiante->usuario = $request->nro_documento . "@cepreuna.edu.pe";
                                         $estudiante->password = $password;
@@ -486,7 +491,7 @@ class EstudianteController extends Controller
                                 $controlEstudiante->save();
                             } else {
                                 $pdf_dni = $this->save_file("DNI", $request->file_dni, $request->file('file_dni')->getClientOriginalExtension(), 'inscripcion');
-
+                                $certificado = $this->save_file("certificado", $request->certificado, $request->file('certificado')->getClientOriginalExtension(), 'inscripcion');
                                 $estudiante = new Estudiante();
                                 $estudiante->nombres = strtoupper($request->nombres);
                                 $estudiante->paterno = strtoupper($request->paterno);
@@ -502,6 +507,7 @@ class EstudianteController extends Controller
                                 $estudiante->ubigeos_nacimiento = $request->ubigeon;
                                 $estudiante->tipo_documentos_id = $request->tipo_documento;
                                 $estudiante->colegios_id = $request->colegio;
+                                $estudiante->pathCertificado = $certificado;
                                 $estudiante->foto = $this->save_image($request->foto);
                                 $estudiante->usuario = $request->nro_documento . "@cepreuna.edu.pe";
                                 $estudiante->password = $password;
@@ -811,7 +817,7 @@ class EstudianteController extends Controller
         $pdf::SetMargins(20, 40, 20, true);
         $pdf::setCellHeightRatio(1.5);
         $pdf::Image('images/UNAPUNO.png', 10, 6, 20, 20, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
-        $pdf::Image('images/logo.png', 167, 6, 34, 18, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
+        $pdf::Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
 
         $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), 156, 49, 44, 52, 'PNG', '', '', true, 150, '', false, false, 1, false, false, false);
 
@@ -1053,7 +1059,7 @@ class EstudianteController extends Controller
 
         $pdf::SetFont('helvetica', 'b', 7);
         $pdf::Cell(30, 5, 'CONTRASEÑA:', 0, 0, 'L', 0, '', 1);
-        $pdf::SetFont('helvetica', '', 8);
+        $pdf::SetFont('times', '', 9);
         $pdf::Cell(30, 5, $estudiante->password, 0, 1, 'L', 0, '', 1);
 
 
@@ -1181,7 +1187,7 @@ class EstudianteController extends Controller
 
 
             $pdf::Image('images/UNAPUNO.png', 20, 8, 20, 20, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
-            $pdf::Image('images/logo.png', 157, 8, 34, 18, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/logo.png', 175, 6, 25, 25, 'PNG', '', '', false, 140, '', false, false, 0, false, false, false);
 
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), 156, 49, 44, 52, 'PNG', '', '', true, 150, '', false, false, 1, false, false, false);
 
