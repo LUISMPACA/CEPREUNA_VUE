@@ -67,7 +67,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="nro_documento">Número de Documento</label>
-                    <input type="text" class="form-control" name="nro_documento" id="nro_documento" @input="changeDocumento" v-model="fields.nro_documento" />
+                    <input type="text" class="form-control" name="nro_documento" id="nro_documento" @blur="callWebService" @input="changeDocumento" v-model="fields.nro_documento" />
                     <div v-if="errors && errors.nro_documento" class="text-danger">
                         {{ errors.nro_documento[0] }}
                     </div>
@@ -79,7 +79,7 @@
                     <div class="col-md-12 col-xs-12 ">
                         <div class="input-group">
                             <div class="custom-file">
-                                <input type="file" id="file_dni" name="file_dni" accept="application/pdf" @change="filesChangeDni" class="custom-file-input " />
+                                <input type="file" id="file_dni" name="file_dni" accept="application/pdf" @change="filesChangeDni" :disabled="observacion" class="custom-file-input " />
                                 <label class="custom-file-label" for="exampleInputFile">{{ selectFileDni.substr(0, 30) }}...</label>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="fecha nacimiento">Fecha de Nacimiento</label>
-                    <input type="date" class="form-control" name="fecha_nac" id="fecha_nac" v-model="fields.fecha_nac" />
+                    <input type="date" class="form-control" name="fecha_nac" id="fecha_nac" v-model="fields.fecha_nac" :disabled="observacion" />
                     <div v-if="errors && errors.fecha_nac" class="text-danger">
                         {{ errors.fecha_nac[0] }}
                     </div>
@@ -105,7 +105,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="email">Correo electrónico</label>
-                    <input type="email" class="form-control" name="email" id="email" v-model="fields.email" />
+                    <input type="email" class="form-control" name="email" id="email" v-model="fields.email" :disabled="observacion"/>
                     <div v-if="errors && errors.email" class="text-danger">
                         {{ errors.email[0] }}
                     </div>
@@ -114,7 +114,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="celular">Celular</label>
-                    <input type="text" class="form-control" name="celular" id="celular" v-model="fields.celular" />
+                    <input type="text" class="form-control" name="celular" id="celular" v-model="fields.celular" :disabled="observacion" />
                     <div v-if="errors && errors.celular" class="text-danger">
                         {{ errors.celular[0] }}
                     </div>
@@ -125,7 +125,7 @@
             <div class="col-md-5 col-xs-12">
                 <div class="form-group">
                     <label for="colegio">Colegio</label>
-                    <v-select :options="colegios" label="denominacion" @search="onSearch" @input="changeColegio">
+                    <v-select :options="colegios" label="denominacion" @search="onSearch" @input="changeColegio" :disabled="observacion" />
                         <template slot="no-options">
                             escriba para buscar su colegio
                         </template>
@@ -605,7 +605,7 @@
         </div>
         <br />
         <div class="text-center">
-            <button type="submit" :disabled="!terminos" class="btn btn-primary">
+            <button type="submit" :disabled="!terminos || observacion" class="btn btn-primary">
                 Registrar Inscripción
             </button>
         </div>
@@ -619,6 +619,7 @@ import toastr from "toastr";
 export default {
     data() {
         return {
+            observacion:false,
             fields: {
                 sexo: 1,
                 tokens: [],
@@ -691,6 +692,24 @@ export default {
         1;
     },
     methods: {
+        callWebService() {
+        $(".loader").show();
+        axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
+            .then(response => {
+                if(response.data.estado){
+                    toastr.error("Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.","Error");
+                    this.observacion = true;
+                }else{
+                    $(".loader").hide();
+                    this.observacion = false;
+                }
+            })
+            .catch(error => {
+            $(".loader").hide();
+            console.error('Error al llamar al servicio web:', error);
+            });
+        },
+
         filesChangeDni(e) {
             this.selectFileDni = "Selecione";
             let file = e.target.files[0];
