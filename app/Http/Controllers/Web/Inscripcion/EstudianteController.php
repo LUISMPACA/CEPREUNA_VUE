@@ -828,7 +828,7 @@ class EstudianteController extends Controller
         $pdf::SetFont('helvetica', 'b', 12);
         $pdf::Cell(0, 5, "Centro de Estudios Preuniversitario", 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', '', 9);
-        $pdf::Cell(0, 5, 'Jr Acora #235 - Telefono 051-363684', 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'Jr Acora #235', 0, 1, 'C', 0, '', 0);
 
         $pdf::ln();
         $pdf::ln();

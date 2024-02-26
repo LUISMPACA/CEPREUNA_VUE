@@ -96,7 +96,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="codigo">Código Unap</label>
+                        <label for="codigo">Código docente Unap</label>
                         <input type="codigo" class="form-control" name="codigo" id="codigo" v-model="fields.codigo" :disabled="fields.condicion == 1" />
                         <div v-if="errors && errors.codigo" class="text-danger">{{ errors.codigo[0] }}</div>
                     </div>
