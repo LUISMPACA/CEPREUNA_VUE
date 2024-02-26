@@ -695,7 +695,7 @@ export default {
     methods: {
         callWebService() {
         $(".loader").show();
-        axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre/' + this.fields.nro_documento)
+        axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
             .then(response => {
                 if(response.data.estado){
                     toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
