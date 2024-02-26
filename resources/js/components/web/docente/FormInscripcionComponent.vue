@@ -103,7 +103,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="contrato">Contrato</label>
+                        <label for="contrato">Condición</label>
                         <select v-model="fields.contrato" id="contrato" class="form-control" :disabled="fields.condicion == 1">
                             <option disabled value=""></option>
                             <option value="1">Contratado</option>
@@ -133,7 +133,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="provincia">Provincia de residencia</label>
+                        <label for="provincia">Provincia de residencia habitual</label>
 
                         <v-select
                             :disabled="disabledProvincia"
@@ -150,7 +150,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="distrito">Distrito de residencia</label>
+                        <label for="distrito">Distrito de residencia habitual</label>
 
                         <v-select :disabled="disabledDistrito" :options="distritos" label="distrito" v-model="distrito" @input="changeDistrito"></v-select>
                         <div v-if="errors && errors.ubigeo" class="text-danger">
@@ -162,7 +162,7 @@
             <div class="row">
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="direccion">Dirección de residencia</label>
+                        <label for="direccion">Dirección de residencia habitual</label>
                         <input type="text" class="form-control" name="direccion" id="direccion" v-model="fields.direccion" />
                         <div v-if="errors && errors.direccion" class="text-danger">{{ errors.direccion[0] }}</div>
                     </div>
@@ -465,11 +465,11 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="modalidad">Su primera vez enseñando Aqui</label>
+                        <label for="modalidad">¿Enseño ciclos pasados?</label>
                         <select v-model="fields.dicto" id="modalidad" class="form-control">
                             <option disabled value=""></option>
-                            <option value="0">Si</option>
-                            <option value="1">No</option>
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
                         </select>
                         <div v-if="errors && errors.dicto" class="text-danger">{{ errors.dicto[0] }}</div>
                     </div>
