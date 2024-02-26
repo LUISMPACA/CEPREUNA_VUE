@@ -826,7 +826,7 @@ class EstudianteController extends Controller
         $pdf::SetFont('helvetica', 'b', 14);
         $pdf::Cell(0, 5, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', 'b', 12);
-        $pdf::Cell(0, 5, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, "Centro de Estudios Preuniversitario", 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', '', 9);
         $pdf::Cell(0, 5, 'Jr Acora #235 - Telefono 051-363684', 0, 1, 'C', 0, '', 0);
 
@@ -834,7 +834,7 @@ class EstudianteController extends Controller
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 14);
 
-        $pdf::Cell(0, 5, 'FICHA DE ' . ($inscripcion->estado == 1 ? 'INSCRIPCION' : 'PREINSCRIPCION') . ' CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'FICHA DE ' . ($inscripcion->estado == 1 ? 'INSCRIPCIÓN' : 'PREINSCRIPCIÓN') . ' CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 1, 'C', 0, '', 0);
 
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
@@ -873,7 +873,7 @@ class EstudianteController extends Controller
         $pdf::Cell(40, 5, $estudiante->fecha_nac, 0, 1, 'L', 0, '', 1);
         // ********
         $pdf::SetFont('helvetica', 'b', 7);
-        $pdf::Cell(30, 5, 'EMAIL:', 0, 0, 'L', 0, '', 1);
+        $pdf::Cell(30, 5, 'E-MAIL:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 5, $estudiante->email, 0, 0, 'L', 0, '', 1);
 
@@ -937,7 +937,7 @@ class EstudianteController extends Controller
         $pdf::Cell(40, 5, $inscripcion->Sede, 0, 0, 'L', 0, '', 1);
 
         $pdf::SetFont('helvetica', 'b', 7);
-        $pdf::Cell(30, 5, 'AREA:', 0, 0, 'L', 0, '', 1);
+        $pdf::Cell(30, 5, 'ÁREA:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 5, $inscripcion->Area, 0, 1, 'L', 0, '', 1);
         // ********
@@ -1067,26 +1067,35 @@ class EstudianteController extends Controller
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(180, 6, 'DECLARACIÓN JURADA ELECTRÓNICA', 1, 1, 'C', 0, '', 0);
 
-        $pdf::SetFont('helvetica', '', 10);
+        $pdf::SetFont('helvetica', '', 9);
         if ($inscripcion->modalidad == '1') {
 
-            $html = '<p style="text-align:justify">Que, a la fecha de suscripción de la presente declaración jurada, declaro contar con acceso de servicio de internet y equipo de cómputo para seguir mis estudios de preparación pre universitaria en el ciclo virtual de ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . ' de CEPREUNA, declaro que será mi responsabilidad el acceso.
-            </p><p style="text-align:justify">Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
+            $html = '<p style="text-align:justify">Que, a la fecha de inscripción:
+            </p>
+            <ul>
+                <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
+                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la UNAP (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
+                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
+                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+             </ul>
+        <p style="text-align:justify">Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
             </p>';
         } else {
             $html = '<p>
-            Que, a la fecha de inscripción.
+            Que, a la fecha de inscripción:
         </p>
         <ul>
-            <li>Cuento con 2 dosis de la vacuna contra el COVID.</li>
-            <li>Culmine el 5to de secundaria.</li>
+            <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
+            <li>No haber logrado una vacante en los procesos de exámenes de admisión a la UNAP (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
+            <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
+            <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
         </ul><p style="text-align:justify">Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
             </p>';
         }
-        if ($inscripcion->estado != 1) {
-            $html .= '<h4>Nota:</h4><p style="text-align:justify">Para confirmar su inscripción debe entregar en CEPREUNA los documentos necesarios asi como el voucher de pago.
-            </p>';
-        }
+        // if ($inscripcion->estado != 1) {
+        //     $html .= '<h4>Nota:</h4><p style="text-align:justify">Para confirmar su inscripción debe entregar en CEPREUNA los documentos necesarios asi como el voucher de pago.
+        //     </p>';
+        // }
 
         $pdf::writeHTML($html, true, false, true, false, '');
 
@@ -1198,7 +1207,7 @@ class EstudianteController extends Controller
             $pdf::SetFont('helvetica', 'b', 12);
             $pdf::Cell(0, 5, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
             $pdf::SetFont('helvetica', '', 9);
-            $pdf::Cell(0, 5, 'Jr Acora #235 - Telefono 051-363684', 0, 1, 'C', 0, '', 0);
+            $pdf::Cell(0, 5, 'Jr Acora #235', 0, 1, 'C', 0, '', 0);
             $pdf::SetFont('helvetica', '', 9);
             $pdf::Cell(0, 5, '“Año de la unidad, la paz y el desarrollo”', 0, 1, 'C', 0, '', 0);
             $pdf::writeHTML("<hr>");
@@ -1271,7 +1280,7 @@ class EstudianteController extends Controller
 
             $pdf::ln();
             // $pdf::SetFont('helvetica', 'b', 7);
-            $pdf::Cell(20, 5, 'AREA:', 0, 0, 'L', 0, '', 1);
+            $pdf::Cell(20, 5, 'ÁREA:', 0, 0, 'L', 0, '', 1);
             // $pdf::SetFont('helvetica', '', 8);
             $pdf::Cell(40, 5, $inscripcion->Area, 0, 0, 'L', 0, '', 1);
             $pdf::ln();
