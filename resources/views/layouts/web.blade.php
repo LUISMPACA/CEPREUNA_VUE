@@ -61,7 +61,7 @@
                         <div class="text-center" style="vertical-align: bottom; margin-left: 10px;">
                             <h5 class="font-weight-bold text-dark" style="margin:0;">Universidad Nacional del Altiplano
                             </h5>
-                            <p class="text-gray" style="margin:0; font-size: 15px;">Centro Pre Universitario</p>
+                            <p class="text-gray" style="margin:0; font-size: 15px;">Centro de Estudios Preuniversitario</p>
                         </div>
                         {{-- </div> --}}
                     </div>
