@@ -29,7 +29,7 @@
                                                     <div class="float-right">
                                                         <nav class="breadcrumb">
                                                             <a class="breadcrumb-item" href="{{  url('/') }}">Inicio</a>
-                                                            <span class="breadcrumb-item active">Inscripción</span>
+                                                            <span class="breadcrumb-item active">Preinscripción</span>
                                                             <span class="breadcrumb-item active">Finalizado</span>
                                                         </nav>
                                                     </div>
@@ -38,7 +38,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="float-left">
-                                                        <h5>Su inscripción fue realizada con éxito, descargue su formato PDF.</h5>
+                                                        <h5>Su Preinscripción fue realizada con éxito, descargue su formato PDF.</h5>
                                                     </div>
                                                     <div class="float-right">
                                                         Fecha: {{date('d-m-Y')}}
@@ -54,7 +54,7 @@
                                                         <li>Recargue la página(f5), Si el problema persiste comuniquese con el administrador</li>
                                                         </ul>
                                                     @else
-                                                    <a class="btn btn-success mb-3" href="{{ url('inscripciones/docentes/pdf/'.$id) }}" download="" >Descargar Ficha de Inscripción</a>
+                                                    <a class="btn btn-success mb-3" href="{{ url('inscripciones/docentes/pdf/'.$id) }}" download="" >Descargar Ficha de Preinscripción</a>
                                                         <div class="form-row">
                                                             <div class="col-md-12 text-center col-xs-12 embed-responsive embed-responsive-16by9">
                                                                 <object class="embed-responsive-item" type="application/pdf" data="{{ url('inscripciones/docentes/pdf/'.$id) }}" allowfullscreen></object>

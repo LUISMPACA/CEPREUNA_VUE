@@ -38,7 +38,7 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="float-left">
-                                                        <h5>INSCRIPCIÓN DE DOCENTES</h5>
+                                                        <h5>PREINSCRIPCIÓN DE DOCENTES</h5>
                                                     </div>
                                                     <div class="float-right">
                                                         Fecha: {{date('d-m-Y')}}

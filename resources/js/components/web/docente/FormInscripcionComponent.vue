@@ -691,7 +691,7 @@
             </div>
             <br />
             <div class="text-center">
-                <button type="submit" :disabled="!terminos" class="btn btn-primary">Registrar Inscripción</button>
+                <button type="submit" :disabled="!terminos" class="btn btn-primary">Registrar Preinscripción</button>
             </div>
 
             <!-- Modal -->

@@ -531,7 +531,7 @@ class DocenteController extends Controller
 
         $pdf::SetFont('helvetica', 'b', 14);
         // $pdf::Cell(0, 6, 'FICHA DE INSCRIPCION DOCENTE CEPREUNA CICLO '.$periodo->inicio_ciclo.' - '.$periodo->fin_ciclo, 0, 1, 'C', 0, '', 0);
-        $pdf::MultiCell(0, 18, 'FICHA DE INSCRIPCIÓN DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
+        $pdf::MultiCell(0, 18, 'FICHA DE PREINSCRIPCIÓN DOCENTE CEPREUNA CICLO ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo, 0, 'C', 0, 0, '', '', true);
 
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
