@@ -926,6 +926,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('curricula/lista/data', 'Intranet\Configuracion\CurriculaController@lista');
             Route::get('curricula/detalle/lista/data', 'Intranet\Configuracion\CurriculaController@detalle');
             Route::post('curricula/detalle/guardar/{id}', 'Intranet\Configuracion\CurriculaController@storeD');
+            Route::put('curricula/detalle/editar/{id}', 'Intranet\Configuracion\CurriculaController@updateD');
             Route::delete('curricula/detalle/eliminar/{id}', 'Intranet\Configuracion\CurriculaController@destroyD');
 
             Route::resource('/turnos', 'Intranet\Configuracion\TurnoController');
