@@ -183,6 +183,36 @@ class CurriculaController extends Controller
         }
         return $response;
     }
+
+    public function updateD(Request $request, $id){
+        $rules = $request->validate([
+            'horas' => 'required',
+            'horario_inscripcion' => 'required',
+            'curso' => 'required',
+        ], $messages = [
+            'required' => '* El campo :attribute es obligatorio.',
+        ]);
+        DB::beginTransaction();
+        try {
+
+            $data = CurriculaDetalle::find($id);
+            $data->horas = $request->horas;
+            $data->horario_inscripcion = $request->horario_inscripcion;
+            $data->cursos_id = $request->curso;
+            //$data->curriculas_id = $id;
+            $data->save();
+
+            DB::commit();
+            $response["message"] = 'Registro guardado correctamente';
+            $response["status"] = true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            $response["message"] =  'Error al guardar registro, intentelo nuevamante.';
+            $response["status"] =  false;
+        }
+        return $response;
+    }
+
     public function destroyD($id){
         DB::beginTransaction();
         try {

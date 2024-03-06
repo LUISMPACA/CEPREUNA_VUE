@@ -66,7 +66,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="nro_documento">Número de Documento</label>
+                    <label for="nro_documento">Número del Documento</label>
                     <input type="text" class="form-control" name="nro_documento" id="nro_documento" @blur="callWebService" @input="changeDocumento" v-model="fields.nro_documento" />
                     <div v-if="errors && errors.nro_documento" class="text-danger">
                         {{ errors.nro_documento[0] }}
@@ -75,7 +75,7 @@
             </div>
             <div class="col-md-8 col-xs-12">
                 <div class="row form-group">
-                    <label class="col-md-12 col-xs-12 control-label">Subir DNI (solo formato .pdf 1MB): </label>
+                    <label class="col-md-12 col-xs-12 control-label">Subir documento de identidad (ambas caras y en formato .pdf 1MB): </label>
                     <div class="col-md-12 col-xs-12 ">
                         <div class="input-group">
                             <div class="custom-file">
@@ -232,7 +232,7 @@
         <div class="row">
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="departamento">Departamento de residencia</label>
+                    <label for="departamento">Departamento de residencia habitual</label>
 
                     <v-select
                         :disabled="disabledDepartamento"
@@ -249,7 +249,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="provincia">Provincia de residencia</label>
+                    <label for="provincia">Provincia de residencia habitual</label>
 
                     <v-select
                         :disabled="disabledProvincia"
@@ -266,7 +266,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="distrito">Distrito de residencia</label>
+                    <label for="distrito">Distrito de residencia habitual</label>
 
                     <v-select :disabled="disabledDistrito" :options="distritos" label="distrito" v-model="distrito" @input="changeDistrito"></v-select>
                     <div v-if="errors && errors.ubigeo" class="text-danger">
@@ -283,8 +283,8 @@
             <div class="col-md-12 col-xs-12">
                 <div class="alert alert-warning" role="alert">
                     <strong class="text-danger"
-                        ><i class="fa fa-info-circle"></i> El número de vacantes para modalidad presencial de acuerdo a su area, turno y sede es limitado, una vez cumplida la meta la opción de
-                        modalidad presencial desaparecera.</strong
+                        ><i class="fa fa-info-circle"></i> El número de vacantes para modalidad presencial de acuerdo a su área, turno y sede es limitado, una vez cumplida la meta la opción de
+                        modalidad presencial desaparecerá.</strong
                     >
                     <h6 style="margin-top:5px">Vacantes agotadas:</h6>
                     <ul>
@@ -338,7 +338,7 @@
 
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="cantidad inscrito">Número de inscripciones</label>
+                    <label for="cantidad inscrito">Número de matriculas</label>
 
                     <input type="number" class="form-control" min="0" name="cantidad_inscrito" id="cantidad_inscrito" v-model="fields.cantidad_inscrito" />
                     <div v-if="errors && errors.cantidad_inscrito" class="text-danger">

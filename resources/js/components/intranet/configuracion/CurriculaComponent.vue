@@ -141,7 +141,9 @@
                                             <button class="btn btn-sm btn-danger" @click="eliminarD(props.row.id)">
                                                 eliminar
                                             </button>
-                                            <!-- <a href="#" @click="editar(props.row.id)"><i class="fa  fa-trash big-icon text-danger" aria-hidden="true"></i></a> -->
+                                            <button  class="btn btn-sm btn-primary" @click="editarD(props.row)">
+                                                editar
+                                            </button>
                                         </div>
                                     </v-server-table>
                                 </div>
@@ -332,6 +334,13 @@ export default {
             this.editD = 0;
             $("#ModalFormularioD").modal("show");
         },
+        editarD:function(data){
+            this.editD = data.id;
+            $("#ModalFormularioD").modal("show");
+            this.fieldsD.horas = data.horas;
+            this.fieldsD.horario_inscripcion= data.horario_inscripcion;
+            this.fieldsD.curso = data.cursos_id;
+        },
         eliminarD:function(id){
             this.$confirm({
                 title: "Alerta",
@@ -387,11 +396,11 @@ export default {
                     });
             else {
                 axios
-                    .put("curricula/" + this.id, this.fields)
+                    .put("curricula/detalle/editar/" + this.editD, this.fieldsD)
                     .then(response => {
                         // $(".loader").hide();
                         if (response.data.status) {
-                            this.$refs.table.refresh();
+                            this.$refs.tableDetalle.refresh();
                             toastr.success(response.data.message);
                             $("#ModalFormularioD").modal("hide");
                             // window.location.replace(response.data.url);
