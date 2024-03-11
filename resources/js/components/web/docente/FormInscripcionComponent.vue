@@ -15,7 +15,7 @@
                 <div class="col-md-3 col-xs-12">
                     <div class="form-group">
                         <label for="nro_documento">Número de Documento</label>
-                        <input type="text" class="form-control" maxlength="8" minlength="8" name="nro_documento" id="nro_documento" v-model="fields.nro_documento" />
+                        <input type="text" class="form-control" maxlength="8" minlength="8" name="nro_documento" id="nro_documento" v-model="fields.nro_documento" @blur="callWebService" />
                         <div v-if="errors && errors.nro_documento" class="text-danger">{{ errors.nro_documento[0] }}</div>
                     </div>
                 </div>
@@ -836,6 +836,24 @@ export default {
         // }
     },
     methods: {
+        callWebService() {
+            const dniObservados = [
+            '45755695', '42178926', '40115241', '71658411', '01534962',
+            '73592666', '74291812', '73385117', '46439707', '71658411',
+            '02288624', '29373702', '74951231', '02300341', '02291983',
+            '44046855', '47979866', '46901726', '70082428', '71778168',
+            '70841848', '70205101', '73584231', '72454159', 
+            '40018413', '70206892', '01550161'];
+
+            if (!dniObservados.includes(this.fields.nro_documento)) {
+                $(".loader").show();
+                toastr.error(
+                    'La inscripción de docentes ha culminado.', 
+                    'Error', 
+                    {timeOut: 8000}
+                );
+            }
+        },
         maxLengthRuc(){
             if (this.fields.ruc.length > 11) {
                 this.fields.ruc = this.fields.ruc.slice(0, 11);
