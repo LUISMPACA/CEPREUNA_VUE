@@ -837,7 +837,7 @@ export default {
     },
     methods: {
         callWebService() {
-            const dniObservados = [
+           /* const dniObservados = [
             '45755695', '42178926', '40115241', '71658411', '01534962',
             '73592666', '74291812', '73385117', '46439707', '71658411',
             '02288624', '29373702', '74951231', '02300341', '02291983',
@@ -853,7 +853,7 @@ export default {
                     'Error', 
                     {timeOut: 8000}
                 );
-            }
+            }*/
         },
         maxLengthRuc(){
             if (this.fields.ruc.length > 11) {
