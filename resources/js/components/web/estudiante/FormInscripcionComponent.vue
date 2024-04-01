@@ -286,7 +286,7 @@
                         ><i class="fa fa-info-circle"></i> El número de vacantes para modalidad presencial de acuerdo a su área, turno y sede es limitado, una vez cumplida la meta la opción de
                         modalidad presencial desaparecerá.</strong
                     >
-                    <h6 style="margin-top:5px">Vacantes agotadas:</h6>
+                    <!-- <h6 style="margin-top:5px">Vacantes agotadas:</h6> -->
                     <ul>
                         <li v-for="(vacante, index) in vacantes" :key="index">{{ vacante.area.denominacion + " - " + vacante.sede.denominacion + " - " + vacante.turno.denominacion }}</li>
                     </ul>
