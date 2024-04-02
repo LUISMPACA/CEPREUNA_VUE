@@ -39,7 +39,7 @@ class EstudianteController extends Controller
             'c.denominacion as colegio'
         ]);
 
-        $data = $data->join('ubigeos as u', 'u.id', 'estudiantes.ubigeos_id')
+        $data = $data->leftJoin('ubigeos as u', 'u.id', 'estudiantes.ubigeos_id')
             ->join('colegios as c', 'c.id', 'estudiantes.colegios_id');
         $data = $data->orderBy('id', 'desc');
         $response = $table->finish($data);
