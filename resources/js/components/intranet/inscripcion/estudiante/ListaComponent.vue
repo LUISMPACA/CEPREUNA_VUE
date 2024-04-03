@@ -64,7 +64,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Modal  Editar de Inscripcion-->
         <div class="modal fade" id="modalEditarInscripcion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-xl">
@@ -151,6 +151,10 @@
                                     <button v-if="permissions.includes('agregar mora estudiante')" type="button" @click="agregarMora" class="btn btn-primary">
                                         <i class="far fa-check-square"></i> Agregar Mora
                                     </button>
+                                    <a target="_blank" type="button" :href="'../../storage/inscripcion/' + infoEstudiante.DNI" class="btn btn-dark"><i class="fas fa-user"></i> Ver DNI</a>
+                                    <a target="_blank" type="button" :href="'../../storage/inscripcion/' + infoEstudiante.certificado" class="btn btn-secondary mt-1">
+                                        <i class="fa fa-list-alt"></i> Ver Certificado de Estudios
+                                    </a>
                                 </div>
 
                                 <div class="col-md-5  col-xs-12">
@@ -405,7 +409,7 @@
                                                 <label for="inicio">Modalidad</label>
                                                 <div class="input-group input-group-sm">
                                                     <select id="" class="form-control" v-model="fields.modalidad[key]">
-                                                        <option v-for="(modalidad,index) in options.listColumns.modalidad" :key=index :value="modalidad.id">{{ modalidad.text }}</option>
+                                                        <option v-for="(modalidad, index) in options.listColumns.modalidad" :key="index" :value="modalidad.id">{{ modalidad.text }}</option>
                                                     </select>
                                                 </div>
                                                 <div v-if="errors && errors.fin" class="text-danger">
@@ -416,7 +420,7 @@
                                                 <label for="inicio">Tipo Estudiante</label>
                                                 <div class="input-group input-group-sm">
                                                     <select id="" class="form-control" v-model="fields.tipo_estudiante[key]">
-                                                        <option v-for="(tipo,index) in options.listColumns.tipo_estudiante" :key=index :value="tipo.id">{{ tipo.text }}</option>
+                                                        <option v-for="(tipo, index) in options.listColumns.tipo_estudiante" :key="index" :value="tipo.id">{{ tipo.text }}</option>
                                                     </select>
                                                 </div>
                                                 <div v-if="errors && errors.fin" class="text-danger">
@@ -436,7 +440,6 @@
                 </div>
             </div>
         </form>
-
     </div>
 </template>
 
@@ -586,7 +589,9 @@ export default {
                 email: "",
                 usuario: "",
                 foto: "",
-                tipo_colegio: ""
+                tipo_colegio: "",
+                DNI: "",
+                certificado: ""
             },
             statusPago: true,
             statusActualizar: false,
@@ -650,6 +655,8 @@ export default {
                 this.infoEstudiante.usuario = estudiante.usuario;
                 this.infoEstudiante.foto = estudiante.foto;
                 this.infoEstudiante.tipo_colegio = estudiante.colegio.tipo_colegios_id;
+                this.infoEstudiante.DNI = estudiante.path_dni;
+                this.infoEstudiante.certificado = estudiante.pathCertificado;
 
                 this.infoInscripcion.id = inscripcion.id;
                 this.infoInscripcion.correlativo = inscripcion.correlativo;
