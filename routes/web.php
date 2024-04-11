@@ -681,13 +681,15 @@ Route::post('get-tarifa-colegio/', 'Web\PagoController@getTarifaColegio');
 Route::post('get-tarifa-modalidad/', 'Web\PagoController@getTarifaModalidad');
 
 // Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-
+Route::get('/inscripciones/estudiantes-extemporaneos', 'Web\Inscripcion\EstudianteController@indexExtemporaneo');
 Route::group(['middleware' => ['auth']], function () {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
 
     Route::group(['prefix' => 'inscripciones'], function () {
         Route::get('/docentes-extemporaneos', 'Web\Inscripcion\DocenteController@indexExtemporaneo');
+        Route::get('/download-pdf', 'Web\Inscripcion\DocenteController@download_pdf');
+        // Route::get('/estudiantes-extemporaneos', 'Web\Inscripcion\EstudianteController@indexExtemporaneo');
         Route::get('/download-pdf', 'Web\Inscripcion\DocenteController@download_pdf');
     });
 
