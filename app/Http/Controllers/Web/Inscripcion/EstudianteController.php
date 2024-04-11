@@ -49,7 +49,11 @@ class EstudianteController extends Controller
         $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1']])->first();
         return view('web.inscripcion.estudiante', $response);
     }
-
+    public function indexExtemporaneo()
+    {
+        $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1']])->first();
+        return view('web.inscripcion.estudiante-extemporaneo', $response);
+    }
     /**
      * Show the form for creating a new resource.
      *

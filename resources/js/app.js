@@ -78,6 +78,7 @@ Vue.component("example-component", require("./components/ExampleComponent.vue").
 Vue.component("example-chart", require("./components/intranet/estadistica/ChartComponent.vue").default);
 
 Vue.component("w-form-inscripcion-estudiante", require("./components/web/estudiante/FormInscripcionComponent.vue").default);
+Vue.component("w-form-inscripcion-estudiante-extemporaneo", require("./components/web/estudiante/FormInscripcionExtemporaneoComponent.vue").default);
 Vue.component("w-simulacro-inscripcion-estudiante", require("./components/web/estudiante/SimulacroInscripcionComponent.vue").default);
 
 

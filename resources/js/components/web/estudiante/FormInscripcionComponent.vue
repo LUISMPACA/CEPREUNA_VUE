@@ -679,11 +679,11 @@ export default {
             terminos: false,
             sede: 1,
             estadoVacantes: true,
-            // modalidades: [
-            //     { id: 1, denominacion: "Virtual" },
-            //     { id: 2, denominacion: "Presencial" }
-            // ],
-            modalidades: [],
+            modalidades: [
+                { id: 1, denominacion: "Virtual" },
+                { id: 2, denominacion: "Presencial" }
+            ],
+            //modalidades: [],
             selectFileDni: "Selecione",
             selectFileCertificado: "Selecione",
             showEstadoUniversidad: false,
@@ -1014,36 +1014,37 @@ export default {
         //             }.bind(this)
         //         );
         // },
-        getVacanteModalidad: function(turno) {
-            console.log(turno);
-            axios
-                .get("get-vacante-modalidad", {
-                    params: {
-                        area: this.fields.area,
-                        turno: this.fields.turno
-                    }
-                })
-                .then(
-                    function(response) {
-                        // this.turnos = response.data;
-                        let virtual = response.data.filter(e => {
-                            return e.denominacion == "Virtual";
-                        });
+        getVacanteModalidad: function() {            
+            // axios
+            //     .get("get-vacante-modalidad", {
+            //         params: {
+            //             area: this.fields.area,
+            //             turno: this.fields.turno
+            //         }
+            //     })
+            //     .then(
+            //         function(response) {
+            //             // this.turnos = response.data;
+            //             let virtual = response.data.filter(e => {
+            //                 return e.denominacion == "Virtual";
+            //             });
 
-                        if (virtual.length != 0) {
-                            if (response.data.length > 1) {
-                                this.modalidades = [
-                                    { id: 1, denominacion: "Virtual" },
-                                    { id: 2, denominacion: "Presencial" }
-                                ];
-                            } else {
-                                this.modalidades = [{ id: 1, denominacion: "Virtual" }];
-                            }
-                        } else {
-                            this.modalidades = [{ id: 2, denominacion: "Presencial" }];
-                        }
-                    }.bind(this)
-                );
+            //             if (virtual.length != 0) {
+            //                 if (response.data.length > 1) {
+            //                     this.modalidades = [
+            //                         { id: 1, denominacion: "Virtual" },
+            //                         { id: 2, denominacion: "Presencial" }
+            //                     ];
+            //                 } else {
+            //                   this.modalidades = [{ id: 1, denominacion: "Virtual" }];
+            //                 }
+            //             } else {
+            //                    this.modalidades = [{ id: 2, denominacion: "Presencial" }];
+            //             }
+            //         }.bind(this)
+            //     );
+
+
         },
         getVacanteTurnos: function(area) {
             axios
@@ -1059,21 +1060,61 @@ export default {
                 );
         },
         getVacanteSedes: function(area) {
-            axios
-                .get("get-vacante-sedes", {
-                    params: {
-                        area: this.fields.area,
-                        turno: this.fields.turno,
-                        modalidad: this.fields.modalidad
-                    }
-                })
-                .then(
-                    function(response) {
-                        // this.turnos = response.data;
+            // axios
+            //     .get("get-vacante-sedes", {
+            //         params: {
+            //             area: this.fields.area,
+            //             turno: this.fields.turno,
+            //             modalidad: this.fields.modalidad
+            //         }
+            //     })
+            //     .then(
+            //         function(response) {
+            //             // this.turnos = response.data;
 
-                        this.sedes = response.data;
-                    }.bind(this)
-                );
+            //             this.sedes = response.data;
+            //         }.bind(this)
+            //     );
+            if (this.fields.modalidad === 2) {
+                if (
+                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
+                    this.fields.turno === 1
+                ) {
+                    // Activar el tercer select con las opciones para "JULI"
+                    this.sedes = [{ id: 4, denominacion: "Juli - Chucuito" }];
+                } else if (
+                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
+                    this.fields.turno === 3
+                ) {
+                    // Activar el tercer select con las opciones para "PUNO"
+                    this.sedes = [{ id: 3, denominacion: "Puno" }];
+                } else if (this.fields.area === 1 && this.fields.turno === 2) {
+                    // Activar el tercer select con las opciones para "AYAVIRI", "AZANGARO" y "HUANCANE"
+                    this.sedes = [
+                        { id: 5, denominacion: "Ayaviri" },
+                        { id: 6, denominacion: "Azangaro" },
+                        { id: 7, denominacion: "Huancané" }
+                    ];
+                } else if (this.fields.area === 2 && this.fields.turno === 2) {
+                    // Activar el tercer select con las opciones para "AYAVIRI", "AZANGARO" y "HUANCANE"
+                    this.sedes = [
+                        { id: 5, denominacion: "Ayaviri" },
+                        { id: 6, denominacion: "Azangaro" },
+                        { id: 7, denominacion: "Huancané" }
+                    ];
+                }
+                
+                else if (
+                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
+                    this.fields.turno === 2
+                ) {
+                    // Activar el tercer select con las opciones para "AZANGARO"
+                    this.sedes = [{ id: 6, denominacion: "Azangaro" }];
+                } 
+            } else {
+                // Lógica si la modalidad es 1
+                this.sedes = [{ id: 1, denominacion: "Virtual" }];
+            }
         },
         changeAreas: function(area) {
             if (area != null) {
