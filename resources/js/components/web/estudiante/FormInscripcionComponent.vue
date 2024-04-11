@@ -1109,7 +1109,10 @@ export default {
                     this.fields.turno === 2
                 ) {
                     // Activar el tercer select con las opciones para "AZANGARO"
-                    this.sedes = [{ id: 6, denominacion: "Azangaro" }];
+                    this.sedes = [
+                        { id: 6, denominacion: "Azangaro" },
+                        { id: 7, denominacion: "Huancané" }
+                    ];
                 } 
             } else {
                 // Lógica si la modalidad es 1
