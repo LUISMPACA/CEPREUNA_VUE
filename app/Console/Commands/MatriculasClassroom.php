@@ -48,7 +48,7 @@ class MatriculasClassroom extends Command
 
 
         $matriculaDetalle = MatriculaDetalle::where("estado", "0")->get();
-        $url = "matricula-".time() . ".txt";
+        $url = "matricula-" . time() . ".txt";
 
         Storage::disk("crons")->append($url, "Iniciando sincronización...");
 
@@ -58,7 +58,7 @@ class MatriculasClassroom extends Command
         $control->tipo = 1;
         $control->estado = '0';
         $control->url = $url;
-        $control->users_id = Auth::user()->id;
+        $control->users_id = 4;
         $control->save();
 
         foreach ($matriculaDetalle as $key => $value) {
