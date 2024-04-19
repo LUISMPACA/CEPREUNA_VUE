@@ -58,7 +58,7 @@ class MatriculasClassroom extends Command
         $control->tipo = 1;
         $control->estado = '0';
         $control->url = $url;
-        $control->users_id = 4;
+        $control->users_id = 6;
         $control->save();
 
         foreach ($matriculaDetalle as $key => $value) {
