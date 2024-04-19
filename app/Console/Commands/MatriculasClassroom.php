@@ -47,7 +47,7 @@ class MatriculasClassroom extends Command
         $apiGsuite = new GWorkspace();
 
 
-        $matriculaDetalle = MatriculaDetalle::select("*")
+        $matriculaDetalle = MatriculaDetalle::select("matricula_detalles.*")
             ->join("matriculas as mat", "mat.id", "matriculas_id")
             ->join("inscripciones as ins", "ins.estudiantes_id", "=", "mat.estudiantes_id")
             ->where([["matricula_detalles.estado", "0"], ["ins.modalidad", "1"]])
