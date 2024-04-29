@@ -47,8 +47,12 @@ class MatriculasClassroom extends Command
         $apiGsuite = new GWorkspace();
 
 
-        $matriculaDetalle = MatriculaDetalle::where("estado", "0")->get();
-        $url = "matricula-".time() . ".txt";
+        $matriculaDetalle = MatriculaDetalle::select("matricula_detalles.*")
+            ->join("matriculas as mat", "mat.id", "matriculas_id")
+            ->join("inscripciones as ins", "ins.estudiantes_id", "=", "mat.estudiantes_id")
+            ->where([["matricula_detalles.estado", "0"], ["ins.modalidad", "1"]])
+            ->get();
+        $url = "matricula-" . time() . ".txt";
 
         Storage::disk("crons")->append($url, "Iniciando sincronización...");
 
@@ -58,7 +62,7 @@ class MatriculasClassroom extends Command
         $control->tipo = 1;
         $control->estado = '0';
         $control->url = $url;
-        $control->users_id = Auth::user()->id;
+        $control->users_id = 6;
         $control->save();
 
         foreach ($matriculaDetalle as $key => $value) {
