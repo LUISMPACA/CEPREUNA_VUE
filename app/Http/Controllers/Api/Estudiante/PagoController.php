@@ -128,116 +128,210 @@ class PagoController extends Controller
         $token = Str::random(40);
 
         // $tarifa = Tarifa::where('id',$request->tarifa)->first();
-
-        $bancoPagoValidacion = BancoPago::where([
-            ["secuencia", $request->secuencia],
-            ["imp_pag", $request->monto],
-            ["fch_pag", $request->fecha],
-            ["concepto", '00000067']
-        ])
-            ->first();
-
-        if ($bancoPagoValidacion->cuenta == '0701010736') {
+        if ($request->pagarEnPagalo == true) {
             $pago = Pago::where([
-                ["secuencia", $request->secuencia],
-                ["monto", $request->monto],
-                ["fecha", $request->fecha],
-            ])->first();
-        } else {
-            $pago = Pago::where([
-                ["secuencia", $request->secuencia],
+                [DB::raw('SUBSTRING(secuencia, 2, 6)'), $request->secuencia], // Ignorar el primer dígito y comparar los siguientes seis dígitos
                 ["monto", $request->monto],
                 ["fecha", $request->fecha],
                 ["nro_documento", $request->documento],
             ])->first();
-        }
-
-        if (empty($pago)) {
-            if ($bancoPagoValidacion->cuenta == '0701010736') {
+            if (empty($pago)) {
                 $bancoPago = BancoPago::where([
-                    ["secuencia", $request->secuencia],
+                    [DB::raw('SUBSTRING(secuencia, 2, 6)'), $request->secuencia],
                     ["imp_pag", $request->monto],
                     ["fch_pag", $request->fecha],
-                    ["concepto", '00000067']
-                ])
-                    ->first();
-            } else {
-                $bancoPago = BancoPago::where([
-                    ["secuencia", $request->secuencia],
-                    ["imp_pag", $request->monto],
-                    ["fch_pag", $request->fecha],
+                    ["cod_age", '0987'],
                     ["num_doc", str_pad($request->documento, 15, '0', STR_PAD_LEFT)],
                     ["concepto", '00000067']
                 ])
                     ->first();
+    
+                if (empty($bancoPago)) {
+                    $response = array(
+                        "message" => 'Datos invalidos o el concepto de pago no pertenece a  CEPREUNA, intentelo nuevamente.',
+                        "status" => false,
+                    );
+                } else {
+                    $voucherAdjunto = $this->save_file($request->file, $request->file('file')->getClientOriginalExtension());
+    
+                    DB::beginTransaction();
+                    try {
+    
+                        $nuevoPago = new Pago();
+                        $nuevoPago->monto = $request->monto;
+                        $nuevoPago->secuencia = $bancoPago->secuencia;
+                        $nuevoPago->fecha = $request->fecha;
+                        $nuevoPago->nro_documento = $request->documento;
+                        $nuevoPago->tipo_pago = "1";
+                        $nuevoPago->token = $token . 'b' . time();
+                        $nuevoPago->voucher = $voucherAdjunto;
+                        $nuevoPago->save();
+    
+                        DB::commit();
+                        $message = 'Pago validado correctamente.';
+                        $status = true;
+                        $token = $nuevoPago->token;
+                        $monto = $nuevoPago->monto;
+                        $secuencia = $nuevoPago->secuencia;
+                        $fecha = $nuevoPago->fecha;
+                    } catch (\Exception $e) {
+                        DB::rollback();
+                        $message = 'Error al validar pago, intentelo nuevamente.';
+                        $status = false;
+                    }
+                    if ($status == true) {
+                        $response = array(
+                            "message" => $message,
+                            "status" => $status,
+                            "token" => $token,
+                            "monto" => $monto,
+                            "secuencia" => $secuencia,
+                            "fecha" => $fecha,
+                        );
+                    } else {
+                        $response = array(
+                            "message" => $message,
+                            "status" => $status,
+                        );
+                    }
+                }
+            } else {
+                if ($pago->estado == '1') {
+                    $response = array(
+                        "message" => 'Pago validado correctamente.',
+                        "status" => true,
+                        "token" => $pago->token,
+                        "monto" => $pago->monto,
+                        "secuencia" => $pago->secuencia,
+                        "fecha" => $pago->fecha,
+                    );
+                } else {
+                    $response = array(
+                        "message" => 'El pago ya ha sido registrado anteriormente.',
+                        "status" => false,
+                    );
+                }
             }
+        }
+        else{
+            $bancoPagoValidacion = BancoPago::where([
+                ["secuencia", $request->secuencia],
+                ["imp_pag", $request->monto],
+                ["fch_pag", $request->fecha],
+                ["concepto", '00000067']
+            ])
+                ->first();
 
-            if (empty($bancoPago)) {
+            if (empty($bancoPagoValidacion)) {
                 $response = array(
                     "message" => 'Datos invalidos o el concepto de pago no pertenece a  CEPREUNA, intentelo nuevamente.',
                     "status" => false,
                 );
+                return response()->json($response);
+            }
+
+            if ($bancoPagoValidacion->cuenta == '0701010736') {
+                $pago = Pago::where([
+                    ["secuencia", $request->secuencia],
+                    ["monto", $request->monto],
+                    ["fecha", $request->fecha],
+                ])->first();
             } else {
-                $voucherAdjunto = $this->save_file($request->file, $request->file('file')->getClientOriginalExtension());
+                $pago = Pago::where([
+                    ["secuencia", $request->secuencia],
+                    ["monto", $request->monto],
+                    ["fecha", $request->fecha],
+                    ["nro_documento", $request->documento],
+                ])->first();
+            }
 
-                DB::beginTransaction();
-                try {
-
-                    $nuevoPago = new Pago();
-                    $nuevoPago->monto = $request->monto;
-                    $nuevoPago->secuencia = $request->secuencia;
-                    $nuevoPago->fecha = $request->fecha;
-                    $nuevoPago->nro_documento = $request->documento;
-                    $nuevoPago->tipo_pago = $descuento;
-                    $nuevoPago->token = $token . 'b' . time();
-                    $nuevoPago->voucher = $voucherAdjunto;
-                    $nuevoPago->save();
-
-                    DB::commit();
-                    $message = 'Pago validado correctamente.';
-                    $status = true;
-                    $token = $nuevoPago->token;
-                    $monto = $nuevoPago->monto;
-                    $secuencia = $nuevoPago->secuencia;
-                    $fecha = $nuevoPago->fecha;
-                } catch (\Exception $e) {
-                    DB::rollback();
-                    $message = 'Error al validar pago, intentelo nuevamente.';
-                    $status = false;
+            if (empty($pago)) {
+                if ($bancoPagoValidacion->cuenta == '0701010736') {
+                    $bancoPago = BancoPago::where([
+                        ["secuencia", $request->secuencia],
+                        ["imp_pag", $request->monto],
+                        ["fch_pag", $request->fecha],
+                        ["concepto", '00000067']
+                    ])
+                        ->first();
+                } else {
+                    $bancoPago = BancoPago::where([
+                        ["secuencia", $request->secuencia],
+                        ["imp_pag", $request->monto],
+                        ["fch_pag", $request->fecha],
+                        ["num_doc", str_pad($request->documento, 15, '0', STR_PAD_LEFT)],
+                        ["concepto", '00000067']
+                    ])
+                        ->first();
                 }
 
-                if ($status == true) {
+                if (empty($bancoPago)) {
                     $response = array(
-                        "message" => $message,
-                        "status" => $status,
-                        "token" => $token,
-                        "monto" => $monto,
-                        "secuencia" => $secuencia,
-                        "fecha" => $fecha,
+                        "message" => 'Datos invalidos o el concepto de pago no pertenece a  CEPREUNA, intentelo nuevamente.',
+                        "status" => false,
+                    );
+                } else {
+                    $voucherAdjunto = $this->save_file($request->file, $request->file('file')->getClientOriginalExtension());
+
+                    DB::beginTransaction();
+                    try {
+
+                        $nuevoPago = new Pago();
+                        $nuevoPago->monto = $request->monto;
+                        $nuevoPago->secuencia = $request->secuencia;
+                        $nuevoPago->fecha = $request->fecha;
+                        $nuevoPago->nro_documento = $request->documento;
+                        $nuevoPago->tipo_pago = $descuento;
+                        $nuevoPago->token = $token . 'b' . time();
+                        $nuevoPago->voucher = $voucherAdjunto;
+                        $nuevoPago->save();
+
+                        DB::commit();
+                        $message = 'Pago validado correctamente.';
+                        $status = true;
+                        $token = $nuevoPago->token;
+                        $monto = $nuevoPago->monto;
+                        $secuencia = $nuevoPago->secuencia;
+                        $fecha = $nuevoPago->fecha;
+                    } catch (\Exception $e) {
+                        DB::rollback();
+                        $message = 'Error al validar pago, intentelo nuevamente.';
+                        $status = false;
+                    }
+
+                    if ($status == true) {
+                        $response = array(
+                            "message" => $message,
+                            "status" => $status,
+                            "token" => $token,
+                            "monto" => $monto,
+                            "secuencia" => $secuencia,
+                            "fecha" => $fecha,
+                        );
+                    } else {
+                        $response = array(
+                            "message" => $message,
+                            "status" => $status,
+                        );
+                    }
+                }
+            } else {
+                if ($pago->estado == '1') {
+
+                    $response = array(
+                        "message" => 'Pago validado.',
+                        "status" => true,
+                        "token" => $pago->token,
+                        "monto" => $pago->monto,
+                        "secuencia" => $pago->secuencia,
+                        "fecha" => $pago->fecha,
                     );
                 } else {
                     $response = array(
-                        "message" => $message,
-                        "status" => $status,
+                        "message" => 'El pago ya ha sido registrado anteriormente.',
+                        "status" => false,
                     );
                 }
-            }
-        } else {
-            if ($pago->estado == '1') {
-
-                $response = array(
-                    "message" => 'Pago validado.',
-                    "status" => true,
-                    "token" => $pago->token,
-                    "monto" => $pago->monto,
-                    "secuencia" => $pago->secuencia,
-                    "fecha" => $pago->fecha,
-                );
-            } else {
-                $response = array(
-                    "message" => 'El pago ya ha sido registrado anteriormente.',
-                    "status" => false,
-                );
             }
         }
         return response()->json($response);
