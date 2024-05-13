@@ -185,13 +185,13 @@ Route::get('v1/pagos/grupos/{ciclo}/{page}', function (Request $request, $ciclo,
     if ($request->header('Authorization') == "cepreuna_v1_api") {
         $limit = 80;
         $offset = ($page - 1) * $limit;
-        $results = DB::select("SELECT id, fecha as fecha, created_at, nro_documento, secuencia, monto as dni, voucher FROM pagos WHERE created_at>=? AND voucher NOT LIKE '%.pdf' order by fecha ", [$ciclo]);
+        $results = DB::select("SELECT id, fecha as fecha, created_at, nro_documento, secuencia, monto, voucher FROM pagos WHERE created_at>=? AND voucher NOT LIKE '%.pdf' order by fecha ", [$ciclo]);
         $total_count = count($results);
         $totalPages = ceil($total_count / $limit);
         $results = array_slice($results, $offset, $limit);
 
         $results_pdf = [];
-        $results_pdf = DB::select("SELECT id, fecha as fecha, created_at, nro_documento, secuencia, monto  as dni, voucher FROM pagos WHERE created_at>=? AND voucher LIKE '%.pdf' order by fecha", [$ciclo]);
+        $results_pdf = DB::select("SELECT id, fecha as fecha, created_at, nro_documento, secuencia, monto, voucher FROM pagos WHERE created_at>=? AND voucher LIKE '%.pdf' order by fecha", [$ciclo]);
         $total_count_pdf = count($results_pdf);
         $totalPages_pdf = ceil($total_count_pdf / $limit);
         $results_pdf = array_slice($results_pdf, $offset, $limit);
