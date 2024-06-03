@@ -862,6 +862,12 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('sincronizar-matricula/', function () {
                 Artisan::call('matricula:task');
             });
+            Route::get('cron-encuesta/', 'Intranet\Administracion\ControlCronController@indexCronEncuesta');
+            Route::get('control-encuesta/', 'Intranet\Administracion\ControlCronController@controlEncuesta');
+            Route::post('estado-encuesta-cambiar', function (Request $request) {
+                Artisan::call('encuesta:task ' . $request->input('estado', 1));
+            });
+
 
             Route::get('cron-grupo/', 'Intranet\Administracion\ControlCronController@indexCronGrupo');
             Route::get('control-grupo/', 'Intranet\Administracion\ControlCronController@controlGrupo');

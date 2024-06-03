@@ -72,7 +72,7 @@ class ControlCronController extends Controller
         // dd($tmp->estudiante->idgsuite);
         return view('intranet.administracion.cron-docente');
     }
-    
+
 
     public function controlDocente()
     {
@@ -85,8 +85,9 @@ class ControlCronController extends Controller
         }
         return $response;
     }
-    
-    public function indexCronMinCalificacion(){
+
+    public function indexCronMinCalificacion()
+    {
         return view('intranet.administracion.cron-minCalificacion');
     }
     public function controlMinCalificacion()
@@ -111,6 +112,24 @@ class ControlCronController extends Controller
     public function controlCorreo()
     {
         $query = ControlCron::where([["estado", "0"], ["tipo", "5"]])->first();
+        if ($query) {
+            $response["query"] = $query;
+            $response["status"] = true;
+        } else {
+            $response["status"] = false;
+        }
+        return $response;
+    }
+
+    //control encuesta docente
+    public function indexCronEncuesta()
+    {
+        return view('intranet.administracion.cron-encuesta');
+    }
+
+    public function controlEncuesta()
+    {
+        $query = ControlCron::where([["estado", "0"], ["tipo", "15"]])->first();
         if ($query) {
             $response["query"] = $query;
             $response["status"] = true;

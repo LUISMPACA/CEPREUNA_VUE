@@ -14,7 +14,9 @@ class AddCertificadoToEstudiantesTable extends Migration
     public function up()
     {
         Schema::table('estudiantes', function (Blueprint $table) {
-            $table->text("pathCertificado");
+            if (!Schema::hasColumn('estudiantes', 'pathCertificado')) {
+                $table->text('pathCertificado');
+            }
         });
     }
 
@@ -26,7 +28,7 @@ class AddCertificadoToEstudiantesTable extends Migration
     public function down()
     {
         Schema::table('estudiantes', function (Blueprint $table) {
-            //
+            $table->dropColumn('pathCertificado');
         });
     }
 }
