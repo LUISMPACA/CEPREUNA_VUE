@@ -87,13 +87,13 @@ class PagoController extends Controller
         // return $request->all();
         $idEstudiante = $id;
         $inscripcion = Inscripciones::where('estudiantes_id', $idEstudiante)->first();
-
         $rules = $request->validate([
             'secuencia' => 'required',
             'monto' => 'required',
             // 'fecha' => 'required',
             'fecha' => 'required|date|after:2020-12-14|date_format:Y-m-d',
-            'file' => 'required|mimes:pdf,jpg,jpeg,png|max:2000',
+            //'file' => 'required|mimes:pdf,jpg,jpeg,png|max:2000',
+            'file' => $request->pagarEnPagalo ? 'required|mimes:pdf|max:2000' : 'required|mimes:jpg,jpeg,png|max:2000'
         ], $messages = [
             'required' => '* El campo es obligatorio.',
             'fecha.after' => '* Solo se admiten pagos desde el 15/12/2020.',

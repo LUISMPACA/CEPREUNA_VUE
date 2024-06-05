@@ -15,6 +15,8 @@ class AddModalidadToCalificacionDocentesTable extends Migration
     {
         Schema::table('calificacion_docentes', function (Blueprint $table) {
             $table->enum('modalidad', ['0', '1'])->default('0')->comment('0:presencial 1:virtual');
+            $table->decimal('puntaje_total')->default("0");
+            $table->decimal('observacion')->default("0");
         });
     }
 
