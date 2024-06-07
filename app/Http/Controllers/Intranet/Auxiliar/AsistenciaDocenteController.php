@@ -126,12 +126,12 @@ class AsistenciaDocenteController extends Controller
             $data->save();
 
             if ($request->estado == 1 || $request->estado == 2) {
-                $calificacion = new CalificacionDocente;
+                /* $calificacion = new CalificacionDocente;
                 $calificacion->participantes = 0;
                 $calificacion->docentes_id = $request->docente;
                 $calificacion->carga_academicas_id = $request->carga;
                 $calificacion->asistencia_docentes_id = $data->id;
-                $calificacion->save();
+                $calificacion->save(); */
             }
 
 

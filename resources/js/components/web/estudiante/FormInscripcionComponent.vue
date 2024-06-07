@@ -66,7 +66,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="nro_documento">Número del Documento</label>
+                    <label for="nro_documento">Número de Documento</label>
                     <input type="text" class="form-control" name="nro_documento" id="nro_documento" @blur="callWebService" @input="changeDocumento" v-model="fields.nro_documento" />
                     <div v-if="errors && errors.nro_documento" class="text-danger">
                         {{ errors.nro_documento[0] }}
@@ -75,7 +75,7 @@
             </div>
             <div class="col-md-8 col-xs-12">
                 <div class="row form-group">
-                    <label class="col-md-12 col-xs-12 control-label">Subir documento de identidad (ambas caras y en formato .pdf 1MB): </label>
+                    <label class="col-md-12 col-xs-12 control-label">Subir DNI (solo formato .pdf 1MB): </label>
                     <div class="col-md-12 col-xs-12 ">
                         <div class="input-group">
                             <div class="custom-file">
@@ -232,7 +232,7 @@
         <div class="row">
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="departamento">Departamento de residencia habitual</label>
+                    <label for="departamento">Departamento de residencia</label>
 
                     <v-select
                         :disabled="disabledDepartamento"
@@ -249,7 +249,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="provincia">Provincia de residencia habitual</label>
+                    <label for="provincia">Provincia de residencia</label>
 
                     <v-select
                         :disabled="disabledProvincia"
@@ -266,7 +266,7 @@
             </div>
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="distrito">Distrito de residencia habitual</label>
+                    <label for="distrito">Distrito de residencia</label>
 
                     <v-select :disabled="disabledDistrito" :options="distritos" label="distrito" v-model="distrito" @input="changeDistrito"></v-select>
                     <div v-if="errors && errors.ubigeo" class="text-danger">
@@ -283,10 +283,10 @@
             <div class="col-md-12 col-xs-12">
                 <div class="alert alert-warning" role="alert">
                     <strong class="text-danger"
-                        ><i class="fa fa-info-circle"></i> El número de vacantes para modalidad presencial de acuerdo a su área, turno y sede es limitado, una vez cumplida la meta la opción de
-                        modalidad presencial desaparecerá.</strong
+                        ><i class="fa fa-info-circle"></i> El número de vacantes para modalidad presencial de acuerdo a su area, turno y sede es limitado, una vez cumplida la meta la opción de
+                        modalidad presencial desaparecera.</strong
                     >
-                    <h6 style="margin-top:5px">Lista de vacantes agotadas:</h6>
+                    <h6 style="margin-top:5px">Vacantes agotadas:</h6>
                     <ul>
                         <li v-for="(vacante, index) in vacantes" :key="index">{{ vacante.area.denominacion + " - " + vacante.sede.denominacion + " - " + vacante.turno.denominacion }}</li>
                     </ul>
@@ -338,7 +338,7 @@
 
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
-                    <label for="cantidad inscrito">Número de matriculas</label>
+                    <label for="cantidad inscrito">Número de inscripciones</label>
 
                     <input type="number" class="form-control" min="0" name="cantidad_inscrito" id="cantidad_inscrito" v-model="fields.cantidad_inscrito" />
                     <div v-if="errors && errors.cantidad_inscrito" class="text-danger">
@@ -478,23 +478,23 @@
         <div v-if="errors && errors.tokens" class="text-danger">
             {{ errors.tokens[0] }}
         </div>
-        <!-- <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning" role="alert">
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
-        </div> -->
-        <!-- <div class="row">
+        </div>
+        <div class="row">
             <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
                         <label class="form-check-label">
                             <input type="checkbox" class="form-check-input tipo_descuento" value="2" id="tipo_descuento3" @change="changeTipoDescuento($event)" />
-                            Soy hijo de trabajador de la UNA
+                            Resolución Rectoral N° 1196-2024 (Deportista Calificados)
                         </label>
                     </div>
-                    <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opcion debe entregar la constancia de ser hijo de trabajador de la UNA en el CEPREUNA.</p>
+                    <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opción apersonarce con la Resolución Rectoral, DNI y ficha de inscipción al CEPREUNA.</p>
                 </div>
             </div>
-            <div class="col-md-6 col-xs-12">
+            <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -507,7 +507,7 @@
                         <i class="fa fa-info-circle"></i> Al seleccionar esta opcion debe confirmar su inscripción adjuntando la ficha de inscripcion del hermano en CEPREUNA.
                     </p>
                 </div>
-            </div>
+            </div> -->
             <div class="col-md-4 col-xs-12" v-if="fields.tipo_descuento == '4'">
                 <div class="form-group">
                     <label for="nro_documento_hermano">Número de Documento del Hermano Inscrito</label>
@@ -517,7 +517,7 @@
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
         
         <p class="text-info" v-if="montoPagar != 0 && statusDocumento && !statusDescuento && statusColegio && fields.modalidad">
             <i class="fa fa-info-circle"></i> El monto total a pagar es de <b style="font-size:16px"> S/ {{ (montoPagar + 1).toFixed(2) }}</b
@@ -679,11 +679,11 @@ export default {
             terminos: false,
             sede: 1,
             estadoVacantes: true,
-            modalidades: [
-                { id: 1, denominacion: "Virtual" },
-                { id: 2, denominacion: "Presencial" }
-            ],
-            //modalidades: [],
+            // modalidades: [
+            //     { id: 1, denominacion: "Virtual" },
+            //     { id: 2, denominacion: "Presencial" }
+            // ],
+            modalidades: [],
             selectFileDni: "Selecione",
             selectFileCertificado: "Selecione",
             showEstadoUniversidad: false,
@@ -694,21 +694,38 @@ export default {
     },
     methods: {
         callWebService() {
-        $(".loader").show();
-        axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
-            .then(response => {
-                if(response.data.estado){
-                    toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
-                    this.observacion = true;
-                }else{
-                    $(".loader").hide();
-                    this.observacion = false;
-                }
-            })
-            .catch(error => {
-            $(".loader").hide();
-            console.error('Error al llamar al servicio web:', error);
-            });
+        //$(".loader").show();
+        // axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
+        //     .then(response => {
+        //         if(response.data.estado){
+        //             toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
+        //             this.observacion = true;
+        //         }else{
+        //             $(".loader").hide();
+        //             this.observacion = false;
+        //         }
+        //     })
+        //     .catch(error => {
+        //     $(".loader").hide();
+        //     console.error('Error al llamar al servicio web:', error);
+        //     });
+
+            const dniObservados = 
+            ['75202136',
+             '77342429',
+             '61001251',
+             '75709698',
+             '71695488',
+             '73768683']
+             
+             if (!dniObservados.includes(this.fields.nro_documento)) {
+                $(".loader").show();
+                toastr.error(
+                    'Las inscripciones han finalizado', 
+                    'Error', 
+                    {timeOut: 8000}
+                );
+            }
         },
 
         filesChangeDni(e) {
@@ -1014,37 +1031,36 @@ export default {
         //             }.bind(this)
         //         );
         // },
-        getVacanteModalidad: function() {            
-            // axios
-            //     .get("get-vacante-modalidad", {
-            //         params: {
-            //             area: this.fields.area,
-            //             turno: this.fields.turno
-            //         }
-            //     })
-            //     .then(
-            //         function(response) {
-            //             // this.turnos = response.data;
-            //             let virtual = response.data.filter(e => {
-            //                 return e.denominacion == "Virtual";
-            //             });
+        getVacanteModalidad: function(turno) {
+            console.log(turno);
+            axios
+                .get("get-vacante-modalidad", {
+                    params: {
+                        area: this.fields.area,
+                        turno: this.fields.turno
+                    }
+                })
+                .then(
+                    function(response) {
+                        // this.turnos = response.data;
+                        let virtual = response.data.filter(e => {
+                            return e.denominacion == "Virtual";
+                        });
 
-            //             if (virtual.length != 0) {
-            //                 if (response.data.length > 1) {
-            //                     this.modalidades = [
-            //                         { id: 1, denominacion: "Virtual" },
-            //                         { id: 2, denominacion: "Presencial" }
-            //                     ];
-            //                 } else {
-            //                   this.modalidades = [{ id: 1, denominacion: "Virtual" }];
-            //                 }
-            //             } else {
-            //                    this.modalidades = [{ id: 2, denominacion: "Presencial" }];
-            //             }
-            //         }.bind(this)
-            //     );
-
-
+                        if (virtual.length != 0) {
+                            if (response.data.length > 1) {
+                                this.modalidades = [
+                                    { id: 1, denominacion: "Virtual" },
+                                    { id: 2, denominacion: "Presencial" }
+                                ];
+                            } else {
+                                this.modalidades = [{ id: 1, denominacion: "Virtual" }];
+                            }
+                        } else {
+                            this.modalidades = [{ id: 2, denominacion: "Presencial" }];
+                        }
+                    }.bind(this)
+                );
         },
         getVacanteTurnos: function(area) {
             axios
@@ -1060,64 +1076,21 @@ export default {
                 );
         },
         getVacanteSedes: function(area) {
-            // axios
-            //     .get("get-vacante-sedes", {
-            //         params: {
-            //             area: this.fields.area,
-            //             turno: this.fields.turno,
-            //             modalidad: this.fields.modalidad
-            //         }
-            //     })
-            //     .then(
-            //         function(response) {
-            //             // this.turnos = response.data;
+            axios
+                .get("get-vacante-sedes", {
+                    params: {
+                        area: this.fields.area,
+                        turno: this.fields.turno,
+                        modalidad: this.fields.modalidad
+                    }
+                })
+                .then(
+                    function(response) {
+                        // this.turnos = response.data;
 
-            //             this.sedes = response.data;
-            //         }.bind(this)
-            //     );
-            if (this.fields.modalidad === 2) {
-                if (
-                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
-                    this.fields.turno === 1
-                ) {
-                    // Activar el tercer select con las opciones para "JULI"
-                    this.sedes = [{ id: 4, denominacion: "Juli - Chucuito" }];
-                } else if (
-                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
-                    this.fields.turno === 3
-                ) {
-                    // Activar el tercer select con las opciones para "PUNO"
-                    this.sedes = [{ id: 3, denominacion: "Puno" }];
-                } else if (this.fields.area === 1 && this.fields.turno === 2) {
-                    // Activar el tercer select con las opciones para "AYAVIRI", "AZANGARO" y "HUANCANE"
-                    this.sedes = [
-                        { id: 5, denominacion: "Ayaviri" },
-                        { id: 6, denominacion: "Azangaro" },
-                        { id: 7, denominacion: "Huancané" }
-                    ];
-                } else if (this.fields.area === 2 && this.fields.turno === 2) {
-                    // Activar el tercer select con las opciones para "AYAVIRI", "AZANGARO" y "HUANCANE"
-                    this.sedes = [
-                        { id: 5, denominacion: "Ayaviri" },
-                        { id: 6, denominacion: "Azangaro" },
-                        { id: 7, denominacion: "Huancané" }
-                    ];
-                }
-                
-                else if (
-                    (this.fields.area === 1 || this.fields.area === 2 || this.fields.area === 3) &&
-                    this.fields.turno === 2
-                ) {
-                    // Activar el tercer select con las opciones para "AZANGARO"
-                    this.sedes = [
-                        { id: 6, denominacion: "Azangaro" },
-                        { id: 7, denominacion: "Huancané" }
-                    ];
-                } 
-            } else {
-                // Lógica si la modalidad es 1
-                this.sedes = [{ id: 1, denominacion: "Virtual" }];
-            }
+                        this.sedes = response.data;
+                    }.bind(this)
+                );
         },
         changeAreas: function(area) {
             if (area != null) {

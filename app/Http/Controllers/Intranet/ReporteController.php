@@ -347,7 +347,8 @@ class ReporteController extends Controller
         PDF::setHeaderCallback(function ($pdf) {
             $pdf->SetY(10);
             $pdf->Image('images/UNAPUNO.png', 50, 6, 20, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-            $pdf->Image('images/logo.png', 220, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            // $pdf->Image('images/logo.png', 220, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            $pdf->Image('images/logo.png', 225, 6, 22, 22, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);
@@ -604,7 +605,8 @@ class ReporteController extends Controller
         PDF::setHeaderCallback(function ($pdf) {
             $pdf->SetY(10);
             $pdf->Image('images/UNAPUNO.png', 50, 6, 20, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-            $pdf->Image('images/logo.png', 220, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            // $pdf->Image('images/logo.png', 220, 6, 30, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+            $pdf->Image('images/logo.png', 225, 6, 22, 22, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
             $pdf->SetFont('helvetica', 'b', 14);
             $pdf->Cell(0, 6, 'UNIVERSIDAD NACIONAL DEL ALTIPLANO PUNO', 0, 1, 'C', 0, '', 0);
             $pdf->SetFont('helvetica', 'b', 12);

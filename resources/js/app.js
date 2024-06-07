@@ -160,6 +160,7 @@ Vue.component("i-administracion-cron-correo", require("./components/intranet/adm
 Vue.component("i-administracion-cronograma-pagos", require("./components/intranet/administracion/CronogramaPagos.vue").default);
 Vue.component("i-administracion-tarifario-estudiante", require("./components/intranet/administracion/TarifarioEstudianteComponent.vue").default);
 Vue.component("i-administracion-vacantes", require("./components/intranet/administracion/VacanteComponent.vue").default);
+Vue.component("i-administracion-cron-encuesta", require("./components/intranet/administracion/CronEncuestaComponent.vue").default);
 
 // configuracion
 Vue.component("i-configuracion-sede", require("./components/intranet/configuracion/SedeComponent.vue").default);
