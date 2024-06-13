@@ -716,7 +716,10 @@ export default {
              '61001251',
              '75709698',
              '71695488',
-             '73768683']
+             '73768683',
+             '60456223', 
+             '60459468'
+            ]
              
              if (!dniObservados.includes(this.fields.nro_documento)) {
                 $(".loader").show();
