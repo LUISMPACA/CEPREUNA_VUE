@@ -99,7 +99,7 @@ class PagoController extends Controller
             'fecha.after' => '* Solo se admiten pagos desde el 15/12/2020.',
             'file.required' => '* El voucher es obligatorio',
             'file.mimes' => '* Solo se admiten formatos pdf,jpg,jpeg,png.',
-            'file.max' => '* El peso maximo del archivo debe ser menor a 6 MB.'
+            'file.max' => '* El peso maximo del archivo debe ser menor a 2 MB.'
         ]);
         // dd($request->all());
 
@@ -145,7 +145,7 @@ class PagoController extends Controller
                     ["concepto", '00000067']
                 ])
                     ->first();
-    
+
                 if (empty($bancoPago)) {
                     $response = array(
                         "message" => 'Datos invalidos o el concepto de pago no pertenece a  CEPREUNA, intentelo nuevamente.',
@@ -153,10 +153,10 @@ class PagoController extends Controller
                     );
                 } else {
                     $voucherAdjunto = $this->save_file($request->file, $request->file('file')->getClientOriginalExtension());
-    
+
                     DB::beginTransaction();
                     try {
-    
+
                         $nuevoPago = new Pago();
                         $nuevoPago->monto = $request->monto;
                         $nuevoPago->secuencia = $bancoPago->secuencia;
@@ -166,7 +166,7 @@ class PagoController extends Controller
                         $nuevoPago->token = $token . 'b' . time();
                         $nuevoPago->voucher = $voucherAdjunto;
                         $nuevoPago->save();
-    
+
                         DB::commit();
                         $message = 'Pago validado correctamente.';
                         $status = true;
@@ -212,8 +212,7 @@ class PagoController extends Controller
                     );
                 }
             }
-        }
-        else{
+        } else {
             $bancoPagoValidacion = BancoPago::where([
                 ["secuencia", $request->secuencia],
                 ["imp_pag", $request->monto],
