@@ -474,7 +474,7 @@ class SimulacroController extends Controller
         $pdf::Cell(40, 5, $inscripcion->Escuela, 0, 0, 'L', 0, '', 1);
 
         $pdf::Image('images/UNAPUNO.png', 10, 5, 24, 24, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-        $pdf::Image('images/logo.png', 170, 5, 31, 27, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+        $pdf::Image('images/logo-simulacro.png', 170, 5, 31, 27, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
         $style = array(
             'border' => true,
             'padding' => 1,
