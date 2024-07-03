@@ -399,14 +399,16 @@ class SimulacroController extends Controller
         $pdf::SetFont('helvetica', 'b', 12);
         $pdf::Cell(0, 5, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', '', 9);
-        $pdf::Cell(0, 5, 'FECHA DE EXAMEN SIMULACRO : SÁBADO 30 DE DICIEMBRE 2023', 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN : DOMINGO 21 DE JULIO DEL 2024', 0, 1, 'C', 0, '', 0);
 
-        $pdf::ln();
+
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 14);
 
-        $pdf::Cell(0, 5, 'FICHA DE ' .  'INSCRIPCIÓN' . ' SIMULACRO PRESENCIAL - DICIEMBRE 2023 ', 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'FICHA DE ' .  'INSCRIPCIÓN', 0, 1, 'C', 0, '', 0);
+        $pdf::SetFont('helvetica', 'b', 14);
 
+        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN PRESENCIAL ABRIL - JULIO 2024 ', 0, 1, 'C', 0, '', 0);
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(130, 6, 'DATOS DEL POSTULANTE', 1, 1, 'C', 0, '', 0);
@@ -470,8 +472,9 @@ class SimulacroController extends Controller
         $pdf::Cell(30, 5, 'PROGRAMA DE ESTUDIOS:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 5, $inscripcion->Escuela, 0, 0, 'L', 0, '', 1);
+
         $pdf::Image('images/UNAPUNO.png', 10, 5, 24, 24, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
-        $pdf::Image('images/logo.png', 170, 8, 24, 20, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
+        $pdf::Image('images/logo.png', 170, 5, 31, 27, 'PNG', '', '', true, 150, '', false, false, 0, false, false, false);
         $style = array(
             'border' => true,
             'padding' => 1,
@@ -486,6 +489,7 @@ class SimulacroController extends Controller
         if ($InscripcionSimulacro) {
             $pdf::ln();
             $pdf::SetFont('helvetica', 'b', 10);
+
             $pdf::Cell(170, 6, 'DETALLES DE VOUCHER', 1, 1, 'C', 0, '', 0);
 
             $total = 0;
@@ -552,18 +556,14 @@ class SimulacroController extends Controller
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::SetXY(20, 141);
-        $pdf::Cell(170, 6, 'DECLARACIÓN JURADA ELECTRÓNICA', 1, 1, 'C', 0, '', 0);
+        // $pdf::Cell(170, 6, 'DECLARACIÓN JURADA ELECTRÓNICA', 1, 1, 'C', 0, '', 0);
 
         $pdf::SetFont('helvetica', '', 10);
         $html = ' 
-        <table>
-        <tr>
-            <th>El quien suscribe declara bajo juramento que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen de Admisión CEPREUNA 2023", es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta resultará en la exclusión de mi participación en el simulacro. En consecuencia, ratifico la veracidad de la presente declaración jurada. </th>
-        </tr>
-        </table>
+        
         <table border="0.5">
         <tr style="text-align:center; font-weight:bold;">
-            <th>RECOMENDACIONES PARA PRESENTARSE EL DIA DEL SIMULACRO DE EXAMEN DE ADMISIÓN CEPREUNA 2023</th>
+            <th>HORARIO DE INGRESO - INICIO DEL EXAMEN</th>
         </tr>
         </table>
         <table>
@@ -571,10 +571,13 @@ class SimulacroController extends Controller
             <th>
                 <ul>
                     <li>
-                    Horario de Ingreso: El ingreso será desde las <span style="font-weight:bold">07:00 a.m. hasta las 09:00 a.m.</span> Pasado este horario no se podrá ingresar por ningún motivo.
+                    Hora de Ingreso: <span style="font-weight:bold; font-size:11px;">&nbsp;&nbsp;&nbsp;07:00 a.m. a 09:00 a.m.</span> <br> * Transcurrido este horario NADIE podrá ingresar por ningún motivo.
                     </li>
                     <li>
-                    Inicio del Examen: El examen dará comienzo puntualmente a las 10:00 a.m. hasta las 12:00 p.m.  
+                    Inicio del Examen: <span style="font-weight:bold; font-size:11px;">10:00 a.m.</span>
+                    </li>
+                    <li>
+                    Fin del Examen: <span style="font-weight:bold; font-size:11px;">&nbsp;&nbsp;&nbsp;12:00 p.m.</span>  
                     </li>
                 </ul>
             </th>
@@ -592,10 +595,10 @@ class SimulacroController extends Controller
             <th>
                 <ul>
                     <li>
-                    Presenta tu Documento Nacional de Identidad (D.N.I) en original.
+                    Presentar su Documento Nacional de Identidad (D.N.I) en fisico.
                     </li>
                     <li>
-                    Asegúrate de llevar contigo el impreso de la constancia de inscripción para agilizar el proceso de registro. 
+                    Presentar impreso su ficha de inscripción para agilizar el proceso de registro. 
                     </li>
                 </ul>
             </th>
@@ -639,7 +642,17 @@ class SimulacroController extends Controller
         </table>
         <table>
         <tr >
-            <th>El presente examen de simulacro no otorga alguna vacante o puntaje en los procesos de Admisión a la Universidad Nacional del Altiplano.</th>
+            <th style="text-align:justify;">El presente simulacro de examen NO OTORGA vacante o puntaje en los Procesos de Admisión a la Universidad Nacional del Altiplano.</th>
+        </tr>
+        </table>
+        <table border="0.5">
+        <tr style="text-align:center; font-weight:bold;">
+            <th>DECLARACION JURADA</th>
+        </tr>
+        </table>
+        <table>
+        <tr>
+            <th style="text-align:justify;">El que suscribe declara bajo juramento que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen CEPREUNA ciclo ABRIL - JULIO 2024" es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta, excluye mi participación en el simulacro; en consecuencia, ratifico la veracidad de los datos en la presente declaración jurada. </th>
         </tr>
         </table>
         ';
