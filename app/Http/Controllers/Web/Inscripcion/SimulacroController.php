@@ -378,7 +378,7 @@ class SimulacroController extends Controller
             // $y = $pdf->SetY(-15);
             $pdf->Line(10, 283, 200, 283);
             $pdf->SetFont('helvetica', '', 8);
-            $pdf->Cell(0, 10, 'CEPREUNA ' . $periodo->inicio_ciclo . ' - ' . $periodo->fin_ciclo . ' - Fecha y Hora de Registro: ' . $inscripcion->Fecha, "t", false, 'L', 0, '', 0, false, 'T', 'M');
+            $pdf->Cell(0, 10, 'CEPREUNA ' . 'ABRIL 2024' . ' - ' . 'JULIO 2024' . ' - Fecha y Hora de Registro: ' . $inscripcion->Fecha, "t", false, 'L', 0, '', 0, false, 'T', 'M');
         });
         $pdf::SetTitle('Solicitud');
         $pdf::AddPage();
