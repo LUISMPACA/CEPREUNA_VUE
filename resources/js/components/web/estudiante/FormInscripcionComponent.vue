@@ -718,7 +718,8 @@ export default {
              '71695488',
              '73768683',
              '60456223', 
-             '60459468'
+             '60459468',
+             '73352256'
             ]
              
              if (!dniObservados.includes(this.fields.nro_documento)) {
