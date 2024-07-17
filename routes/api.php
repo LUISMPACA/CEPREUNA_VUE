@@ -208,3 +208,31 @@ Route::get('v1/pagos/grupos/{ciclo}/{page}', function (Request $request, $ciclo,
         ]);
     }
 });
+
+Route::get('v1/simulacro/datos', function (Request $request) {
+    if ($request->header('Authorization') == "cepreuna_v1_api") {
+        $pagosInRange = DB::table('banco_pagos')
+                            ->where('imp_pag', '>=', 11)
+                            ->where('imp_pag', '<', 20)
+                            ->where('fch_pag', '>=', '2024-05-05')
+                            ->count();
+
+        $countSimulacros = DB::table('inscripcion_simulacros')->count();
+
+        $countByArea = DB::table('inscripcion_simulacros as is2')
+                            ->join('estudiantes as e', 'e.id', '=', 'is2.estudiantes_id')
+                            ->join('inscripciones as i', 'e.id', '=', 'i.estudiantes_id')
+                            ->join('areas as a', 'a.id', '=', 'i.areas_id')
+                            ->select('a.denominacion as area', DB::raw('COUNT(a.id) as cantidad'))
+                            ->groupBy('a.id')
+                            ->get();
+
+        $response = [
+            'pagosInRange' => $pagosInRange,
+            'countSimulacros' => $countSimulacros,
+            'countByArea' => $countByArea,
+        ];
+
+        return response()->json($response);
+    }
+});
