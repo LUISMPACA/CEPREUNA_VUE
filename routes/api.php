@@ -37,6 +37,9 @@ Route::group(['prefix' => 'perfil'], function () {
     Route::post('/guardar-foto/{id}', 'Api\Estudiante\PerfilController@guardarFoto');
     Route::get('/encrypt/{id}', 'Api\Estudiante\PerfilController@encrypt');
 });
+Route::group(['prefix' => 'v1/ficha'], function () {
+    Route::post('/api-get-ficha', 'Api\Estudiante\FichaSimulacroController@getFicha');
+});
 
 Route::get('v1/{dni}', function (Request $request, $dni) {
     if ($request->header('Authorization') == "cepreuna_v1_api")
