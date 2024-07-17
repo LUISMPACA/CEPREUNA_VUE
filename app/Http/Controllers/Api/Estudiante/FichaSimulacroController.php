@@ -40,7 +40,15 @@ class FichaSimulacroController extends Controller
                     $response["datos"] = [];
                     $response["mensajes"] = "El estudiante no se encuentra registrado para el Examen Simulacro";
                 }
+            } else{
+                $response["status"] = false;
+                $response["datos"] = [];
+                $response["mensajes"] = "Contraseña Invalida";
             }
+        }else{
+            $response["status"] = false;
+            $response["datos"] = [];
+            $response["mensajes"] = "Usted no es estudiante del Cepreuna";
         }
         return response()->json($response);
     }
