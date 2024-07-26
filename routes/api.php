@@ -51,7 +51,7 @@ Route::get('v1/{dni}', function (Request $request, $dni) {
         CASE WHEN ap.parentescos_id = 1 THEN 1 WHEN ap.parentescos_id = 2 THEN 2 ELSE 3 END AS apo_parentesco, ma.habilitado_estado AS habilitado FROM estudiantes es
         INNER JOIN inscripciones ins ON ins.estudiantes_id=es.id
         INNER JOIN periodos pe ON pe.id=ins.periodos_id
-        INNER JOIN ubigeos ub ON es.ubigeos_id = ub.id
+        LEFT  JOIN ubigeos ub ON es.ubigeos_id = ub.id
         INNER JOIN colegios co ON co.id = es.colegios_id
         INNER JOIN tipo_colegios tc ON tc.id = co.tipo_colegios_id
         LEFT JOIN estudiante_apoderados ea ON ea.estudiantes_id=es.id
