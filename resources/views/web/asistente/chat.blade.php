@@ -102,7 +102,7 @@
                                 </div>
                                 <h5 class="mt-3">ASISTENTE CEPREUNA 🤖</h5>
                                 <hr>
-                                <div id="chat-box" class="chat-box border p-3">
+                                <div id="chat-box" class="chat-box border p-3" style="min-height:50vh">
                                     <!-- Mensajes del chat se agregan aquí -->
                                 </div>
                                 <div id="typing-indicator" class="typing-indicator">
