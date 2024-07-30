@@ -11,6 +11,7 @@ use App\Models\Matricula;
 use App\Models\TarifaEstudiante;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
 
 class OpenAIController extends Controller
 {
@@ -29,75 +30,86 @@ class OpenAIController extends Controller
     }
 
     public function createThreadAndRun(Request $request)
-    {
-        try {
-            // Check if there is an existing thread ID in the session
-            $threadId = Session::get('thread_id');
+{
+    try {
+        // Check if there is an existing thread ID in the session
+        $threadId = Session::get('thread_id');
 
-            // If no thread ID in the session, create a new thread
-            if (!$threadId) {   
-                $response = $this->openAIClient->post('threads', ['json' => []]);
-                $threadData = json_decode($response->getBody()->getContents(), true);
-                $threadId = $threadData['id'] ?? null;
+        // If no thread ID in the session, create a new thread
+        if (!$threadId) {   
+            $response = $this->openAIClient->post('threads', ['json' => []]);
+            $threadData = json_decode($response->getBody()->getContents(), true);
+            $threadId = $threadData['id'] ?? null;
 
-                if (!$threadId) {
-                    return response()->json(['error' => 'Unable to create thread.'], 500);
-                }
-
-                // Store the thread ID in the session
-                Session::put('thread_id', $threadId);
+            if (!$threadId) {
+                return response()->json(['error' => 'Unable to create thread.'], 500);
             }
 
-            // Generate message content
-            $dni = $request->input('dni');
-            $datosDNI = $this->obtenerDatosPorDNI($dni);
-            $messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
-            //return $datosDNI;
-            // Add a message to the thread
-            $messageResponse = $this->openAIClient->post("threads/{$threadId}/messages", [
-                'json' => [
-                    'role' => 'user',
-                    'content' => $messageContent,
-                ],
-            ]);
-
-            $messageData = json_decode($messageResponse->getBody()->getContents(), true);
-
-            // Create a Run to process the thread
-            $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
-                'json' => [
-                    'assistant_id' => 'asst_vQFHRgbHNZeUjC77pX7gqmya', // Reemplaza con el ID de tu asistente
-                    'instructions' => $request->input('instructions', ''),
-                ],
-            ]);
-
-            $runData = json_decode($runResponse->getBody()->getContents(), true);
-            $runId = $runData['id'] ?? null;
-
-            if (!$runId) {
-                return response()->json(['error' => 'Unable to create run.'], 500);
-            }
-
-            // Polling for Run Completion
-            $runStatus = $this->pollRunStatus($threadId, $runId);
-
-            // Get messages from the thread
-            $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
-            $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-
-            return response()->json([
-                'thread' => $threadData,
-                'message' => $messageData,
-                'runStatus' => $runStatus,
-                'messages' => $messagesData,
-            ]);
-        } catch (RequestException $e) {
-            return response()->json([
-                'error' => 'Unable to process request.',
-                'message' => $e->getMessage(),
-            ], $e->getCode() ?: 500);
+            // Store the thread ID in the session
+            Session::put('thread_id', $threadId);
         }
+
+        // Fetch previous messages if exist
+        $previousMessages = [];
+        $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+        $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+        
+        if (isset($messagesData['data']) && count($messagesData['data']) > 0) {
+            foreach ($messagesData['data'] as $message) {
+                $previousMessages[] = $message['content'];
+            }
+        }
+
+        // Generate message content
+        $dni = $request->input('dni');
+        $datosDNI = $this->obtenerDatosPorDNI($dni);
+        $messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
+        
+        // Add previous messages to the current message
+        $completeMessageContent = implode("\n", $previousMessages) . "\n" . $messageContent;
+
+        // Add a message to the thread
+        $messageResponse = $this->openAIClient->post("threads/{$threadId}/messages", [
+            'json' => [
+                'role' => 'user',
+                'content' => $completeMessageContent,
+            ],
+        ]);
+
+        // Create a Run to process the thread
+        $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
+            'json' => [
+                'assistant_id' => 'asst_vQFHRgbHNZeUjC77pX7gqmya', // Reemplaza con el ID de tu asistente
+                'instructions' => $request->input('instructions', ''),
+            ],
+        ]);
+
+        
+        $runData = json_decode($runResponse->getBody()->getContents(), true);
+        $runId = $runData['id'] ?? null;
+
+        if (!$runId) {
+            return response()->json(['error' => 'Unable to create run.'], 500);
+        }
+
+        // Polling for Run Completion
+        $runStatus = $this->pollRunStatus($threadId, $runId);
+
+        // Get messages from the thread
+        $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+        $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+
+        return response()->json([
+            'messages' => $messagesData,
+        ]);
+    } catch (RequestException $e) {
+        return response()->json([
+            'error' => 'Unable to process request.',
+            'message' => $e->getMessage(),
+        ], $e->getCode() ?: 500);
     }
+}
+
 
     private function pollRunStatus($threadId, $runId)
     {
@@ -134,10 +146,12 @@ class OpenAIController extends Controller
                 ->where("nro_documento", $dni)
                 ->first();
 
+            $constancia = "";
+
             if ($estu) {
                 $inscripcion = Inscripciones::where("estudiantes_id", $estu->id)->first();
                 $estudiante = $inscripcion->estudiante()->select('id','nombres', 'paterno', 'materno', 'nro_documento','usuario', 'password')->with('colegio')->first();
-                $matricula =Matricula::select('habilitado as validado', 'habilitado_estado as habilitado','grupo_aulas_id')->where("estudiantes_id", $estu->id)->first();
+                $matricula =Matricula::select('id','habilitado as validado', 'habilitado_estado as habilitado','grupo_aulas_id')->where("estudiantes_id", $estu->id)->first();
                 $auxiliar = DB::table('auxiliar_grupos as ag')->join('auxiliares as a', 'a.id', '=', 'ag.auxiliares_id')->join('users as u', 'u.id', '=', 'a.users_id')->where('ag.grupo_aulas_id', $matricula->grupo_aulas_id)->select('a.telefono as celular', 'u.name','u.paterno','u.materno')->first();
                 $area = $inscripcion->area()->first();
                 $sede = $inscripcion->sede()->first();
@@ -147,9 +161,13 @@ class OpenAIController extends Controller
                 $inscripcionPagos = $inscripcion->inscripcionPago()->with('conceptoPago')->orderBy('concepto_pagos_id')->get();
                 $sumaTotalPagos = $inscripcion->inscripcionPago()->sum('monto');
                 $tarifaEstudiante = TarifaEstudiante::where("estudiantes_id", $estudiante->id)->get();
+                
+                if($matricula->habilitado == "1"){
+                    $constancia = 'https://sistemas.cepreuna.edu.pe/dga/estudiantes/pdf-constancia/'.Crypt::encryptString($matricula->id);
+                }
 
                 return [
-                    //"inscripcion" => $inscripcion,
+                    "constancia" => $constancia,
                     "estudiante" => $estudiante,
                     "matricula" => $matricula,
                     "area" => $area->denominacion,
@@ -172,5 +190,29 @@ class OpenAIController extends Controller
         } catch (\Exception $e) {
             return ['error' => 'Unable to fetch data from database.', 'message' => $e->getMessage()];
         }
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if ($estudiante = Estudiante::where('usuario', $credentials['email'])->first()) {
+
+            // Verificar si se encontró el estudiante y la contraseña coincide
+            if ($estudiante->usuario == $credentials['email'] && $estudiante->password == $credentials['password']) {
+                // para el formulario
+                $estudiante = Estudiante::join('inscripciones', 'estudiantes.id', '=', 'inscripciones.estudiantes_id')
+                    ->select('estudiantes.nro_documento',)
+                    ->where('estudiantes.usuario', $credentials['email'])
+                    ->where('estudiantes.password', $credentials['password'])
+                    ->first();
+
+                $response = json_decode($estudiante, true);
+                return view('web.asistente.chat', ['estudiante' => $response]);
+                
+            }
+        }
+
+        return redirect()->back()->with('error', 'El correo o la contraseña ingresados son incorrectos. Por favor, verifica tus credenciales y vuelve a intentarlo.');
     }
 }
