@@ -180,6 +180,7 @@ class OpenAIController extends Controller
                 ->first();
 
             $constancia = "";
+            $preinscripcion = "";
 
             if ($estu) {
                 $inscripcion = Inscripciones::where("estudiantes_id", $estu->id)->first();
