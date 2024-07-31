@@ -45,6 +45,17 @@
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
+        .btn-finish {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Ocultar el botón inicialmente */
+        }
         .breadcrumb {
             background-color: transparent;
             padding: 0;
@@ -112,11 +123,15 @@
                                     <span class="dot"></span>
                                 </div>
                                 <form id="chat-form">
+                                    <!-- Campo de DNI oculto -->
+                                    <div class="form-group mx-sm-3 mb-2" style="display:none;">
+                                        <input type="text" id="dni" name="dni" class="form-control form-control-sm" placeholder="DNI" required>
+                                    </div>
                                     <div class="input-group mt-3">
                                         <input type="text" id="content" name="content" class="form-control" placeholder="Escribe tu mensaje..." required>
-                                        <input type="hidden" id="dni" name="dni" value="{{ $estudiante['nro_documento'] }}">
                                         <button type="submit" class="btn btn-primary">Enviar</button>
                                     </div>
+                                    <button type="button" id="finish-button" class="btn-finish mt-3">Finalizar</button>
                                 </form>
                             </div>
                         </div>
@@ -134,95 +149,107 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     $(document).ready(function() {
-    $('#chat-form').on('submit', function(e) {
-        e.preventDefault();
+        // Solicitar DNI al iniciar
+        var dni;
+        do {
+            dni = prompt("Por favor, ingresa tu DNI:");
+        } while (!dni || dni.trim() === "");
+        $('#dni').val(dni);
 
-        var message = $('#content').val();
-        var dni = $('#dni').val();
-        var $button = $(this).find('button[type="submit"]');
-        var $chatBox = $('#chat-box');
-        var $typingIndicator = $('#typing-indicator');
+        $('#chat-form').on('submit', function(e) {
+            e.preventDefault();
 
-        // Deshabilitar el botón de envío
-        $button.prop('disabled', true);
+            var message = $('#content').val();
+            var $button = $(this).find('button[type="submit"]');
+            var $chatBox = $('#chat-box');
+            var $typingIndicator = $('#typing-indicator');
+            var $finishButton = $('#finish-button');
 
-        // Mostrar mensaje del usuario
-        $chatBox.append('<div class="message user">' + message + '</div>');
+            // Deshabilitar el botón de envío
+            $button.prop('disabled', true);
 
-        // Mostrar indicador de "escribiendo..."
-        $typingIndicator.show();
+            // Mostrar mensaje del usuario
+            $chatBox.append('<div class="message user">' + message + '</div>');
 
-        // Desplazar hacia abajo
-        $chatBox.scrollTop($chatBox[0].scrollHeight);
+            // Mostrar indicador de "escribiendo..."
+            $typingIndicator.show();
 
-        // Enviar mensaje al servidor
-        $.ajax({
-            url: '/api/generate-text',
-            method: 'POST',
-            data: {
-                content: message,
-                dni: dni,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function(response) {
-                // Mostrar respuesta del asistente
-                if (response.messages && response.messages.data) {
-                    var firstMessage = response.messages.data[0].content[0].text.value;
+            // Desplazar hacia abajo
+            $chatBox.scrollTop($chatBox[0].scrollHeight);
 
-                    var formattedMessage = convertToLinks(firstMessage);
+            // Enviar mensaje al servidor
+            $.ajax({
+                url: '/api/generate-text',
+                method: 'POST',
+                data: {
+                    content: message,
+                    dni: dni,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    // Mostrar respuesta del asistente
+                    if (response.messages && response.messages.data) {
+                        var firstMessage = response.messages.data[0].content[0].text.value;
+
+                        var formattedMessage = convertToLinks(firstMessage);
 
                         $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> ' + formattedMessage  + '</div>');
 
-                } else {
-                    $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en la respuesta del asistente.</div>');
+                    } else {
+                        $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en la respuesta del asistente.</div>');
+                    }
+
+                    // Ocultar indicador de "escribiendo..."
+                    $typingIndicator.hide();
+
+                    // Limpiar el formulario
+                    $('#content').val('');
+
+                    // Desplazar hacia abajo
+                    $chatBox.scrollTop($chatBox[0].scrollHeight);
+
+                    // Habilitar el botón de envío
+                    $button.prop('disabled', false);
+
+                    // Mostrar el botón "Finalizar"
+                    $finishButton.show();
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    toastr.error(error.responseJSON.error, "Hubo un Error");
+                    // Ocultar indicador de "escribiendo..."
+                    $typingIndicator.hide();
+                    $('#content').val('');
+                    // Habilitar el botón de envío
+                    $button.prop('disabled', false);
                 }
-
-                // Ocultar indicador de "escribiendo..."
-                $typingIndicator.hide();
-
-                // Limpiar el formulario
-                $('#content').val('');
-
-                // Desplazar hacia abajo
-                $chatBox.scrollTop($chatBox[0].scrollHeight);
-
-                // Habilitar el botón de envío
-                $button.prop('disabled', false);
-            },
-            error: function(error) {
-                console.error('Error:', error);
-                //alert('Hubo un error al procesar la solicitud.');
-                toastr.error(error.responseJSON.error, "Hubo un Error");
-                // Ocultar indicador de "escribiendo..."
-                $typingIndicator.hide();
-                $('#content').val('');
-                // Habilitar el botón de envío
-                $button.prop('disabled', false);
-            }
+            });
         });
+
+        $('#finish-button').on('click', function() {
+            location.reload();
+        });
+
+        function convertToLinks(text) {
+            var urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            var pseudoLinkPattern = /\[(.*?)\]\((.*?)\)/g;
+
+            // Convierte pseudo-enlaces en enlaces HTML
+            text = text.replace(pseudoLinkPattern, function(match, text, url) {
+                return '<a href="' + url.trim() + '" target="_blank">' + text + '</a>';
+            });
+
+            // Convierte URLs en enlaces HTML
+            text = text.replace(urlPattern, function(url) {
+                // Evita duplicar enlaces si ya están convertidos
+                if (text.includes('href="')) {
+                    return url;
+                }
+                return '<a href="' + url.trim() + '" target="_blank">' + url.trim() + '</a>';
+            });
+
+            return text;
+        }
     });
-
-    function convertToLinks(text) {
-        var urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-        var pseudoLinkPattern = /\[(.*?)\]\((.*?)\)/g;
-
-        // Convierte pseudo-enlaces en enlaces HTML
-        text = text.replace(pseudoLinkPattern, function(match, text, url) {
-            return '<a href="' + url.trim() + '" target="_blank">' + text + '</a>';
-        });
-
-        // Convierte URLs en enlaces HTML
-        text = text.replace(urlPattern, function(url) {
-            // Evita duplicar enlaces si ya están convertidos
-            if (text.includes('href="')) {
-                return url;
-            }
-            return '<a href="' + url.trim() + '" target="_blank">' + url.trim() + '</a>';
-        });
-
-        return text;
-    }
-});
-
 </script>
 @endsection

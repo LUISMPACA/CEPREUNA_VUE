@@ -9,6 +9,7 @@ use App\Models\Estudiante;
 use App\Models\Inscripciones;
 use App\Models\Matricula;
 use App\Models\TarifaEstudiante;
+use App\Models\ChatLog;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
@@ -32,6 +33,17 @@ class OpenAIController extends Controller
     public function createThreadAndRun(Request $request)
 {
     try {
+
+        $dni = $request->input('dni');
+        if (!$dni) {
+            return response()->json(['error' => 'DNI is required'], 400);
+        }
+
+        // Generate message content
+        $datosDNI = $this->obtenerDatosPorDNI($dni);
+        if (!($datosDNI['status'])) {
+            return response()->json(['error' => 'No se encontro el DNI'], 500);
+        }
         // Check if there is an existing thread ID in the session
         $threadId = Session::get('thread_id');
 
@@ -60,10 +72,15 @@ class OpenAIController extends Controller
             }
         }
 
-        // Generate message content
-        $dni = $request->input('dni');
-        $datosDNI = $this->obtenerDatosPorDNI($dni);
+        
+
         $messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
+
+         // Verificar si el usuario ha alcanzado el límite de respuestas
+         $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
+         if ($chatLog && $chatLog->remaining_responses <= 0) {
+             return response()->json(['error' => 'Has alcanzado el límite de 10 respuestas.'], 403);
+         }    
         
         // Add previous messages to the current message
         $completeMessageContent = implode("\n", $previousMessages) . "\n" . $messageContent;
@@ -98,6 +115,21 @@ class OpenAIController extends Controller
         // Get messages from the thread
         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+
+        // Calcular remaining_responses
+        $remaining_responses = $chatLog ? max($chatLog->remaining_responses - 1, 0) : 9;
+
+        // Obtener la respuesta del asistente
+        $firstMessage = $messagesData['data'][0]['content'][0]['text']['value']; // Asegúrate de que esta línea sea correcta
+        //return $firstMessage;
+        $estu = Estudiante::select("estudiantes.id") ->where("nro_documento", $dni)->first();
+        // Guardar el log en la base de datos
+        ChatLog::create([
+            'nro_documento' => $dni,
+            'user_message' => $request->input('content'),
+            'assistant_response' => $firstMessage,
+            'remaining_responses' => $remaining_responses
+        ]);
 
         return response()->json([
             'messages' => $messagesData,

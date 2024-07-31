@@ -130,12 +130,16 @@ Route::get('/urlget_e', function () {
 //     }
 // });
 
-
+/**Asistente**/
 Route::get('/asistente', function () {
     return view('web/asistente/login'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
 });
-
+Route::get('/asistentedni', function () {
+    return view('web/asistente/chatSinDni'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+});
 Route::post('asistente', 'OpenAIController@login')->name('loginAsistente');
+
+
 
 Route::get('dga/estudiantes/pdf-constancia/{id}', 'Web\Inscripcion\EstudianteController@pdfConstancia');
 Route::get('dga/estudiantes/foto/{id}', 'Web\Inscripcion\EstudianteController@getFotografia');
