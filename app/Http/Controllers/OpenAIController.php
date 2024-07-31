@@ -41,6 +41,7 @@ class OpenAIController extends Controller
 
         // Generate message content
         $datosDNI = $this->obtenerDatosPorDNI($dni);
+        //return $datosDNI;
         if (!($datosDNI['status'])) {
             return response()->json(['error' => 'No se encontro el DNI'], 500);
         }
@@ -196,10 +197,12 @@ class OpenAIController extends Controller
                 
                 if($matricula->habilitado == "1"){
                     $constancia = 'https://sistemas.cepreuna.edu.pe/dga/estudiantes/pdf-constancia/'.Crypt::encryptString($matricula->id);
+                    $preinscripcion = 'https://inscripciones.admision.unap.edu.pe/pdf-solicitud/10/'.$estu->nro_documento;
                 }
 
                 return [
                     "constancia" => $constancia,
+                    "preinscripcion" => $preinscripcion,
                     "estudiante" => $estudiante,
                     "matricula" => $matricula,
                     "area" => $area->denominacion,
