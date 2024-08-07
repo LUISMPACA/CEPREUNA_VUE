@@ -57,6 +57,12 @@ Route::get('v1/{dni}', function (Request $request, $dni) {
         LEFT JOIN matriculas ma on  ma.estudiantes_id = es.id    
         WHERE es.nro_documento=?", [$dni]);
 });
+Route::get('v1/foto_estudiante/{dni}', function (Request $request, $dni) {
+    if ($request->header('Authorization') == "cepreuna_v1_api")
+        return DB::select("SELECT concat('https://sistemas.cepreuna.edu.pe/storage/fotos/',es.foto) foto_estudiante,
+        es.nro_documento,es.nombres, es.paterno,es.materno,es.nro_documento from estudiantes es
+        WHERE es.nro_documento=?", [$dni]);
+});
 
 Route::get('v1/alumnos/inscritos', function (Request $request) {
     if ($request->header('Authorization') == "cepreuna_v1_api") {
