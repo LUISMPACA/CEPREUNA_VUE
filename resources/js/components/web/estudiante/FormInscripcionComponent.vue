@@ -694,41 +694,43 @@ export default {
     },
     methods: {
         callWebService() {
-        //$(".loader").show();
-        // axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
-        //     .then(response => {
-        //         if(response.data.estado){
-        //             toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
-        //             this.observacion = true;
-        //         }else{
-        //             $(".loader").hide();
-        //             this.observacion = false;
-        //         }
-        //     })
-        //     .catch(error => {
-        //     $(".loader").hide();
-        //     console.error('Error al llamar al servicio web:', error);
-        //     });
+            //$(".loader").show();
+            // axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
+            //     .then(response => {
+            //         if(response.data.estado){
+            //             toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
+            //             this.observacion = true;
+            //         }else{
+            //             $(".loader").hide();
+            //             this.observacion = false;
+            //         }
+            //     })
+            //     .catch(error => {
+            //     $(".loader").hide();
+            //     console.error('Error al llamar al servicio web:', error);
+            //     });
 
-            const dniObservados = 
-            ['75202136',
-             '77342429',
-             '61001251',
-             '75709698',
-             '71695488',
-             '73768683',
-             '60456223', 
-             '60459468'
-            ]
+            // const dniObservados = 
+            // ['75202136',
+            //  '77342429',
+            //  '61001251',
+            //  '75709698',
+            //  '71695488',
+            //  '73768683',
+            //  '60456223', 
+            //  '60459468',
+            //  '73352256',
+            //  '75709698',
+            // ]
              
-             if (!dniObservados.includes(this.fields.nro_documento)) {
-                $(".loader").show();
-                toastr.error(
-                    'Las inscripciones han finalizado', 
-                    'Error', 
-                    {timeOut: 8000}
-                );
-            }
+            //  if (!dniObservados.includes(this.fields.nro_documento)) {
+            //     $(".loader").show();
+            //     toastr.error(
+            //         'Las inscripciones han finalizado', 
+            //         'Error', 
+            //         {timeOut: 8000}
+            //     );
+            // }
         },
 
         filesChangeDni(e) {

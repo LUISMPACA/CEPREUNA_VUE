@@ -178,9 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Spatie\Permission\PermissionServiceProvider::class,
-
-
-
+        App\Providers\OpenAIServiceProvider::class,
     ],
 
     /*

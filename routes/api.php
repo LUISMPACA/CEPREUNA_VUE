@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OpenAIController;
+
+Route::post('/generate-text', [OpenAIController::class, 'createThreadAndRun']);
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +40,9 @@ Route::group(['prefix' => 'perfil'], function () {
     Route::post('/guardar-foto/{id}', 'Api\Estudiante\PerfilController@guardarFoto');
     Route::get('/encrypt/{id}', 'Api\Estudiante\PerfilController@encrypt');
 });
+Route::group(['prefix' => 'v1/ficha'], function () {
+    Route::post('/api-get-ficha', 'Api\Estudiante\FichaSimulacroController@getFicha');
+});
 
 Route::get('v1/{dni}', function (Request $request, $dni) {
     if ($request->header('Authorization') == "cepreuna_v1_api")
@@ -48,7 +54,7 @@ Route::get('v1/{dni}', function (Request $request, $dni) {
         CASE WHEN ap.parentescos_id = 1 THEN 1 WHEN ap.parentescos_id = 2 THEN 2 ELSE 3 END AS apo_parentesco, ma.habilitado_estado AS habilitado FROM estudiantes es
         INNER JOIN inscripciones ins ON ins.estudiantes_id=es.id
         INNER JOIN periodos pe ON pe.id=ins.periodos_id
-        INNER JOIN ubigeos ub ON es.ubigeos_id = ub.id
+        LEFT  JOIN ubigeos ub ON es.ubigeos_id = ub.id
         INNER JOIN colegios co ON co.id = es.colegios_id
         INNER JOIN tipo_colegios tc ON tc.id = co.tipo_colegios_id
         LEFT JOIN estudiante_apoderados ea ON ea.estudiantes_id=es.id
@@ -179,7 +185,11 @@ Route::get('v1/resultados_simulacro/{dni}', function (Request $request, $dni) {
     if ($request->header('Authorization') == "cepreuna_v1_api") {
         // $fecha = '2023-12-30';
 
-        $resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$request->fecha, $dni]);
+        //$resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$request->fecha, $dni]);
+        $resultados = DB::table('ingresantes')
+        ->where('fecha_examen', $request->fecha)
+        ->where('dni', $dni)
+        ->first();
 
         return response()->json($resultados);
     } else {
@@ -209,5 +219,33 @@ Route::get('v1/pagos/grupos/{ciclo}/{page}', function (Request $request, $ciclo,
             'total_count_pdf' => $total_count_pdf,
             'results_pdf' => $results_pdf
         ]);
+    }
+});
+
+Route::get('v1/simulacro/datos', function (Request $request) {
+    if ($request->header('Authorization') == "cepreuna_v1_api") {
+        $pagosInRange = DB::table('banco_pagos')
+                            ->where('imp_pag', '>=', 11)
+                            ->where('imp_pag', '<', 20)
+                            ->where('fch_pag', '>=', '2024-05-05')
+                            ->count();
+
+        $countSimulacros = DB::table('inscripcion_simulacros')->count();
+
+        $countByArea = DB::table('inscripcion_simulacros as is2')
+                            ->join('estudiantes as e', 'e.id', '=', 'is2.estudiantes_id')
+                            ->join('inscripciones as i', 'e.id', '=', 'i.estudiantes_id')
+                            ->join('areas as a', 'a.id', '=', 'i.areas_id')
+                            ->select('a.denominacion as area', DB::raw('COUNT(a.id) as cantidad'))
+                            ->groupBy('a.id')
+                            ->get();
+
+        $response = [
+            'pagosInRange' => $pagosInRange,
+            'countSimulacros' => $countSimulacros,
+            'countByArea' => $countByArea,
+        ];
+
+        return response()->json($response);
     }
 });
