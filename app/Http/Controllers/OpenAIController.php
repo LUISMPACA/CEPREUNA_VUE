@@ -30,26 +30,126 @@ class OpenAIController extends Controller
         ]);
     }
 
-    public function createThreadAndRun(Request $request)
+//     public function createThreadAndRun(Request $request)
+// {
+//     try {
+
+//         $dni = $request->input('dni');
+//         if (!$dni) {
+//             return response()->json(['error' => 'DNI is required'], 400);
+//         }
+
+//         // Check if there is an existing thread ID in the session
+//         $threadId = Session::get('thread_id');
+
+//         // If no thread ID in the session, create a new thread
+//         if (!$threadId) {   
+//             $response = $this->openAIClient->post('threads', ['json' => []]);
+//             $threadData = json_decode($response->getBody()->getContents(), true);
+//             $threadId = $threadData['id'] ?? null;
+
+//             if (!$threadId) {
+//                 return response()->json(['error' => 'Unable to create thread.'], 500);
+//             }
+
+//             // Store the thread ID in the session
+//             Session::put('thread_id', $threadId);
+//         }
+
+//         // Fetch previous messages if exist
+//         $previousMessages = [];
+//         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+//         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+        
+//         if (isset($messagesData['data']) && count($messagesData['data']) > 0) {
+//             foreach ($messagesData['data'] as $message) {
+//                 $previousMessages[] = $message['content'];
+//             }
+//         }
+
+//         //$messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
+//         $messageContent = $request->input('content');   
+//          // Verificar si el usuario ha alcanzado el límite de respuestas
+//          $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
+//          if ($chatLog && $chatLog->remaining_responses <= 0) {
+//              return response()->json(['error' => 'Has alcanzado el límite de 10 respuestas.'], 403);
+//          }    
+        
+//         // Add previous messages to the current message
+//         $completeMessageContent = implode("\n", $previousMessages) . "\n" . $messageContent;
+
+//         // Add a message to the thread
+//         $messageResponse = $this->openAIClient->post("threads/{$threadId}/messages", [
+//             'json' => [
+//                 'role' => 'user',
+//                 'content' => $completeMessageContent,
+//             ],
+//         ]);
+
+//         $conversationHistory = ["hola como stas"];
+//         // Create a Run to process the thread
+//         $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
+//             'json' => [
+//                 'assistant_id' => 'asst_pjuDvtjfR0PpssuFYQWnvHs7', // Reemplaza con el ID de tu asistente
+//                 'instructions' => $request->input('instructions', ''),
+//                 'conversation_history' => $conversationHistory
+//             ],
+//         ]);
+
+        
+//         $runData = json_decode($runResponse->getBody()->getContents(), true);
+//         $runId = $runData['id'] ?? null;
+
+//         if (!$runId) {
+//             return response()->json(['error' => 'Unable to create run.'], 500);
+//         }
+
+//         // Polling for Run Completion
+//         $runStatus = $this->pollRunStatus($threadId, $runId);
+
+//         // Get messages from the thread
+//         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+//         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+
+//         // Calcular remaining_responses
+//         $remaining_responses = $chatLog ? max($chatLog->remaining_responses - 1, 0) : 9;
+
+//         // Obtener la respuesta del asistente
+//         $firstMessage = $messagesData['data'][0]['content'][0]['text']['value']; // Asegúrate de que esta línea sea correcta
+//         //return $firstMessage;
+//         $estu = Estudiante::select("estudiantes.id") ->where("nro_documento", $dni)->first();
+//         // Guardar el log en la base de datos
+//         ChatLog::create([
+//             'nro_documento' => $dni,
+//             'user_message' => $request->input('content'),
+//             'assistant_response' => $firstMessage,
+//             'remaining_responses' => $remaining_responses
+//         ]);
+
+//         return response()->json([
+//             'messages' => $messagesData,
+//         ]);
+//     } catch (RequestException $e) {
+//         return response()->json([
+//             'error' => 'Unable to process request.',
+//             'message' => $e->getMessage(),
+//         ], $e->getCode() ?: 500);
+//     }
+// }
+
+public function createThreadAndRun(Request $request)
 {
     try {
-
         $dni = $request->input('dni');
         if (!$dni) {
             return response()->json(['error' => 'DNI is required'], 400);
         }
 
-        // Generate message content
-        $datosDNI = $this->obtenerDatosPorDNI($dni);
-        //return $datosDNI;
-        if (!($datosDNI['status'])) {
-            return response()->json(['error' => 'No se encontro el DNI'], 500);
-        }
         // Check if there is an existing thread ID in the session
         $threadId = Session::get('thread_id');
 
         // If no thread ID in the session, create a new thread
-        if (!$threadId) {   
+        if (!$threadId) {
             $response = $this->openAIClient->post('threads', ['json' => []]);
             $threadData = json_decode($response->getBody()->getContents(), true);
             $threadId = $threadData['id'] ?? null;
@@ -62,47 +162,43 @@ class OpenAIController extends Controller
             Session::put('thread_id', $threadId);
         }
 
-        // Fetch previous messages if exist
-        $previousMessages = [];
-        $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
-        $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-        
-        if (isset($messagesData['data']) && count($messagesData['data']) > 0) {
-            foreach ($messagesData['data'] as $message) {
-                $previousMessages[] = $message['content'];
-            }
+        //intentos
+        $intentos = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
+        if ($intentos && $intentos->remaining_responses <= 0) {
+            return response()->json(['error' => 'Has alcanzado el límite de respuestas diarias.'], 403);
+        } 
+
+        // Fetch previous conversation context
+        $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'asc')->get();
+           
+        $conversationHistory = $chatLog->map(function ($log) {
+            return [
+                'role' => 'user',
+                'content' => $log->user_message,
+            ];
+        })->toArray();
+
+        // Append the new user message to the conversation history
+        $conversationHistory[] = [
+            'role' => 'user',
+            'content' => $request->input('content'),
+        ];
+
+        // Send the entire conversation history as individual messages to the API
+        foreach ($conversationHistory as $message) {
+            $this->openAIClient->post("threads/{$threadId}/messages", [
+                'json' => $message,
+            ]);
         }
 
-        
-
-        $messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
-
-         // Verificar si el usuario ha alcanzado el límite de respuestas
-         $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
-         if ($chatLog && $chatLog->remaining_responses <= 0) {
-             return response()->json(['error' => 'Has alcanzado el límite de 10 respuestas.'], 403);
-         }    
-        
-        // Add previous messages to the current message
-        $completeMessageContent = implode("\n", $previousMessages) . "\n" . $messageContent;
-
-        // Add a message to the thread
-        $messageResponse = $this->openAIClient->post("threads/{$threadId}/messages", [
-            'json' => [
-                'role' => 'user',
-                'content' => $completeMessageContent,
-            ],
-        ]);
-
-        // Create a Run to process the thread
+        // Create a Run to process the thread (without the conversation_history parameter)
         $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
             'json' => [
-                'assistant_id' => 'asst_vQFHRgbHNZeUjC77pX7gqmya', // Reemplaza con el ID de tu asistente
+                'assistant_id' => 'asst_pjuDvtjfR0PpssuFYQWnvHs7', // Reemplaza con el ID de tu asistente
                 'instructions' => $request->input('instructions', ''),
             ],
         ]);
 
-        
         $runData = json_decode($runResponse->getBody()->getContents(), true);
         $runId = $runData['id'] ?? null;
 
@@ -116,20 +212,32 @@ class OpenAIController extends Controller
         // Get messages from the thread
         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+        //return $messagesData;
+        // Get the assistant's latest response
 
         // Calcular remaining_responses
-        $remaining_responses = $chatLog ? max($chatLog->remaining_responses - 1, 0) : 9;
+        $assistantResponse = '';
+        if (isset($messagesData['data']) && is_array($messagesData['data'])) {
+            foreach ($messagesData['data'] as $message) {
+                if (isset($message['content']) && is_array($message['content'])) {
+                    foreach ($message['content'] as $contentPart) {
+                        if (isset($contentPart['text']['value'])) {
+                            $assistantResponse .= $contentPart['text']['value'] . "\n";
+                        }
+                    }
+                }
+            }
+        }
 
-        // Obtener la respuesta del asistente
-        $firstMessage = $messagesData['data'][0]['content'][0]['text']['value']; // Asegúrate de que esta línea sea correcta
-        //return $firstMessage;
-        $estu = Estudiante::select("estudiantes.id") ->where("nro_documento", $dni)->first();
+        // Calcular remaining_responses
+        $remaining_responses = $chatLog->isNotEmpty() ? max($chatLog->last()->remaining_responses - 1, 0) : 9;
+
         // Guardar el log en la base de datos
         ChatLog::create([
             'nro_documento' => $dni,
             'user_message' => $request->input('content'),
-            'assistant_response' => $firstMessage,
-            'remaining_responses' => $remaining_responses
+            'assistant_response' => $assistantResponse,
+            'remaining_responses' => $remaining_responses,
         ]);
 
         return response()->json([
@@ -144,12 +252,13 @@ class OpenAIController extends Controller
 }
 
 
+
     private function pollRunStatus($threadId, $runId)
     {
         $status = null;
         $attempts = 0;
         $maxAttempts = 10;
-        $delay = 5; // seconds
+        $delay = 3; // seconds
 
         while ($attempts < $maxAttempts) {
             try {

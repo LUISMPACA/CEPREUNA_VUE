@@ -125,18 +125,38 @@
                                 <form id="chat-form">
                                     <!-- Campo de DNI oculto -->
                                     <div class="form-group mx-sm-3 mb-2" style="display:none;">
-                                        <input type="text" id="dni" name="dni" class="form-control form-control-sm" placeholder="DNI" required>
+                                        <input type="text" id="dni" name="dni" class="form-control form-control-sm" placeholder="DNI">
                                     </div>
                                     <div class="input-group mt-3">
                                         <input type="text" id="content" name="content" class="form-control" placeholder="Escribe tu mensaje..." required>
                                         <button type="submit" class="btn btn-primary">Enviar</button>
                                     </div>
-                                    <button type="button" id="finish-button" class="btn-finish mt-3">Finalizar</button>
+                                    <button type="button" id="finish-button" class="btn btn-dark btn-finish mt-3">Finalizar</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para capturar el DNI -->
+<div class="modal fade" id="dniModal" tabindex="-1" aria-labelledby="dniModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dniModalLabel">Ingrese su DNI</h5>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="dniInput">DNI</label>
+                    <input type="number" min="8" class="form-control" id="dniInput" placeholder="Ingrese su DNI" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveDniBtn">Guardar</button>
             </div>
         </div>
     </div>
@@ -148,16 +168,31 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+    var conversationHistory = [];
     $(document).ready(function() {
-        // Solicitar DNI al iniciar
-        var dni;
-        do {
-            dni = prompt("Por favor, ingresa tu DNI:");
-        } while (!dni || dni.trim() === "");
-        $('#dni').val(dni);
+        // Mostrar el modal al cargar la página
+        $('#dniModal').modal('show');
+
+        $('#saveDniBtn').on('click', function() {
+            var dni = $('#dniInput').val();
+            if (!dni || dni.trim() === "" || dni.length !== 8) {
+                toastr.warning('El DNI es obligatorio');
+                return;
+            } else{
+                $('#dni').val(dni);
+                $('#dniModal').modal('hide');
+            }
+        });
 
         $('#chat-form').on('submit', function(e) {
             e.preventDefault();
+
+
+            if ($('#dni').val() === "") {
+                toastr.warning('Debe ingresar su DNI primero');
+                $('#dniModal').modal('show');
+                return;
+            }
 
             var message = $('#content').val();
             var $button = $(this).find('button[type="submit"]');
@@ -167,6 +202,8 @@
 
             // Deshabilitar el botón de envío
             $button.prop('disabled', true);
+            $('#content').val("");
+            $('#content').prop('disabled', true);
 
             // Mostrar mensaje del usuario
             $chatBox.append('<div class="message user">' + message + '</div>');
@@ -177,21 +214,24 @@
             // Desplazar hacia abajo
             $chatBox.scrollTop($chatBox[0].scrollHeight);
 
+            conversationHistory.push({role: 'user', content: message});
             // Enviar mensaje al servidor
             $.ajax({
                 url: '/api/generate-text',
                 method: 'POST',
                 data: {
                     content: message,
-                    dni: dni,
+                    dni: $('#dni').val(),
+                    conversation: conversationHistory,
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
                     // Mostrar respuesta del asistente
                     if (response.messages && response.messages.data) {
                         var firstMessage = response.messages.data[0].content[0].text.value;
-
+                        var firstMessage = cleanMessage(firstMessage);
                         var formattedMessage = convertToLinks(firstMessage);
+                        
 
                         $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> ' + formattedMessage  + '</div>');
 
@@ -204,17 +244,22 @@
 
                     // Limpiar el formulario
                     $('#content').val('');
+                    $('#content').prop('disabled', false);
+                    $('#content').focus();
+                    // Volver a habilitar el botón de envío
+                    $button.prop('disabled', false);
 
                     // Desplazar hacia abajo
                     $chatBox.scrollTop($chatBox[0].scrollHeight);
-
-                    // Habilitar el botón de envío
-                    $button.prop('disabled', false);
 
                     // Mostrar el botón "Finalizar"
                     $finishButton.show();
                 },
                 error: function(error) {
+                    // $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en el servidor. Inténtelo de nuevo más tarde.</div>');
+                    // $typingIndicator.hide();
+                    // $button.prop('disabled', false);
+                    // $chatBox.scrollTop($chatBox[0].scrollHeight);
                     console.error('Error:', error);
                     toastr.error(error.responseJSON.error, "Hubo un Error");
                     // Ocultar indicador de "escribiendo..."
@@ -231,24 +276,19 @@
         });
 
         function convertToLinks(text) {
-            var urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-            var pseudoLinkPattern = /\[(.*?)\]\((.*?)\)/g;
-
-            // Convierte pseudo-enlaces en enlaces HTML
-            text = text.replace(pseudoLinkPattern, function(match, text, url) {
-                return '<a href="' + url.trim() + '" target="_blank">' + text + '</a>';
-            });
-
-            // Convierte URLs en enlaces HTML
-            text = text.replace(urlPattern, function(url) {
-                // Evita duplicar enlaces si ya están convertidos
-                if (text.includes('href="')) {
-                    return url;
+            var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+            return text.replace(urlRegex, function(url) {
+                var hyperlink = url;
+                if (!hyperlink.match('^https?:\/\/')) {
+                    hyperlink = 'http://' + hyperlink;
                 }
-                return '<a href="' + url.trim() + '" target="_blank">' + url.trim() + '</a>';
+                return '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
             });
+        }
 
-            return text;
+        function cleanMessage(message) {
+            // Elimina los patrones específicos del mensaje
+            return message.replace(/\\u3010.*?source.*?\\u3011/g, '');
         }
     });
 </script>
