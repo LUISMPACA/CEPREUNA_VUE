@@ -482,7 +482,7 @@
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
         </div>
         <div class="row">
-            <div class="col-md-6 col-xs-12">
+            <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -493,7 +493,7 @@
                     </div>
                     <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opción apersonarce con la Resolución Rectoral, DNI y ficha de inscipción al CEPREUNA.</p>
                 </div>
-            </div>
+            </div> -->
             <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
@@ -694,21 +694,21 @@ export default {
     },
     methods: {
         callWebService() {
-            //$(".loader").show();
-            // axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
-            //     .then(response => {
-            //         if(response.data.estado){
-            //             toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
-            //             this.observacion = true;
-            //         }else{
-            //             $(".loader").hide();
-            //             this.observacion = false;
-            //         }
-            //     })
-            //     .catch(error => {
-            //     $(".loader").hide();
-            //     console.error('Error al llamar al servicio web:', error);
-            //     });
+            $(".loader").show();
+             axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
+                 .then(response => {
+                     if(response.data.estado){
+                         toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
+                         this.observacion = true;
+                     }else{
+                         $(".loader").hide();
+                         this.observacion = false;
+                     }
+                 })
+                 .catch(error => {
+                 $(".loader").hide();
+                 console.error('Error al llamar al servicio web:', error);
+            });
 
             // const dniObservados = 
             // ['75202136',
