@@ -1,5 +1,6 @@
 <template>
-    <form @submit.prevent="submit">
+    <div>
+        <form @submit.prevent="submit">
         <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Complete los siguientes campos.</p>
         <h5 class="text-secondary">1. Datos Personales</h5>
         <div class="row">
@@ -610,7 +611,25 @@
                 Registrar Inscripción
             </button>
         </div>
-    </form>
+        </form>
+        <!-- modal -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <img src="/images/popup.jpg" class="img-fluid" alt="Descripción de la imagen" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -1296,6 +1315,7 @@ export default {
     },
     mounted() {
         console.log("Component mounted.");
+        $('#imageModal').modal("show");
         this.getTipoDocumentos();
         this.getPaises();
         this.getDepartamentos();
