@@ -1,5 +1,6 @@
 <template>
-    <form @submit.prevent="submit">
+    <div>
+        <form @submit.prevent="submit">
         <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Complete los siguientes campos.</p>
         <h5 class="text-secondary">1. Datos Personales</h5>
         <div class="row">
@@ -482,7 +483,7 @@
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
         </div>
         <div class="row">
-            <div class="col-md-6 col-xs-12">
+            <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -493,7 +494,7 @@
                     </div>
                     <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opción apersonarce con la Resolución Rectoral, DNI y ficha de inscipción al CEPREUNA.</p>
                 </div>
-            </div>
+            </div> -->
             <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
@@ -610,7 +611,25 @@
                 Registrar Inscripción
             </button>
         </div>
-    </form>
+        </form>
+        <!-- modal -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <img src="/images/popup.jpg" class="img-fluid" alt="Descripción de la imagen" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -694,21 +713,21 @@ export default {
     },
     methods: {
         callWebService() {
-            //$(".loader").show();
-            // axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
-            //     .then(response => {
-            //         if(response.data.estado){
-            //             toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
-            //             this.observacion = true;
-            //         }else{
-            //             $(".loader").hide();
-            //             this.observacion = false;
-            //         }
-            //     })
-            //     .catch(error => {
-            //     $(".loader").hide();
-            //     console.error('Error al llamar al servicio web:', error);
-            //     });
+            $(".loader").show();
+             axios.get('https://inscripciones.admision.unap.edu.pe/api/v1/observados-cepre-libre/' + this.fields.nro_documento)
+                 .then(response => {
+                     if(response.data.estado){
+                         toastr.error('Usted se encuentra observado por la oficina de admisión. Diríjase a esa oficina para más información. No podrá continuar con su inscripción.', 'Error', {timeOut: 8000});
+                         this.observacion = true;
+                     }else{
+                         $(".loader").hide();
+                         this.observacion = false;
+                     }
+                 })
+                 .catch(error => {
+                 $(".loader").hide();
+                 console.error('Error al llamar al servicio web:', error);
+            });
 
             // const dniObservados = 
             // ['75202136',
@@ -1296,6 +1315,7 @@ export default {
     },
     mounted() {
         console.log("Component mounted.");
+        $('#imageModal').modal("show");
         this.getTipoDocumentos();
         this.getPaises();
         this.getDepartamentos();

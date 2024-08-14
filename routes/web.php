@@ -132,11 +132,14 @@ Route::get('/urlget_e', function () {
 
 /**Asistente**/
 Route::get('/asistente', function () {
-    return view('web/asistente/login'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+    //return view('web/asistente/login'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+    return view('web/asistente/chatSinDni');
 });
+
 Route::get('/asistentedni', function () {
-    return view('web/asistente/chatSinDni'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+    //return view('web/asistente/chatSinDni'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
 });
+
 Route::post('asistente', 'OpenAIController@login')->name('loginAsistente');
 
 
