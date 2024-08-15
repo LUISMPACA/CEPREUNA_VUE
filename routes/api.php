@@ -63,12 +63,12 @@ Route::get('v1/{dni}', function (Request $request, $dni) {
         LEFT JOIN matriculas ma on  ma.estudiantes_id = es.id    
         WHERE es.nro_documento=?", [$dni]);
 });
-Route::get('v1/foto_estudiante/{dni}', function (Request $request, $dni) {
-    if ($request->header('Authorization') == "cepreuna_v1_api")
-        return DB::select("SELECT concat('https://sistemas.cepreuna.edu.pe/storage/fotos/',es.foto) foto_estudiante,
-        es.nro_documento,es.nombres, es.paterno,es.materno,es.nro_documento from estudiantes es
-        WHERE es.nro_documento=?", [$dni]);
-});
+// Route::get('v1/foto_estudiante/{dni}', function (Request $request, $dni) {
+//     if ($request->header('Authorization') == "cepreuna_v1_api")
+//         return DB::select("SELECT concat('https://sistemas.cepreuna.edu.pe/storage/fotos/',es.foto) foto_estudiante,
+//         es.nro_documento,es.nombres, es.paterno,es.materno,es.nro_documento from estudiantes es
+//         WHERE es.nro_documento=?", [$dni]);
+// });
 
 Route::get('v1/alumnos/inscritos', function (Request $request) {
     if ($request->header('Authorization') == "cepreuna_v1_api") {
@@ -187,9 +187,9 @@ Route::get('v1/resultados_simulacro/{dni}', function (Request $request, $dni) {
 
         //$resultados = DB::select("SELECT * FROM ingresantes WHERE fecha_examen = ? AND dni = ?", [$request->fecha, $dni]);
         $resultados = DB::table('ingresantes')
-        ->where('fecha_examen', $request->fecha)
-        ->where('dni', $dni)
-        ->first();
+            ->where('fecha_examen', $request->fecha)
+            ->where('dni', $dni)
+            ->first();
 
         return response()->json($resultados);
     } else {
@@ -225,20 +225,20 @@ Route::get('v1/pagos/grupos/{ciclo}/{page}', function (Request $request, $ciclo,
 Route::get('v1/simulacro/datos', function (Request $request) {
     if ($request->header('Authorization') == "cepreuna_v1_api") {
         $pagosInRange = DB::table('banco_pagos')
-                            ->where('imp_pag', '>=', 11)
-                            ->where('imp_pag', '<', 20)
-                            ->where('fch_pag', '>=', '2024-05-05')
-                            ->count();
+            ->where('imp_pag', '>=', 11)
+            ->where('imp_pag', '<', 20)
+            ->where('fch_pag', '>=', '2024-05-05')
+            ->count();
 
         $countSimulacros = DB::table('inscripcion_simulacros')->count();
 
         $countByArea = DB::table('inscripcion_simulacros as is2')
-                            ->join('estudiantes as e', 'e.id', '=', 'is2.estudiantes_id')
-                            ->join('inscripciones as i', 'e.id', '=', 'i.estudiantes_id')
-                            ->join('areas as a', 'a.id', '=', 'i.areas_id')
-                            ->select('a.denominacion as area', DB::raw('COUNT(a.id) as cantidad'))
-                            ->groupBy('a.id')
-                            ->get();
+            ->join('estudiantes as e', 'e.id', '=', 'is2.estudiantes_id')
+            ->join('inscripciones as i', 'e.id', '=', 'i.estudiantes_id')
+            ->join('areas as a', 'a.id', '=', 'i.areas_id')
+            ->select('a.denominacion as area', DB::raw('COUNT(a.id) as cantidad'))
+            ->groupBy('a.id')
+            ->get();
 
         $response = [
             'pagosInRange' => $pagosInRange,
