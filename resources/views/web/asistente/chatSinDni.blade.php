@@ -276,15 +276,19 @@
         });
 
         function convertToLinks(text) {
-            var urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g;
+            // Expresión regular para encontrar URLs
+            var urlRegex = /(((https?:\/\/)|(www\.))[^\s\)\(\u{1F600}-\u{1F64F}]+)/gu;
             return text.replace(urlRegex, function(url) {
                 var hyperlink = url;
+                // Añadir 'http://' si la URL no tiene esquema
                 if (!hyperlink.match('^https?:\/\/')) {
                     hyperlink = 'http://' + hyperlink;
                 }
+                // Devolver el enlace en formato HTML
                 return '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
-            });
+            }).replace(/\s*\)\s*|\s*\(\s*/g, ' '); // Eliminar paréntesis y ajustar espacios
         }
+
 
         function cleanMessage(message) {
             // Elimina los patrones específicos del mensaje
