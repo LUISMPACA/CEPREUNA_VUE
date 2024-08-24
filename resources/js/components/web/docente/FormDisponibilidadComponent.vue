@@ -726,7 +726,7 @@ export default {
                 });
                 // console.log(this.fields);
                 axios
-                    .post("docentes", formData)
+                    .post("disponibilidades", formData)
                     .then(response => {
                         $(".loader").hide();
                         console.log(response);

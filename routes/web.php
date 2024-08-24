@@ -658,7 +658,7 @@ Route::group(['prefix' => 'inscripciones'], function () {
     Route::post('validacion', 'Web\Inscripcion\SimulacroController@login')->name('loginSimulacro');
     /**/
     /*Disponibilidad*/
-    Route::resource('/disponibilidad', 'Web\Inscripcion\DisponibilidadController');
+    Route::resource('/disponibilidades', 'Web\Inscripcion\DisponibilidadController');
     Route::get('disponibilidad', 'Web\Inscripcion\DisponibilidadController@showLogin');
     Route::post('disponibilidad', 'Web\Inscripcion\DisponibilidadController@login')->name('logindisponibilidad');
     /**/
