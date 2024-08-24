@@ -4,29 +4,27 @@ namespace App\Http\Controllers\Web\Inscripcion;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use App\Models\Estudiante;
-use App\Models\Inscripciones;
-use App\Models\Periodo;
-use App\Models\Apoderado;
-use App\Models\EstudianteApoderado;
-use App\Models\Pago;
-use App\Models\BancoPago;
-use App\Models\Colegio;
-use App\Models\ConfiguracionInscripciones;
-use App\Models\ConfiguracionVacante;
-use App\Models\Docente;
-use App\Models\Tarifa;
-use App\Models\InscripcionPago;
-use App\Models\Parentesco;
-use App\Models\TarifaEstudiante;
-use App\Services\GWorkspace;
 use Illuminate\Validation\Rule;
-use App\Models\InscripcionSimulacro;
-use PDF;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Crypt;
+use App\Models\Docente;
+use App\Models\InscripcionDocente;
+use App\Models\InscripcionCurso;
+use App\Models\PlantillaHorario;
+use App\Models\Disponibilidades;
+use App\Models\Periodo;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+// use Illuminate\Support\Facades\DB;
+use App\Models\Turno;
+use App\Models\Area;
+use App\Models\Curricula;
+use App\Models\AdjuntoGrado;
+use App\Models\AdjuntoExperiencia;
+use App\Models\AdjuntoCapacitaciones;
+use App\Models\AdjuntoProducciones;
+use App\Models\DocentesDisponibilidad;
+use App\Models\ConfiguracionInscripciones;
+use DB;
+use PDF;
 
 class DisponibilidadController extends Controller
 {
@@ -70,38 +68,34 @@ class DisponibilidadController extends Controller
 
 
         $credentials = $request->only('email', 'password');
-        $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1'], ['observacion', 'simulacro']])->first();
 
-        $docente = Docente::where('id',1309)->first();
-        $response['docente'] = json_encode($docente);        
-        return view('web.docente.disponibilidad',$response);
-        // if ($estudiante = Estudiante::where('usuario', $credentials['email'])->first()) {
+        //$docente = Docente::where('id',2406)->first();
+        //$response['docente'] = json_encode($docente);  
+        $docente = Docente::join('docente_aptos', 'docentes.id', '=', 'docente_aptos.docentes_id')
+        ->select(
+            'docentes.*',
+            'docente_aptos.usuario',
+        )
+        ->where('docente_aptos.usuario', $credentials['email'])->first();   
+        //return view('web.docente.disponibilidad',$response);
+        if ($docente) {
 
-        //     // Verificar si se encontró el estudiante y la contraseña coincide
-        //     if ($estudiante->usuario == $credentials['email'] && $estudiante->password == $credentials['password']) {
+            // Verificar si se encontró el estudiante y la contraseña coincide
+            if ($docente->usuario == $credentials['email'] && $docente->nro_documento == $credentials['password']) {
 
-        //         //validacion
-        //         $Existe = InscripcionSimulacro::where('estudiantes_id', $estudiante->id)->first();
-        //         //return $Existe;
-        //         if ($Existe) {
-        //             return redirect()->back()->with('error', 'El estudiante ya se encuentra registrado para el simulacro.');
-        //         }
-        //         // para el formulario
-        //         $estudiante = Estudiante::join('inscripciones', 'estudiantes.id', '=', 'inscripciones.estudiantes_id')
-        //             ->join('sedes', 'inscripciones.sedes_id', '=', 'sedes.id')
-        //             ->select('estudiantes.*', 'inscripciones.*', 'sedes.*')
-        //             ->where('estudiantes.usuario', $credentials['email'])
-        //             ->where('estudiantes.password', $credentials['password'])
-        //             ->first();
+                //validacion
+                $Existe = DocentesDisponibilidad::where('docentes_id', $docente->id)->first();
+                if (!$Existe) {
+                    return redirect()->back()->with('error', 'No se Encuenta Habilitado para corregir su Disponibilidad.');
+                }
+                // para el formulario
+                $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1'], ['observacion', 'simulacro']])->first();
+                $response['docente'] = json_encode($docente);
+                return view('web.docente.disponibilidad',$response);
+            }
+        }
 
-        //         $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1'], ['observacion', 'simulacro']])->first();
-
-        //         $response['estudiante'] = json_encode($estudiante);
-        //         return view('web.inscripcion.estudiante-simulacro', $response);
-        //     }
-        // }
-
-       // return redirect()->back()->with('error', 'El correo o la contraseña ingresados son incorrectos. Por favor, verifica tus credenciales y vuelve a intentarlo.');
+       return redirect()->back()->with('error', 'El correo o la contraseña ingresados son incorrectos. Por favor, verifica tus credenciales y vuelve a intentarlo.');
     }
 
     /**
@@ -112,145 +106,134 @@ class DisponibilidadController extends Controller
      */
     public function store(Request $request)
     {
+        //return $request;
+        // dd();
+        // var_dump($request->prioridad);
+        // dd($request->tipo_trabajador);
         $rules = $request->validate([
-            'nombres' => 'required|string',
-            'paterno' => 'required|string',
-            'materno' => 'required|string',
+            'nombres' => 'required',
+            'paterno' => 'required',
+            'materno' => 'required',
             'tipo_documento' => 'required',
             'nro_documento' => 'required',
+            'ruc' => 'required|digits:11',
             'email' => 'required|email',
-            'celular' => 'required',
-            'sede' => 'required',
+            'celular' => 'required|digits:9',
+            'direccion' => 'required',
+            'codigo' => 'required_if:condicion,2',
+            'tipo_trabajador' => 'required_if:condicion,2',
+            'contrato' => 'required_if:condicion,2',
+            'prioridad' => 'required',
+
+            'modalidad' => 'required',
             'area' => 'required',
-            'escuela' => 'required',
-            'tokens' => 'required',
-            'id' => 'required',
+            'cursos' => 'array|min:1',
+            'sede' => 'array|min:1',
+            'disponibilidad' => 'required|array|min:1',
+
+            /**Datos Bancarios**/
+            'nombre_banco' => 'required',
+            'cci' => 'required|digits:20',
+            //Dicto
+            'dicto' => 'required',
+
         ], $messages = [
             'required' => '* El campo :attribute es obligatorio.',
-            'email.email' => '* El formato del correo no es el correcto',
+            'digits' => 'El campo :attribute debe tener exactamente :digits dígitos.',
+            'programa.required' => "* El campo Especialidad es obligatorio.",
+            'email' => '* El campo :attribute no es un correo electronico.',
+            'cursos.min' => '* Seleccionar minimo un Curso.',
+            'sede.min' => '* Seleccionar minimo una Sede.',
+            'disponibilidad.min' => '* Seleccionar minimo una Disponiblidad.',
+            'codigo.required_if' => '* El campo :attribute es obligatorio.'
+
+            // 'produccion_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
+            // 'grado_archivo.*.max' =>'Tamaño maximo de archivo no mayor 1M.',
+
         ]);
+        //dd($request);
+        $periodo = Periodo::where('estado', '1')->first();
+        $docenteExiste = Docente::where("nro_documento", $request->nro_documento)->first();
+       
+        // error
+        DB::beginTransaction();
+        try {
+            $docente = Docente::find($docenteExiste->id);
+            $docente->nombres = mb_strtoupper($request->nombres);
+            $docente->paterno = mb_strtoupper($request->paterno);
+            $docente->materno = mb_strtoupper($request->materno);
+            $docente->nro_documento = $request->nro_documento;
+            $docente->condicion = $request->condicion;
+            $docente->email = $request->email;
+            $docente->celular = $request->celular;
+            $docente->direccion = $request->direccion;
+            $docente->codigo_unap = $request->codigo;
+            $docente->tipo_trabajador = $request->tipo_trabajador;
+            $docente->contrato = $request->contrato;
+            //$docente->programas_id = 1;
+            $docente->tipo_documentos_id = $request->tipo_documento;
+            $docente->ruc = $request->ruc;
+            $docente->nombre_banco = $request->nombre_banco;
+            $docente->cci = $request->cci;
+            $docente->dicto = $request->dicto;
+            $docente->save();
+            
 
-        // dd($cantidadVacantes->cantidad);
-        $tokens = $request->tokens;
-        $pagoExistente = true;
-        $documentoValidado = true;
-        $sumaPagoDB = 0;
-        $cont = 0;
-        $validarPago = 0;
-        $comisionBanco = 0;
-        if (isset($tokens)) {
-            while ($cont < count($tokens)) {
-
-                $validarPago = Pago::where('token', $tokens[$cont])->first();
-                $comisionBanco = $comisionBanco + 1;
-
-                if (empty($validarPago)) {
-                    $pagoExistente = false;
-                } else {
-                    if ($validarPago->estado == '1') {
-                        $sumaPagoDB = $sumaPagoDB + $validarPago->monto;
-                        // validar pago con el numero de documento del estudiante
-                        $validarDocumento = BancoPago::where([
-                            ["secuencia", $validarPago->secuencia],
-                            ["imp_pag", $validarPago->monto],
-                            ["fch_pag", $validarPago->fecha],
-                            ["num_doc", str_pad($request->nro_documento, 15, '0', STR_PAD_LEFT)],
-                        ])
-                            ->first();
-                        if (empty($validarDocumento)) {
-                            $documentoValidado = false;
-                        }
-                    } else {
-                        $pagoExistente = false;
-                    }
-                }
-                $cont = $cont + 1;
-            }
-        } else {
-            $pagoExistente = false;
-        }
-
-
-        $totalPagar = round(11, 2);
-        if (empty($validarPago)) {
-            $pagoExistente = false;
-        }
-
-        $periodoActual = Periodo::where('estado', '1')->first();
-
-        if ($pagoExistente) {
-            if ($documentoValidado) {
-                if (round($sumaPagoDB, 2) >= $totalPagar) {
-                    //DB::beginTransaction();
-                    try {
-                        $cont = 0;
-                        $sumaImporte = 0;
-                        while ($cont < count($tokens)) {
-                            $pago = Pago::where('token', $tokens[$cont])->first();
-                            if (!empty($pago)) {
-                                $pago = Pago::find($pago->id);
-                                $pago->estado = '2';
-                                $pago->save();
-                                //  215.00
-                                // guadar el pago en la misma tabla (todos los campos) 
-
-                                $controlEstudiante = Estudiante::where('nro_documento', $request->nro_documento)->first();
-
-                                if (isset($controlEstudiante)) {
-                                    $InscripcionSimulacro = new InscripcionSimulacro();
-                                    $InscripcionSimulacro->estudiantes_id = $controlEstudiante->id;
-                                    $InscripcionSimulacro->monto = $pago->monto;
-                                    $InscripcionSimulacro->secuencia = $pago->secuencia;
-                                    $InscripcionSimulacro->nro_documento = $pago->nro_documento;
-                                    $InscripcionSimulacro->codigoqr = $request->nro_documento;
-                                    $InscripcionSimulacro->pagos_id = $pago->id;
-                                    $InscripcionSimulacro->save();
-                                } else {
-                                    $response = array(
-                                        "message" => '* El Estudiante no se encuenta matriculado.',
-                                        "status" => false,
-                                    );
-                                }
-                            }
-                            $cont = $cont + 1;
-                        }
-                        //DB::commit();
-                        $message = 'Inscripcion realizada con exito.';
-                        $status = true;
-                        $error = '';
-                    } catch (\Exception $e) {
-                        //DB::rollback();
-                        $message = 'Error al inscribirse, intentelo nuevamante.';
-                        $status = false;
-                        $error = $e;
-                    }
-
-                    $response = array(
-                        "message" => $message,
-                        "status" => $status,
-                        "url" => url("inscripciones/simulacro/" . Crypt::encryptString($InscripcionSimulacro->id)),
-                        "error" => $error
-                    );
-                } else {
-                    $response = array(
-                        "message" => '* El monto total de pago no es valido, ingrese nuevamente el pago correspondiente.',
-                        "status" => false,
-                    );
-                }
-            } else {
-                $response = array(
-                    "message" => '* Error al validar pago, Ud. esta intentando ingresar un pago que no esta a su nombre.',
-                    "status" => false,
-                );
-            }
-        } else {
-
-            $response = array(
-                "message" => '* El monto total de pago no es valido, ingrese nuevamente el pago correspondiente.',
-                "status" => false,
+             // Actualizar o crear la inscripción del docente en el periodo actual
+             $inscripcion = InscripcionDocente::updateOrCreate(
+                [
+                    'docentes_id' => $docente->id,
+                    'periodos_id' => $periodo->id
+                ]
             );
+
+            // Actualizar cursos asociados
+            InscripcionCurso::where('inscripcion_docentes_id', $docenteExiste->id)->delete();
+            foreach ($request->cursos as $curso) {
+                InscripcionCurso::create([
+                    'inscripcion_docentes_id' => $docenteExiste->id,
+                    'curricula_detalles_id' => $curso,
+                ]);
+            }
+
+            // Actualizar disponibilidades asociadas
+            Disponibilidades::where('inscripcion_docentes_id', $docenteExiste->id)->delete();
+            foreach ($request->disponibilidad as $key => $value) {
+
+                $ids = explode("-", $value);
+
+                $disponibilidad =  new Disponibilidades;
+
+                if (((int)$ids[2]) == $request->prioridad) {
+                    $disponibilidad->prioridad = "1";
+                } else {
+                    $disponibilidad->prioridad = "2";
+                }
+                $disponibilidad->dia = $ids[0];
+                $disponibilidad->plantilla_horarios_id = $ids[1];
+                $disponibilidad->sedes_id = $ids[2];
+                $disponibilidad->inscripcion_docentes_id = $inscripcion->id;
+                $disponibilidad->save();
+            }
+
+            $docenteDisponibilidad = DocentesDisponibilidad::where('docentes_id', $docenteExiste->id)->first();
+            $docenteDisponibilidad->edit = '1';
+            $docenteDisponibilidad->save();
+
+        DB::commit();
+            $response["message"] = 'Inscripción realizada con éxito.';
+            $response["status"] = true;
+            $response["error"] = '';
+            $response["url"] = url("inscripciones/docentes/" . Crypt::encryptString($inscripcion->id));
+        } catch (\Exception $e) {
+            DB::rollback();
+            $response["message"] =  'Error al inscribirse, intentelo nuevamante.';
+            $response["status"] =  false;
+            $response["error"] =  $e;
+            $response["url"] =  "";
         }
-        return response()->json($response);
+
+        return $response;
     }
 
     /**
