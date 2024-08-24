@@ -618,9 +618,30 @@ class DocenteController extends Controller
         $pdf::Cell(40, 6, $docente->ubigeo->departamento, 0, 0, 'L', 0, '', 1);
 
         $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(30, 6, 'RUC:', 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::Cell(40, 6, $docente->ruc, 0, 1, 'L', 0, '', 1);
+
+
+        $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(30, 6, 'PROVINCIA R.:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
-        $pdf::Cell(40, 6, $docente->ubigeo->provincia, 0, 1, 'L', 0, '', 1);
+        $pdf::Cell(40, 6, $docente->ubigeo->provincia, 0, 0, 'L', 0, '', 1);
+
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(30, 6, 'CCI:', 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::Cell(40, 6, $docente->cci, 0, 1, 'L', 0, '', 1);
+
+
+
+
+
+
+
+
+
+
         // ********
         $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(30, 6, 'DISTRITO R.:', 0, 0, 'L', 0, '', 1);
@@ -631,6 +652,8 @@ class DocenteController extends Controller
         $pdf::Cell(30, 6, 'DIRECCIÓN R.:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 6, $docente->direccion, 0, 1, 'L', 0, '', 1);
+
+
 
         $pdf::ln();
         $pdf::ln();
