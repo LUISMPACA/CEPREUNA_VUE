@@ -704,20 +704,20 @@ class DocenteController extends Controller
         foreach ($areas as $key => $value) {
             $areaPostulacion .= " | " . $value->denominacion;
         }
-        // $cursoPostulacion = "";
-        // foreach ($cursos as $key => $value) {
-        //     if($value->curso!=null)
-        //     $cursoPostulacion.=" | ".$value->curso->denominacion;
-        // }
+        $cursoPostulacion = "";
+        foreach ($cursos as $key => $value) {
+            if ($value->curso != null)
+                $cursoPostulacion .= " | " . $value->curso->denominacion;
+        }
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(60, 6, $sedesPostulacion, 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(60, 6, $areaPostulacion, 0, 1, 'L', 0, '', 1);
         // ********
-        // $pdf::SetFont('helvetica', 'b', 8);
-        // $pdf::Cell(190, 6, 'CURSO:', 0, 1, 'L', 0, '', 1);
-        // $pdf::SetFont('helvetica', '', 8);
-        // $pdf::MultiCell(190, 6, $cursoPostulacion, 0, 'L', 0, 0, '', '', true);
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(190, 6, 'CURSO:', 0, 1, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::MultiCell(190, 6, $cursoPostulacion, 0, 'L', 0, 0, '', '', true);
 
         // ******************************************************************
         // |        FORMATO DE DISPONIBILIDAD
@@ -1289,7 +1289,7 @@ class DocenteController extends Controller
         }
         $areaPostulacion = "";
         foreach ($areas as $key => $value) {
-            $areaPostulacion .= " | " . $value->denominacion;
+            $areaPostulacion .= " | ";
         }
         // $cursoPostulacion = "";
         // foreach ($cursos as $key => $value) {
