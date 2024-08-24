@@ -213,8 +213,9 @@ public function createThreadAndRun(Request $request)
         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
         //return $messagesData;
+   
         // Get the assistant's latest response
-
+        $firstMessage = $messagesData['data'][0]['content'][0]['text']['value'];
         // Calcular remaining_responses
         $assistantResponse = '';
         if (isset($messagesData['data']) && is_array($messagesData['data'])) {
@@ -236,7 +237,7 @@ public function createThreadAndRun(Request $request)
         ChatLog::create([
             'nro_documento' => $dni,
             'user_message' => $request->input('content'),
-            'assistant_response' => $assistantResponse,
+            'assistant_response' => $firstMessage,
             'remaining_responses' => $remaining_responses,
         ]);
 

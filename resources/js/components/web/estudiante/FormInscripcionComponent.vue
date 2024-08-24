@@ -587,14 +587,14 @@
                             <input type="checkbox" v-model="terminos" class="form-check-input" name="condiciones" id="condiciones0" value="checkedValue" />
                             <b>Declaro bajo Juramento:</b>
                             <p>
-                                Que, a la fecha de inscripción.
+                                Que, a la fecha de inscripción:
                             </p>
                             <ul>
-                                <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
-                                <!-- <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP. o ser un estudiante que esté en proceso de finalizar la educación secundaria (Quinto de secundaria).</li> -->
-                                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la Universidad Nacional del Altiplano (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
-                                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
-                                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+                                <li>He culminado el quinto de secundaria o estar cursando el quinto de secundaria.</li>
+                                <li>Tengo certificado de estudios o constancia de logros de aprendizaje. </li>
+                                <li>No he logrado una vacante en los procesos de admisión a la Universidad Nacional del Altiplano Puno del CEPREUNA 2024-I, EXTRAORDINARIO 2024, GENERAL 2024-I, CEPREUNA 2024-II y GENERAL 2024-II.</li> 
+                                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico y para el examen de admisión realizar un pago adicional que determine la Dirección de Admisión.</li>
+                                <li>Cumpliré con los pagos de las cuotas en las fechas establecidas en el presente ciclo.</li>
                             </ul>
                             <p>
                                 Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
