@@ -76,18 +76,22 @@ class DisponibilidadController extends Controller
             'docentes.*',
             'docente_aptos.usuario',
         )
-        ->where('docente_aptos.usuario', $credentials['email'])->first();   
+        ->where('docente_aptos.usuario', $credentials['email'])->first();
         //return view('web.docente.disponibilidad',$response);
         if ($docente) {
 
             // Verificar si se encontró el estudiante y la contraseña coincide
             if ($docente->usuario == $credentials['email'] && $docente->nro_documento == $credentials['password']) {
-
+                
                 //validacion
                 $Existe = DocentesDisponibilidad::where('docentes_id', $docente->id)->first();
                 if (!$Existe) {
                     return redirect()->back()->with('error', 'No se Encuenta Habilitado para corregir su Disponibilidad.');
                 }
+                if($Existe->edit == '1'){
+                    return redirect()->back()->with('error', 'Usted actualizó su disponibilidad horaria.');
+                }
+
                 // para el formulario
                 $response["configuracion"] = ConfiguracionInscripciones::where([['tipo_usuario', 1], ['estado', '1'], ['observacion', 'simulacro']])->first();
                 $response['docente'] = json_encode($docente);
