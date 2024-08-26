@@ -19,7 +19,7 @@ class LlamaAIController extends Controller
         $this->llamaClient = new Client([
             'base_uri' => 'https://api.llama-api.com/',
             'headers'  => [
-                'Authorization' => 'Bearer ' . 'LA-d59d6593e63c4e588573023502ce524e010552be957042b19fd1bad801d714dd',
+                'Authorization' => 'Bearer ' . 'key',
                 'Content-Type'  => 'application/json',
             ],
         ]);
