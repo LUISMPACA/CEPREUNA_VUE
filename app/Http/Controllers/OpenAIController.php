@@ -28,231 +28,163 @@ class OpenAIController extends Controller
                 'OpenAI-Beta'   => 'assistants=v2',
             ],
         ]);
-    }
 
-//     public function createThreadAndRun(Request $request)
-// {
-//     try {
-
-//         $dni = $request->input('dni');
-//         if (!$dni) {
-//             return response()->json(['error' => 'DNI is required'], 400);
-//         }
-
-//         // Check if there is an existing thread ID in the session
-//         $threadId = Session::get('thread_id');
-
-//         // If no thread ID in the session, create a new thread
-//         if (!$threadId) {   
-//             $response = $this->openAIClient->post('threads', ['json' => []]);
-//             $threadData = json_decode($response->getBody()->getContents(), true);
-//             $threadId = $threadData['id'] ?? null;
-
-//             if (!$threadId) {
-//                 return response()->json(['error' => 'Unable to create thread.'], 500);
-//             }
-
-//             // Store the thread ID in the session
-//             Session::put('thread_id', $threadId);
-//         }
-
-//         // Fetch previous messages if exist
-//         $previousMessages = [];
-//         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
-//         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-        
-//         if (isset($messagesData['data']) && count($messagesData['data']) > 0) {
-//             foreach ($messagesData['data'] as $message) {
-//                 $previousMessages[] = $message['content'];
-//             }
-//         }
-
-//         //$messageContent = $request->input('content') . " Datos para el DNI {$dni}: " . json_encode($datosDNI);
-//         $messageContent = $request->input('content');   
-//          // Verificar si el usuario ha alcanzado el límite de respuestas
-//          $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
-//          if ($chatLog && $chatLog->remaining_responses <= 0) {
-//              return response()->json(['error' => 'Has alcanzado el límite de 10 respuestas.'], 403);
-//          }    
-        
-//         // Add previous messages to the current message
-//         $completeMessageContent = implode("\n", $previousMessages) . "\n" . $messageContent;
-
-//         // Add a message to the thread
-//         $messageResponse = $this->openAIClient->post("threads/{$threadId}/messages", [
-//             'json' => [
-//                 'role' => 'user',
-//                 'content' => $completeMessageContent,
-//             ],
-//         ]);
-
-//         $conversationHistory = ["hola como stas"];
-//         // Create a Run to process the thread
-//         $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
-//             'json' => [
-//                 'assistant_id' => 'asst_pjuDvtjfR0PpssuFYQWnvHs7', // Reemplaza con el ID de tu asistente
-//                 'instructions' => $request->input('instructions', ''),
-//                 'conversation_history' => $conversationHistory
-//             ],
-//         ]);
-
-        
-//         $runData = json_decode($runResponse->getBody()->getContents(), true);
-//         $runId = $runData['id'] ?? null;
-
-//         if (!$runId) {
-//             return response()->json(['error' => 'Unable to create run.'], 500);
-//         }
-
-//         // Polling for Run Completion
-//         $runStatus = $this->pollRunStatus($threadId, $runId);
-
-//         // Get messages from the thread
-//         $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
-//         $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-
-//         // Calcular remaining_responses
-//         $remaining_responses = $chatLog ? max($chatLog->remaining_responses - 1, 0) : 9;
-
-//         // Obtener la respuesta del asistente
-//         $firstMessage = $messagesData['data'][0]['content'][0]['text']['value']; // Asegúrate de que esta línea sea correcta
-//         //return $firstMessage;
-//         $estu = Estudiante::select("estudiantes.id") ->where("nro_documento", $dni)->first();
-//         // Guardar el log en la base de datos
-//         ChatLog::create([
-//             'nro_documento' => $dni,
-//             'user_message' => $request->input('content'),
-//             'assistant_response' => $firstMessage,
-//             'remaining_responses' => $remaining_responses
-//         ]);
-
-//         return response()->json([
-//             'messages' => $messagesData,
-//         ]);
-//     } catch (RequestException $e) {
-//         return response()->json([
-//             'error' => 'Unable to process request.',
-//             'message' => $e->getMessage(),
-//         ], $e->getCode() ?: 500);
-//     }
-// }
-
-public function createThreadAndRun(Request $request)
-{
-    try {
-        $dni = $request->input('dni');
-        if (!$dni) {
-            return response()->json(['error' => 'DNI is required'], 400);
-        }
-
-        // Check if there is an existing thread ID in the session
-        $threadId = Session::get('thread_id');
-
-        // If no thread ID in the session, create a new thread
-        if (!$threadId) {
-            $response = $this->openAIClient->post('threads', ['json' => []]);
-            $threadData = json_decode($response->getBody()->getContents(), true);
-            $threadId = $threadData['id'] ?? null;
-
-            if (!$threadId) {
-                return response()->json(['error' => 'Unable to create thread.'], 500);
-            }
-
-            // Store the thread ID in the session
-            Session::put('thread_id', $threadId);
-        }
-
-        //intentos
-        $intentos = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
-        if ($intentos && $intentos->remaining_responses <= 0) {
-            return response()->json(['error' => 'Has alcanzado el límite de respuestas diarias.'], 403);
-        } 
-
-        // Fetch previous conversation context
-        $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'asc')->get();
-           
-        $conversationHistory = $chatLog->map(function ($log) {
-            return [
-                'role' => 'user',
-                'content' => $log->user_message,
-            ];
-        })->toArray();
-
-        // Append the new user message to the conversation history
-        $conversationHistory[] = [
-            'role' => 'user',
-            'content' => $request->input('content'),
-        ];
-
-        // Send the entire conversation history as individual messages to the API
-        foreach ($conversationHistory as $message) {
-            $this->openAIClient->post("threads/{$threadId}/messages", [
-                'json' => $message,
-            ]);
-        }
-
-        // Create a Run to process the thread (without the conversation_history parameter)
-        $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
-            'json' => [
-                'assistant_id' => 'asst_pjuDvtjfR0PpssuFYQWnvHs7', // Reemplaza con el ID de tu asistente
-                'instructions' => $request->input('instructions', ''),
+        $this->llamaClient = new Client([
+            'base_uri' => 'https://api.llama-api.com/',
+            'headers'  => [
+                'Authorization' => 'Bearer ' . "LA-d59d6593e63c4e588573023502ce524e010552be957042b19fd1bad801d714dd",
+                'Content-Type'  => 'application/json',
             ],
         ]);
+    }
 
-        $runData = json_decode($runResponse->getBody()->getContents(), true);
-        $runId = $runData['id'] ?? null;
+    public function createThreadAndRun(Request $request)
+    {
+        try {
+            $dni = $request->input('dni');
+            if (!$dni) {
+                return response()->json(['error' => 'DNI is required'], 400);
+            }
 
-        if (!$runId) {
-            return response()->json(['error' => 'Unable to create run.'], 500);
-        }
+            // Check if there is an existing thread ID in the session
+            $threadId = Session::get('thread_id');
 
-        // Polling for Run Completion
-        $runStatus = $this->pollRunStatus($threadId, $runId);
+            // If no thread ID in the session, create a new thread
+            if (!$threadId) {
+                $response = $this->openAIClient->post('threads', ['json' => []]);
+                $threadData = json_decode($response->getBody()->getContents(), true);
+                $threadId = $threadData['id'] ?? null;
 
-        // Get messages from the thread
-        $messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
-        $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-        //return $messagesData;
-   
-        // Get the assistant's latest response
-        $firstMessage = $messagesData['data'][0]['content'][0]['text']['value'];
-        // Calcular remaining_responses
-        $assistantResponse = '';
-        if (isset($messagesData['data']) && is_array($messagesData['data'])) {
-            foreach ($messagesData['data'] as $message) {
-                if (isset($message['content']) && is_array($message['content'])) {
-                    foreach ($message['content'] as $contentPart) {
-                        if (isset($contentPart['text']['value'])) {
-                            $assistantResponse .= $contentPart['text']['value'] . "\n";
+                if (!$threadId) {
+                    return response()->json(['error' => 'Unable to create thread.'], 500);
+                }
+
+                // Store the thread ID in the session
+                Session::put('thread_id', $threadId);
+            }
+
+            //intentos
+            $intentos = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'desc')->first();
+            if ($intentos && $intentos->remaining_responses <= 0) {
+                return response()->json(['error' => 'Has alcanzado el límite de respuestas diarias.'], 403);
+            } 
+
+            // Fetch previous conversation context
+            $chatLog = ChatLog::where('nro_documento', $dni)->orderBy('created_at', 'asc')->get();
+            
+            $conversationHistory = $chatLog->map(function ($log) {
+                return [
+                    'role' => 'user',
+                    'content' => $log->user_message,
+                ];
+            })->toArray();
+
+            // Append the new user message to the conversation history
+            $conversationHistory[] = [
+                'role' => 'user',
+                'content' => $request->input('content'),
+            ];
+
+            // Send the entire conversation history as individual messages to the API
+            foreach ($conversationHistory as $message) {
+                $this->openAIClient->post("threads/{$threadId}/messages", [
+                    'json' => $message,
+                ]);
+            }
+
+            // Create a Run to process the thread (without the conversation_history parameter)
+            $runResponse = $this->openAIClient->post("threads/{$threadId}/runs", [
+                'json' => [
+                    'assistant_id' => 'asst_pjuDvtjfR0PpssuFYQWnvHs7', // Reemplaza con el ID de tu asistente
+                    'instructions' => $request->input('instructions', ''),
+                ],
+            ]);
+            
+            $language = 'es';
+            $question = $request->input('content');
+            $filePath = public_path('images/archivo.txt');
+            // Leer el contenido del archivo .txt
+            $fileContent = file_get_contents($filePath);
+
+            // Convertir el contenido a UTF-8
+            $fileContent = mb_convert_encoding($fileContent, 'UTF-8', 'auto');
+
+            // Limpiar caracteres que puedan causar problemas
+            $fileContent = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $fileContent);
+            $apiRequestJson = $this->prepareRequest($fileContent, $question, $language);
+
+            // $response = $this->llamaClient->post('chat/completions', [
+            //     'json' => $apiRequestJson,
+            // ]);
+
+            $runData = json_decode($runResponse->getBody()->getContents(), true);
+            $runId = $runData['id'] ?? null;
+
+            if (!$runId) {
+                return response()->json(['error' => 'Unable to create run.'], 500);
+            }
+
+            // Polling for Run Completion
+            $runStatus = $this->pollRunStatus($threadId, $runId);
+
+            $promises = [
+               'openai' => $this->openAIClient->getAsync("threads/{$threadId}/messages"),
+                'llamaia' => $this->llamaClient->postAsync('chat/completions', [
+                    'json' => $apiRequestJson
+                ]),
+            ];
+
+            $results = \GuzzleHttp\Promise\settle($promises)->wait();
+
+            return $results ;
+
+            // Get messages from the thread
+            //$messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+
+
+            $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
+            //return $messagesData;
+    
+            // Get the assistant's latest response
+            $firstMessage = $messagesData['data'][0]['content'][0]['text']['value'];
+            // Calcular remaining_responses
+            $assistantResponse = '';
+            if (isset($messagesData['data']) && is_array($messagesData['data'])) {
+                foreach ($messagesData['data'] as $message) {
+                    if (isset($message['content']) && is_array($message['content'])) {
+                        foreach ($message['content'] as $contentPart) {
+                            if (isset($contentPart['text']['value'])) {
+                                $assistantResponse .= $contentPart['text']['value'] . "\n";
+                            }
                         }
                     }
                 }
             }
+
+            // Calcular remaining_responses
+            $remaining_responses = $chatLog->isNotEmpty() ? max($chatLog->last()->remaining_responses - 1, 0) : 9;
+        
+            //Guardar el log en la base de datos
+            $chatLog = ChatLog::create([
+                'nro_documento' => $dni,
+                'user_message' => $request->input('content'),
+                'assistant_response' => $firstMessage,
+                'llamaia_response' => $reponsellamaia,
+                'remaining_responses' => $remaining_responses,
+            ]);
+
+            return response()->json([
+                'id' => $chatLog->id,
+                'messagesOpenIA' => $messagesData,
+                'messagesLlamaIA' => $reponsellamaia
+            ]);
+        } catch (RequestException $e) {
+            return response()->json([
+                'error' => 'Unable to process request.',
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?: 500);
         }
-
-        // Calcular remaining_responses
-        $remaining_responses = $chatLog->isNotEmpty() ? max($chatLog->last()->remaining_responses - 1, 0) : 9;
-
-        // Guardar el log en la base de datos
-        ChatLog::create([
-            'nro_documento' => $dni,
-            'user_message' => $request->input('content'),
-            'assistant_response' => $firstMessage,
-            'remaining_responses' => $remaining_responses,
-        ]);
-
-        return response()->json([
-            'messages' => $messagesData,
-        ]);
-    } catch (RequestException $e) {
-        return response()->json([
-            'error' => 'Unable to process request.',
-            'message' => $e->getMessage(),
-        ], $e->getCode() ?: 500);
     }
-}
-
-
 
     private function pollRunStatus($threadId, $runId)
     {
@@ -280,6 +212,62 @@ public function createThreadAndRun(Request $request)
 
         return ['status' => 'failed', 'message' => 'Run did not complete within the expected time.'];
     }
+
+    public function processLLamaAssitans($question)
+    {
+        try {
+            $language = 'es';
+
+            $filePath = public_path('images/archivo.txt');
+            // Leer el contenido del archivo .txt
+            $fileContent = file_get_contents($filePath);
+
+            // Convertir el contenido a UTF-8
+            $fileContent = mb_convert_encoding($fileContent, 'UTF-8', 'auto');
+
+            // Limpiar caracteres que puedan causar problemas
+            $fileContent = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $fileContent);
+            $apiRequestJson = $this->prepareRequest($fileContent, $question, $language);
+
+            $response = $this->llamaClient->post('chat/completions', [
+                'json' => $apiRequestJson,
+            ]);
+
+            $responseJson = json_decode($response->getBody()->getContents(), true);
+
+            // Obtener el contenido de la respuesta del asistente
+            if (isset($responseJson['choices'][0]['message']['content'])) {
+                $assistantResponse = $responseJson['choices'][0]['message']['content'];
+            } else {
+                $assistantResponse = "No se encontró el contenido esperado.";
+            }
+
+            return $assistantResponse; // Devolver solo el contenido del asistente
+
+        } catch (RequestException $e) {
+            // Manejar el error de solicitud
+            return 'Unable to process request: ' . $e->getMessage();
+        } catch (\Exception $e) {
+            // Manejar errores generales
+            return 'An error occurred: ' . $e->getMessage();
+        }
+    }
+
+    private function prepareRequest($fileContent, $question, $language)
+    {
+        return [
+            "model" => "llama-13b-chat",
+            "messages" => [
+                [
+                    "role" => "user",
+                    "content" => "Por favor, responde en {$language} y con ayuda de emojis. Sobre esta información: '{$fileContent}', {$question}"
+                ]
+            ],
+            "max_tokens" => 200,
+            "stream" => false
+        ];
+    }
+
 
     private function obtenerDatosPorDNI($dni)
     {

@@ -19,7 +19,7 @@ class LlamaAIController extends Controller
         $this->llamaClient = new Client([
             'base_uri' => 'https://api.llama-api.com/',
             'headers'  => [
-                'Authorization' => 'Bearer ' . 'key',
+                'Authorization' => 'Bearer ' . "LA-d59d6593e63c4e588573023502ce524e010552be957042b19fd1bad801d714dd",
                 'Content-Type'  => 'application/json',
             ],
         ]);
@@ -28,7 +28,7 @@ class LlamaAIController extends Controller
     public function processDocumentAndQuestion(Request $request)
     {
         try {
-            $file = $request->file('document');
+           // $file = $request->file('document');
             $question = $request->input('question');
             $language = $request->input('language', 'es');
 
@@ -36,9 +36,15 @@ class LlamaAIController extends Controller
             //     return response()->json(['error' => 'Document and question are required'], 400);
             // }
 
-            $filePath = $file->getRealPath();
-            //$fileContent = "hola como estas son las 12 del medio dia";
-            $fileContent = $this->readDocx($filePath);
+            $filePath = public_path('images/archivo.txt');
+            // Leer el contenido del archivo .txt
+            $fileContent = file_get_contents($filePath);
+        
+            // Convertir el contenido a UTF-8
+            $fileContent = mb_convert_encoding($fileContent, 'UTF-8', 'auto');
+        
+            // Limpiar caracteres que puedan causar problemas
+            $fileContent = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $fileContent);
             $apiRequestJson = $this->prepareRequest($fileContent, $question, $language);
 
             $response = $this->llamaClient->post('chat/completions', [

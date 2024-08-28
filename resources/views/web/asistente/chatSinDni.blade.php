@@ -19,11 +19,23 @@
             display: flex;
             flex-direction: column;
         }
+        .message-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 15px;
+        } 
+        .hidden-container {
+            display: none;
+        }
         .message {
             margin-bottom: 15px;
             border-radius: 5px;
             padding: 10px;
             max-width: 75%;
+        }
+        .message:hover {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
         .message.user {
             background-color: #007bff;
@@ -84,7 +96,6 @@
         .typing-indicator .dot:nth-child(3) {
             animation-delay: 0.6s;
         }
-
         @keyframes blink {
             0%, 80%, 100% {
                 opacity: 0;
@@ -168,132 +179,196 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
+
     var conversationHistory = [];
+    var hasChosenResponse = true; // Inicia en true porque no hay respuestas la primera vez
+    var isFirstInteraction = true; // Variable para rastrear si es la primera interacción
     $(document).ready(function() {
-        // Mostrar el modal al cargar la página
-        $('#dniModal').modal('show');
 
-        $('#saveDniBtn').on('click', function() {
-            var dni = $('#dniInput').val();
-            if (!dni || dni.trim() === "" || dni.length !== 8) {
-                toastr.warning('El DNI es obligatorio');
-                return;
-            } else{
-                $('#dni').val(dni);
-                $('#dniModal').modal('hide');
-            }
-        });
+    // Mostrar el modal al cargar la página
+    $('#dniModal').modal('show');
 
-        $('#chat-form').on('submit', function(e) {
-            e.preventDefault();
-
-
-            if ($('#dni').val() === "") {
-                toastr.warning('Debe ingresar su DNI primero');
-                $('#dniModal').modal('show');
-                return;
-            }
-
-            var message = $('#content').val();
-            var $button = $(this).find('button[type="submit"]');
-            var $chatBox = $('#chat-box');
-            var $typingIndicator = $('#typing-indicator');
-            var $finishButton = $('#finish-button');
-
-            // Deshabilitar el botón de envío
-            $button.prop('disabled', true);
-            $('#content').val("");
-            $('#content').prop('disabled', true);
-
-            // Mostrar mensaje del usuario
-            $chatBox.append('<div class="message user">' + message + '</div>');
-
-            // Mostrar indicador de "escribiendo..."
-            $typingIndicator.show();
-
-            // Desplazar hacia abajo
-            $chatBox.scrollTop($chatBox[0].scrollHeight);
-
-            conversationHistory.push({role: 'user', content: message});
-            // Enviar mensaje al servidor
-            $.ajax({
-                url: '/api/generate-text',
-                method: 'POST',
-                data: {
-                    content: message,
-                    dni: $('#dni').val(),
-                    conversation: conversationHistory,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    // Mostrar respuesta del asistente
-                    if (response.messages && response.messages.data) {
-                        var firstMessage = response.messages.data[0].content[0].text.value;
-                        var firstMessage = cleanMessage(firstMessage);
-                        var formattedMessage = convertToLinks(firstMessage);
-                        
-
-                        $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> ' + formattedMessage  + '</div>');
-
-                    } else {
-                        $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en la respuesta del asistente.</div>');
-                    }
-
-                    // Ocultar indicador de "escribiendo..."
-                    $typingIndicator.hide();
-
-                    // Limpiar el formulario
-                    $('#content').val('');
-                    $('#content').prop('disabled', false);
-                    $('#content').focus();
-                    // Volver a habilitar el botón de envío
-                    $button.prop('disabled', false);
-
-                    // Desplazar hacia abajo
-                    $chatBox.scrollTop($chatBox[0].scrollHeight);
-
-                    // Mostrar el botón "Finalizar"
-                    $finishButton.show();
-                },
-                error: function(error) {
-                    // $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en el servidor. Inténtelo de nuevo más tarde.</div>');
-                    // $typingIndicator.hide();
-                    // $button.prop('disabled', false);
-                    // $chatBox.scrollTop($chatBox[0].scrollHeight);
-                    console.error('Error:', error);
-                    toastr.error(error.responseJSON.error, "Hubo un Error");
-                    // Ocultar indicador de "escribiendo..."
-                    $typingIndicator.hide();
-                    $('#content').val('');
-                    // Habilitar el botón de envío
-                    $button.prop('disabled', false);
-                }
-            });
-        });
-
-        $('#finish-button').on('click', function() {
-            location.reload();
-        });
-
-        function convertToLinks(text) {
-            // Expresión regular para encontrar URLs
-            var urlRegex = /(((https?:\/\/)|(www\.))[^\s\)\(\u{1F600}-\u{1F64F}]+)/gu;
-            return text.replace(urlRegex, function(url) {
-                var hyperlink = url;
-                // Añadir 'http://' si la URL no tiene esquema
-                if (!hyperlink.match('^https?:\/\/')) {
-                    hyperlink = 'http://' + hyperlink;
-                }
-                // Devolver el enlace en formato HTML
-                return '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
-            }).replace(/\s*\)\s*|\s*\(\s*/g, ' '); // Eliminar paréntesis y ajustar espacios
-        }
-
-
-        function cleanMessage(message) {
-            // Elimina los patrones específicos del mensaje
-            return message.replace(/\\u3010.*?source.*?\\u3011/g, '');
+    $('#saveDniBtn').on('click', function() {
+        var dni = $('#dniInput').val();
+        if (!dni || dni.trim() === "" || dni.length !== 8) {
+            toastr.warning('El DNI es obligatorio');
+            return;
+        } else{
+            $('#dni').val(dni);
+            $('#dniModal').modal('hide');
         }
     });
+
+    $('#chat-form').on('submit', function(e) {
+        e.preventDefault();
+
+
+        if ($('#dni').val() === "") {
+            toastr.warning('Debe ingresar su DNI primero');
+            $('#dniModal').modal('show');
+            return;
+        }
+
+        var message = $('#content').val();
+        var $button = $(this).find('button[type="submit"]');
+        var $chatBox = $('#chat-box');
+        var $typingIndicator = $('#typing-indicator');
+        var $finishButton = $('#finish-button');
+
+        // Deshabilitar el botón de envío
+        $button.prop('disabled', true);
+        $('#content').val("");
+        $('#content').prop('disabled', true);
+
+        // Mostrar mensaje del usuario
+        $chatBox.append('<div class="message user">' + message + '</div>');
+
+        // Mostrar indicador de "escribiendo..."
+        $typingIndicator.show();
+
+        // Desplazar hacia abajo
+        $chatBox.scrollTop($chatBox[0].scrollHeight);
+
+        conversationHistory.push({role: 'user', content: message});
+
+        $.ajax({
+            url: '/api/generate-text',
+            method: 'POST',
+            data: {
+                content: message,
+                dni: $('#dni').val(),
+                conversation: conversationHistory,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.messagesOpenIA && response.messagesOpenIA.data) {
+                    var openAsistente = response.messagesOpenIA.data[0].content[0].text.value;
+                    var llamaAsistente = response.messagesLlamaIA;
+
+                    var cleanOpenAsistente = cleanMessage(openAsistente);
+                    var formattedOpenMessage = convertToLinks(cleanOpenAsistente);
+
+                    var cleanLlamaAsistente = cleanMessage(llamaAsistente);
+                    var formattedLlamaMessage = convertToLinks(cleanLlamaAsistente);
+
+                    // Mostrar las respuestas en paralelo con IDs únicos
+                    $chatBox.append(
+                        '<div class="message-container">' +
+                            '<div class="message assistant assistant-openai" id="openai-' + response.id + '" data-id="' + response.id + '" data-target=".assistant-openai">' +
+                            '<strong>Asistente OpenAI:</strong> ' + formattedOpenMessage +
+                            '</div>' +
+                            '<div class="message assistant assistant-llama" id="llama-' + response.id + '" data-id="' + response.id + '" data-target=".assistant-llama">' +
+                            '<strong>Asistente LLaMA:</strong> ' + formattedLlamaMessage +
+                            '</div>' +
+                        '</div>'
+                    );
+
+                    //$chatBox.append('<div class="message assistant"><strong>Asistente:</strong> ' + formattedOpenMessage  + '</div>');
+
+                    hasChosenResponse = false;
+                    isFirstInteraction = false; // Marca que la primera interacción ha pasado
+                } else {
+                    $chatBox.append('<div class="message assistant"><strong>Asistente:</strong> Error en la respuesta del asistente.</div>');
+                }
+
+                // Ocultar indicador de "escribiendo..."
+                $typingIndicator.hide();
+
+                // Limpiar el formulario
+                $('#content').val('');
+                //$('#content').prop('disabled', false);
+                //$('#content').focus();
+                // Volver a habilitar el botón de envío
+                //$button.prop('disabled', false);
+
+                toastr.warning(
+                    'Para realizar otra pregunta, por favor selecciona una de las respuestas disponibles.',
+                    'Atención'
+                );
+                // Desplazar hacia abajo
+                $chatBox.scrollTop($chatBox[0].scrollHeight);
+
+                // Mostrar el botón "Finalizar"
+                $finishButton.show();
+            },
+            error: function(error) {
+                toastr.error(error.responseJSON.error, "Hubo un Error");
+                $typingIndicator.hide();
+                $('#content').val('');
+                $button.prop('disabled', false);
+            }
+        });
+    });
+
+    // Manejar la selección de respuestas al hacer clic en toda el área del mensaje
+    $(document).on('click', '.message.assistant', function() {
+        if (hasChosenResponse) return; // No hacer nada si ya se ha elegido una respuesta
+
+        // Obtén el ID del elemento clicado
+        var clickedId = $(this).attr('id'); // Ej. 'openai-1' o 'llama-1'
+        var responseIndex = $(this).data('id'); // ID de respuesta para identificar el grupo
+
+        // Elimina el contenedor pero mantiene el contenido
+        $('.message-container').contents().unwrap();
+
+        // Oculta todos los elementos con la clase 'assistant' en el grupo actual
+        $('.message[data-id="' + responseIndex + '"]').hide();
+
+        // Muestra solo el elemento que coincide con el ID seleccionado
+        $('#' + clickedId).show();
+
+        // Mostrar un mensaje tipo "toast" para confirmar la selección
+        toastr.info('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
+
+        // Marcar que se ha elegido una respuesta
+        hasChosenResponse = true;
+
+        // Habilitar el campo de entrada y el botón de envío
+        $('#content').prop('disabled', false);
+        $('#content').focus();
+        $('button[type="submit"]').prop('disabled', false);
+    });
+
+
+
+    $('#finish-button').on('click', function() {
+        // Aquí puedes manejar la lógica para finalizar la conversación
+        location.reload();
+        });
+    });
+
+    // Manejador de clics para los elementos deshabilitados
+    $(document).on('click', '#content:disabled, button:disabled', function(event) {
+        // Mostrar el mensaje de advertencia
+        toastr.warning(
+            'Para realizar otra pregunta, por favor selecciona una de las respuestas disponibles.',
+            'Atención'
+        );
+
+        // Prevenir la acción predeterminada del clic
+        event.preventDefault();
+        event.stopImmediatePropagation();
+    });
+
+
+    function convertToLinks(text) {
+        // Expresión regular para encontrar URLs
+        var urlRegex = /(((https?:\/\/)|(www\.))[^\s\)\(\u{1F600}-\u{1F64F}]+[^\s\)\(\.,;])/gu;
+        return text.replace(urlRegex, function(url) {
+            var hyperlink = url;
+            // Añadir 'http://' si la URL no tiene esquema
+            if (!hyperlink.match('^https?:\/\/')) {
+                hyperlink = 'http://' + hyperlink;
+            }
+            // Devolver el enlace en formato HTML
+            return '<a href="' + hyperlink + '" target="_blank">' + url + '</a>';
+        }).replace(/\s*\)\s*|\s*\(\s*/g, ' '); // Eliminar paréntesis y ajustar espacios
+    }
+
+    // Función para convertir texto en enlaces
+    function cleanMessage(message) {
+        // Elimina los patrones específicos del mensaje
+        return message.replace(/\\u3010.*?source.*?\\u3011/g, '');
+    }
 </script>
 @endsection
