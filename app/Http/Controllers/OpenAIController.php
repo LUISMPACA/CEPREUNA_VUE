@@ -111,11 +111,16 @@ class OpenAIController extends Controller
 
             // Limpiar caracteres que puedan causar problemas
             $fileContent = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $fileContent);
-            $apiRequestJson = $this->prepareRequest($fileContent, $question, $language);
 
-            // $response = $this->llamaClient->post('chat/completions', [
-            //     'json' => $apiRequestJson,
-            // ]);
+            // Convertir el historial de conversación a formato LLaMA
+            $llamaConversation = array_map(function ($msg) {
+                return ['role' => 'user', 'content' => $msg['content']];
+            }, $conversationHistory);
+
+            // Añadir la pregunta actual al historial para LLaMA
+            $llamaConversation[] = ['role' => 'user', 'content' => $question];
+
+            $apiRequestJson = $this->prepareRequest($fileContent, $llamaConversation, $language, $question);
 
             $runData = json_decode($runResponse->getBody()->getContents(), true);
             $runId = $runData['id'] ?? null;
@@ -241,16 +246,36 @@ class OpenAIController extends Controller
         }
     }
 
-    private function prepareRequest($fileContent, $question, $language)
+    private function prepareRequest($fileContent, $conversationHistory, $language, $question)
     {
+        // Construir los mensajes con el historial de la conversación
+        $messages = array_map(function ($message) {
+            return [
+                "role" => $message['role'], // 'user' o 'assistant' según corresponda
+                "content" => $message['content']
+            ];
+        }, $conversationHistory);
+
+        // Agregar el contexto adicional del archivo .txt y la pregunta
+        $messages[] = [
+            "role" => "user",
+            "content" => "Por favor, responde en {$language} sobre la información a continuación."
+        ];
+
+        $messages[] = [
+            "role" => "system",
+            "content" => "Información del archivo: '{$fileContent}'"
+        ];
+
+        $messages[] = [
+            "role" => "user",
+            "content" => $question// La pregunta actual
+        ];
+
+        // Construir y retornar la solicitud
         return [
             "model" => "llama-13b-chat",
-            "messages" => [
-                [
-                    "role" => "user",
-                    "content" => "Por favor, responde en {$language} y con ayuda de emojis. Sobre esta información: '{$fileContent}', {$question}"
-                ]
-            ],
+            "messages" => $messages,
             "max_tokens" => 200,
             "stream" => false
         ];
