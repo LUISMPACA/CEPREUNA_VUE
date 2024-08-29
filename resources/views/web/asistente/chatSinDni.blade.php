@@ -297,6 +297,7 @@
                 $typingIndicator.hide();
                 $('#content').val('');
                 $button.prop('disabled', false);
+                $finishButton.hide();
             }
         });
     });
@@ -304,7 +305,7 @@
     // Manejar la selección de respuestas al hacer clic en toda el área del mensaje
     $(document).on('click', '.message.assistant', function() {
         if (hasChosenResponse) return; // No hacer nada si ya se ha elegido una respuesta
-
+        var $finishButton = $('#finish-button');
         // Obtén el ID del elemento clicado
         var clickedId = $(this).attr('id'); // Ej. 'openai-1' o 'llama-1'
         var responseIndex = $(this).data('id'); // ID de respuesta para identificar el grupo
@@ -338,6 +339,7 @@
                 // Marcar que se ha elegido una respuesta
                 hasChosenResponse = true;
                 toastr.success('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
+                $finishButton.hide();
             },
             error: function(xhr) {
                 //alert('Error: ' + );
@@ -354,9 +356,10 @@
 
     $('#finish-button').on('click', function() {
         // Aquí puedes manejar la lógica para finalizar la conversación
-            toastr.info('Para continuar de le click a la Respuesta Correcta', 'por favor');
+            toastr.info('Para continuar de le click a la Respuesta Correcta', 'POR FAVOR');
         });
     });
+
 
 
 
