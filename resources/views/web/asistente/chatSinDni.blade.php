@@ -36,6 +36,7 @@
         }
         .message:hover {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
         }
         .message.user {
             background-color: #007bff;
@@ -142,7 +143,7 @@
                                         <input type="text" id="content" name="content" class="form-control" placeholder="Escribe tu mensaje..." required>
                                         <button type="submit" class="btn btn-primary">Enviar</button>
                                     </div>
-                                    <button type="button" id="finish-button" class="btn btn-dark btn-finish mt-3">Finalizar</button>
+                                    <button type="button" id="finish-button" class="btn btn-dark btn-finish mt-3">Continuar</button>
                                 </form>
                             </div>
                         </div>
@@ -336,7 +337,7 @@
             success: function(response) {
                 // Marcar que se ha elegido una respuesta
                 hasChosenResponse = true;
-                toastr.info('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
+                toastr.success('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
             },
             error: function(xhr) {
                 //alert('Error: ' + );
@@ -353,21 +354,11 @@
 
     $('#finish-button').on('click', function() {
         // Aquí puedes manejar la lógica para finalizar la conversación
-        location.reload();
+            toastr.info('Para continuar de le click a la Respuesta Correcta', 'por favor');
         });
     });
 
-    // Detectar clic en el botón de envío
-    $('button[type="submit"]').on('click', function(e) {
-        // Verificar si el botón está deshabilitado
-        if ($(this).is(':disabled')) {
-            e.preventDefault(); // Prevenir la acción predeterminada del botón
-            toastr.warning(
-            'Para realizar otra pregunta, por favor selecciona una de las respuestas disponibles.',
-            'Atención'
-        );
-        }
-    });
+
 
     // Detectar clic en el input de contenido
     $('#content').on('click', function(e) {
