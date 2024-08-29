@@ -129,54 +129,42 @@ class OpenAIController extends Controller
 
             $promises = [
                'openai' => $this->openAIClient->getAsync("threads/{$threadId}/messages"),
-                'llamaia' => $this->llamaClient->postAsync('chat/completions', [
+               'llamaia' => $this->llamaClient->postAsync('chat/completions', [
                     'json' => $apiRequestJson
                 ]),
             ];
 
             $results = \GuzzleHttp\Promise\settle($promises)->wait();
 
-            return $results ;
 
-            // Get messages from the thread
-            //$messagesResponse = $this->openAIClient->get("threads/{$threadId}/messages");
+            // Procesar la respuesta de OpenAI
+            $openAIMessages = json_decode($results['openai']['value']->getBody()->getContents(), true);
+            $openAIResponse = isset($openAIMessages['data'][0]['content'][0]['text']['value']) 
+                ? $openAIMessages['data'][0]['content'][0]['text']['value'] 
+                : 'No se encontró respuesta de OpenAI.';
 
-
-            $messagesData = json_decode($messagesResponse->getBody()->getContents(), true);
-            //return $messagesData;
-    
-            // Get the assistant's latest response
-            $firstMessage = $messagesData['data'][0]['content'][0]['text']['value'];
-            // Calcular remaining_responses
-            $assistantResponse = '';
-            if (isset($messagesData['data']) && is_array($messagesData['data'])) {
-                foreach ($messagesData['data'] as $message) {
-                    if (isset($message['content']) && is_array($message['content'])) {
-                        foreach ($message['content'] as $contentPart) {
-                            if (isset($contentPart['text']['value'])) {
-                                $assistantResponse .= $contentPart['text']['value'] . "\n";
-                            }
-                        }
-                    }
-                }
-            }
+            // Procesar la respuesta de LLaMA
+            $llamaResponseJson = json_decode($results['llamaia']['value']->getBody()->getContents(), true);
+            $llamaResponse = isset($llamaResponseJson['choices'][0]['message']['content'])
+                ? $llamaResponseJson['choices'][0]['message']['content']
+                : 'No se encontró respuesta de LLaMA.';
 
             // Calcular remaining_responses
             $remaining_responses = $chatLog->isNotEmpty() ? max($chatLog->last()->remaining_responses - 1, 0) : 9;
         
-            //Guardar el log en la base de datos
+            // Guardar el log en la base de datos
             $chatLog = ChatLog::create([
                 'nro_documento' => $dni,
                 'user_message' => $request->input('content'),
-                'assistant_response' => $firstMessage,
-                'llamaia_response' => $reponsellamaia,
-                'remaining_responses' => $remaining_responses,
+                'assistant_response' => $openAIResponse,
+                'llamaia_response' => $llamaResponse,
+                'remaining_responses' => $remaining_responses
             ]);
 
             return response()->json([
                 'id' => $chatLog->id,
-                'messagesOpenIA' => $messagesData,
-                'messagesLlamaIA' => $reponsellamaia
+                'messagesOpenIA' => $openAIResponse,
+                'messagesLlamaIA' => $llamaResponse
             ]);
         } catch (RequestException $e) {
             return response()->json([
@@ -348,5 +336,27 @@ class OpenAIController extends Controller
         }
 
         return redirect()->back()->with('error', 'El correo o la contraseña ingresados son incorrectos. Por favor, verifica tus credenciales y vuelve a intentarlo.');
+    }
+
+    public function GetBestResponse(Request $request, $id)
+    {
+        // Validar que el valor de 'best_model' sea '0' o '1'
+        $request->validate([
+            'best_model' => 'required|in:0,1',
+        ]);
+
+        // Encontrar el registro de chat_log por su ID
+        $chatLog = ChatLog::find($id);
+
+        // Verificar si el registro existe
+        if (!$chatLog) {
+            return response()->json(['error' => 'Registro no encontrado.'], 404);
+        }
+
+        // Actualizar la columna 'best_model'
+        $chatLog->best_model = $request->input('best_model');
+        $chatLog->save();
+
+        return response()->json(['message' => 'El modelo preferido ha sido actualizado con éxito.']);
     }
 }

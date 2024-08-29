@@ -3,10 +3,11 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenAIController;
-use App\Http\Controllers\LlamaAIController;
+
 
 Route::post('/generate-text', [OpenAIController::class, 'createThreadAndRun']);
-Route::post('/generate', [LlamaAIController::class, 'processDocumentAndQuestion']);
+Route::post('/best-response/{id}', [OpenAIController::class, 'GetBestResponse']);
+
 
 /*
 |--------------------------------------------------------------------------

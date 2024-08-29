@@ -241,8 +241,8 @@
                 _token: '{{ csrf_token() }}'
             },
             success: function(response) {
-                if (response.messagesOpenIA && response.messagesOpenIA.data) {
-                    var openAsistente = response.messagesOpenIA.data[0].content[0].text.value;
+                if (response.messagesOpenIA && response.messagesLlamaIA) {
+                    var openAsistente = response.messagesOpenIA;
                     var llamaAsistente = response.messagesLlamaIA;
 
                     var cleanOpenAsistente = cleanMessage(openAsistente);
@@ -255,10 +255,10 @@
                     $chatBox.append(
                         '<div class="message-container">' +
                             '<div class="message assistant assistant-openai" id="openai-' + response.id + '" data-id="' + response.id + '" data-target=".assistant-openai">' +
-                            '<strong>Asistente OpenAI:</strong> ' + formattedOpenMessage +
+                            '<strong>Respuesta 1:</strong> ' + formattedOpenMessage +
                             '</div>' +
                             '<div class="message assistant assistant-llama" id="llama-' + response.id + '" data-id="' + response.id + '" data-target=".assistant-llama">' +
-                            '<strong>Asistente LLaMA:</strong> ' + formattedLlamaMessage +
+                            '<strong>Respuesta 2:</strong> ' + formattedLlamaMessage +
                             '</div>' +
                         '</div>'
                     );
@@ -307,7 +307,15 @@
         // Obtén el ID del elemento clicado
         var clickedId = $(this).attr('id'); // Ej. 'openai-1' o 'llama-1'
         var responseIndex = $(this).data('id'); // ID de respuesta para identificar el grupo
-
+        var targetClass = $(this).data('target');
+        var bestModelValue = 0;
+        console.log(clickedId, "  --  ", responseIndex, "  --  ", targetClass)
+        if (targetClass == ".assistant-openai"){
+            bestModelValue = 0;
+        }
+        if (targetClass == ".assistant-llama"){
+            bestModelValue = 1;
+        }
         // Elimina el contenedor pero mantiene el contenido
         $('.message-container').contents().unwrap();
 
@@ -317,12 +325,24 @@
         // Muestra solo el elemento que coincide con el ID seleccionado
         $('#' + clickedId).show();
 
-        // Mostrar un mensaje tipo "toast" para confirmar la selección
-        toastr.info('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
-
-        // Marcar que se ha elegido una respuesta
-        hasChosenResponse = true;
-
+        // // Realizar la petición AJAX
+        $.ajax({
+            url: '/api/best-response/' + responseIndex,
+            type: 'POST',
+            data: {
+                best_model: bestModelValue,
+                _token: '{{ csrf_token() }}' // Asegúrate de incluir el token CSRF si usas Laravel
+            },
+            success: function(response) {
+                // Marcar que se ha elegido una respuesta
+                hasChosenResponse = true;
+                toastr.info('Has seleccionado una respuesta. Puedes proceder con otra pregunta.', 'Selección realizada');
+            },
+            error: function(xhr) {
+                //alert('Error: ' + );
+                toastr.Error(xhr.responseJSON.error, 'Error');
+            }
+        });
         // Habilitar el campo de entrada y el botón de envío
         $('#content').prop('disabled', false);
         $('#content').focus();
@@ -337,19 +357,29 @@
         });
     });
 
-    // Manejador de clics para los elementos deshabilitados
-    $(document).on('click', '#content:disabled, button:disabled', function(event) {
-        // Mostrar el mensaje de advertencia
-        toastr.warning(
+    // Detectar clic en el botón de envío
+    $('button[type="submit"]').on('click', function(e) {
+        // Verificar si el botón está deshabilitado
+        if ($(this).is(':disabled')) {
+            e.preventDefault(); // Prevenir la acción predeterminada del botón
+            toastr.warning(
             'Para realizar otra pregunta, por favor selecciona una de las respuestas disponibles.',
             'Atención'
         );
-
-        // Prevenir la acción predeterminada del clic
-        event.preventDefault();
-        event.stopImmediatePropagation();
+        }
     });
 
+    // Detectar clic en el input de contenido
+    $('#content').on('click', function(e) {
+        // Verificar si el input está deshabilitado
+        if ($(this).is(':disabled')) {
+            e.preventDefault(); // Prevenir la acción predeterminada
+            toastr.warning(
+            'Para realizar otra pregunta, por favor selecciona una de las respuestas disponibles.',
+            'Atención'
+        );
+        }
+    });
 
     function convertToLinks(text) {
         // Expresión regular para encontrar URLs
