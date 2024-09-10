@@ -46,6 +46,8 @@ class OpenAIController extends Controller
                 return response()->json(['error' => 'DNI is required'], 400);
             }
 
+            $datosDNI = $this->getLocalEstudiante($dni);
+
             // Check if there is an existing thread ID in the session
             $threadId = Session::get('thread_id');
 
@@ -79,10 +81,11 @@ class OpenAIController extends Controller
                 ];
             })->toArray();
 
+            $contexto = $request->input('content'). " Datos Adicionales:  " . json_encode($datosDNI);
             // Append the new user message to the conversation history
             $conversationHistory[] = [
                 'role' => 'user',
-                'content' => $request->input('content'),
+                'content' => $contexto,
             ];
 
             // Send the entire conversation history as individual messages to the API
@@ -120,7 +123,7 @@ class OpenAIController extends Controller
             // Añadir la pregunta actual al historial para LLaMA
             $llamaConversation[] = ['role' => 'user', 'content' => $question];
 
-            $apiRequestJson = $this->prepareRequest($fileContent, $llamaConversation, $language, $question);
+            $apiRequestJson = $this->prepareRequest($fileContent, $llamaConversation, $language, $question ,$datosDNI);
 
             $runData = json_decode($runResponse->getBody()->getContents(), true);
             $runId = $runData['id'] ?? null;
@@ -246,8 +249,9 @@ class OpenAIController extends Controller
         }
     }
 
-    private function prepareRequest($fileContent, $conversationHistory, $language, $question)
+    private function prepareRequest($fileContent, $conversationHistory, $language, $question, $datos)
     {
+        $contexto = json_encode($datos);
         // Construir los mensajes con el historial de la conversación
         $messages = array_map(function ($message) {
             return [
@@ -259,7 +263,7 @@ class OpenAIController extends Controller
         // Agregar el contexto adicional del archivo .txt y la pregunta
         $messages[] = [
             "role" => "user",
-            "content" => "Por favor, responde en {$language} sobre la información a continuación."
+            "content" => "Por favor, responde en {$language} utilizando emojis, y evita dar respuestas vacias o '[', siempre responde algo."
         ];
 
         $messages[] = [
@@ -270,6 +274,11 @@ class OpenAIController extends Controller
         $messages[] = [
             "role" => "user",
             "content" => $question// La pregunta actual
+        ];
+
+        $messages[] = [
+            "role" => "system",
+            "content" => "Información de su local y auxiliar: '{$contexto}'"
         ];
 
         // Construir y retornar la solicitud
@@ -337,6 +346,58 @@ class OpenAIController extends Controller
         } catch (\Exception $e) {
             return ['error' => 'Unable to fetch data from database.', 'message' => $e->getMessage()];
         }
+    }
+
+
+    public function getLocalEstudiante($dni)
+    {
+
+        $data = DB::table('estudiantes as e')
+            ->select(
+                DB::raw("CONCAT(e.paterno,' ',e.materno,' ',e.nombres) as nombres"),
+                "s.denominacion as sede",
+                "l.denominacion as local",
+                "l.direccion",
+                "l.foto",
+                "a.codigo as aula",
+                "g.denominacion as grupo",
+                "t.denominacion as turno",
+                "ar.denominacion as area"
+            )
+            ->join("matriculas as m", "m.estudiantes_id", "e.id")
+            ->join("grupo_aulas as ga", "ga.id", "m.grupo_aulas_id")
+            ->join("grupos as g", "g.id", "ga.grupos_id")
+            ->join("areas as ar", "ar.id", "ga.areas_id")
+            ->join("turnos as t", "t.id", "ga.turnos_id")
+            ->join("aulas as a", "a.id", "ga.aulas_id")
+            ->join("locales as l", "l.id", "a.locales_id")
+            ->join("sedes as s", "s.id", "l.sedes_id")
+            ->where("e.nro_documento", $dni)
+            ->first();
+
+        $estu = Estudiante::select("estudiantes.*")
+            ->join("matriculas as m", "m.estudiantes_id", "estudiantes.id")
+            ->where("nro_documento", $dni)
+            ->first();
+
+        if ($estu) {
+            $matricula =Matricula::select('id','habilitado as validado', 'habilitado_estado as habilitado','grupo_aulas_id')->where("estudiantes_id", $estu->id)->first();
+            $auxiliar = DB::table('auxiliar_grupos as ag')->join('auxiliares as a', 'a.id', '=', 'ag.auxiliares_id')->join('users as u', 'u.id', '=', 'a.users_id')->where('ag.grupo_aulas_id', $matricula->grupo_aulas_id)->select('a.telefono as celular', 'u.name','u.paterno','u.materno')->first();   
+        }
+        if (isset($auxiliar))
+            $response["auxiliar"] = $auxiliar;
+        else
+            $response["auxiliar"] = "";    
+
+        if (isset($data)) {
+            $response["status"] = true;
+            $response["result"] = $data;
+        } else {
+            $response["status"] = false;
+            $response["result"] = "";
+        }
+
+        return $response;
     }
 
     public function login(Request $request)
