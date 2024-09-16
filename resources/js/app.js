@@ -81,6 +81,8 @@ Vue.component("w-form-inscripcion-estudiante", require("./components/web/estudia
 Vue.component("w-form-inscripcion-estudiante-extemporaneo", require("./components/web/estudiante/FormInscripcionExtemporaneoComponent.vue").default);
 Vue.component("w-simulacro-inscripcion-estudiante", require("./components/web/estudiante/SimulacroInscripcionComponent.vue").default);
 
+Vue.component("w-simulacro-disponibilidad-estudiante", require("./components/web/docente/FormDisponibilidadComponent.vue").default);
+
 
 Vue.component("w-pago", require("./components/web/PagoComponent.vue").default);
 

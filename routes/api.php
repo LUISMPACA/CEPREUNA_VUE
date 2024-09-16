@@ -4,7 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OpenAIController;
 
+
 Route::post('/generate-text', [OpenAIController::class, 'createThreadAndRun']);
+Route::post('/best-response/{id}', [OpenAIController::class, 'GetBestResponse']);
+
 
 /*
 |--------------------------------------------------------------------------

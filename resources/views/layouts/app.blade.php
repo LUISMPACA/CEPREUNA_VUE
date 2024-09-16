@@ -149,6 +149,20 @@
                 </ul>
             </li>
             @endcan
+            @can('ver menu administracion temporal')
+            <li class="c-sidebar-nav-item c-sidebar-nav-dropdown"><a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle">
+                    <svg class="c-sidebar-nav-icon">
+                        <use xlink:href="{{ asset('coreui/vendors/@coreui/icons/svg/free.svg#cil-education') }}">
+                        </use>
+                    </svg> Administración</a>
+                <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/administracion/horario') }}"><span class="c-sidebar-nav-icon"></span> Horario</a>
+                    </li>
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/administracion/propuesta-horario') }}"><span class="c-sidebar-nav-icon"></span> Propuesta Horario</a>
+                    </li>
+                </ul>
+            </li>
+            @endcan
             @can('ver menu matriculas')
             <li class="c-sidebar-nav-item c-sidebar-nav-dropdown"><a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle">
                     <svg class="c-sidebar-nav-icon">

@@ -17,6 +17,7 @@ class ChatLog extends Model
         'nro_documento',
         'user_message',
         'assistant_response',
+        'llamaia_response',
         'remaining_responses',
     ];
 

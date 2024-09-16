@@ -618,9 +618,30 @@ class DocenteController extends Controller
         $pdf::Cell(40, 6, $docente->ubigeo->departamento, 0, 0, 'L', 0, '', 1);
 
         $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(30, 6, 'RUC:', 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::Cell(40, 6, $docente->ruc, 0, 1, 'L', 0, '', 1);
+
+
+        $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(30, 6, 'PROVINCIA R.:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
-        $pdf::Cell(40, 6, $docente->ubigeo->provincia, 0, 1, 'L', 0, '', 1);
+        $pdf::Cell(40, 6, $docente->ubigeo->provincia, 0, 0, 'L', 0, '', 1);
+
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(30, 6, 'CCI:', 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::Cell(40, 6, $docente->cci, 0, 1, 'L', 0, '', 1);
+
+
+
+
+
+
+
+
+
+
         // ********
         $pdf::SetFont('helvetica', 'b', 8);
         $pdf::Cell(30, 6, 'DISTRITO R.:', 0, 0, 'L', 0, '', 1);
@@ -631,6 +652,8 @@ class DocenteController extends Controller
         $pdf::Cell(30, 6, 'DIRECCIÓN R.:', 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(40, 6, $docente->direccion, 0, 1, 'L', 0, '', 1);
+
+
 
         $pdf::ln();
         $pdf::ln();
@@ -681,20 +704,20 @@ class DocenteController extends Controller
         foreach ($areas as $key => $value) {
             $areaPostulacion .= " | " . $value->denominacion;
         }
-        // $cursoPostulacion = "";
-        // foreach ($cursos as $key => $value) {
-        //     if($value->curso!=null)
-        //     $cursoPostulacion.=" | ".$value->curso->denominacion;
-        // }
+        $cursoPostulacion = "";
+        foreach ($cursos as $key => $value) {
+            if($value->curso!=null)
+            $cursoPostulacion.=" | ".$value->curso->denominacion;
+        }
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(60, 6, $sedesPostulacion, 0, 0, 'L', 0, '', 1);
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(60, 6, $areaPostulacion, 0, 1, 'L', 0, '', 1);
         // ********
-        // $pdf::SetFont('helvetica', 'b', 8);
-        // $pdf::Cell(190, 6, 'CURSO:', 0, 1, 'L', 0, '', 1);
-        // $pdf::SetFont('helvetica', '', 8);
-        // $pdf::MultiCell(190, 6, $cursoPostulacion, 0, 'L', 0, 0, '', '', true);
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(190, 6, 'CURSO:', 0, 1, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        $pdf::MultiCell(190, 6, $cursoPostulacion, 0, 'L', 0, 0, '', '', true);
 
         // ******************************************************************
         // |        FORMATO DE DISPONIBILIDAD
@@ -1266,7 +1289,7 @@ class DocenteController extends Controller
         }
         $areaPostulacion = "";
         foreach ($areas as $key => $value) {
-            $areaPostulacion .= " | " . $value->denominacion;
+            $areaPostulacion .= " | ";
         }
         // $cursoPostulacion = "";
         // foreach ($cursos as $key => $value) {

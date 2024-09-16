@@ -657,6 +657,11 @@ Route::group(['prefix' => 'inscripciones'], function () {
     Route::get('validacion', 'Web\Inscripcion\SimulacroController@showLogin');
     Route::post('validacion', 'Web\Inscripcion\SimulacroController@login')->name('loginSimulacro');
     /**/
+    /*Disponibilidad*/
+    Route::resource('/disponibilidades', 'Web\Inscripcion\DisponibilidadController');
+    Route::get('disponibilidad', 'Web\Inscripcion\DisponibilidadController@showLogin');
+    Route::post('disponibilidad', 'Web\Inscripcion\DisponibilidadController@login')->name('logindisponibilidad');
+    /**/
     Route::get('/get-paises', 'Web\Inscripcion\IndexController@getPaises');
     Route::get('/get-departamentos', 'Web\Inscripcion\IndexController@getDepartamentos');
     Route::get('/get-provincias', 'Web\Inscripcion\IndexController@getProvincias');
