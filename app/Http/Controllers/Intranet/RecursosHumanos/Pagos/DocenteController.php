@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Intranet\RecursosHumanos\Pagos;
 use App\Http\Controllers\Controller;
 use App\Models\TPDocumento;
 use App\Models\TPExpediente;
+use App\Models\TPExpedienteDetalles;
 use App\Models\TPTramite;
 use App\Models\TPDocente;
 use App\Models\TPHorasDocente;
@@ -68,7 +69,7 @@ class DocenteController extends Controller
         // $data = $data->join("documentos as do", "do.expediente_id", "expedientes.id");
         // $data = $data->join("tipo_documentos as td", "td.id", "do.tipo_documento_id");
         $data = $data->join("periodos as p", "p.id", "d.periodo_id");
-        $data = $data->where("t.activo",'1');
+        $data = $data->where("t.activo", '1');
 
         if (isset($request->estado)) {
             $data = $data->where("t.estado", $request->estado);
@@ -112,7 +113,7 @@ class DocenteController extends Controller
         $data = $data->join("tramites as t", "t.expediente_id", "expedientes.id");
         $data = $data->join("oficinas as o", "o.id", "t.oficina_id");
         $data = $data->join("docentes as d", "d.id", "expedientes.docente_id");
-        $data = $data->leftJoin("cepreuna2022.users as u", "u.id", "t.user_id");
+        $data = $data->leftJoin("tramite_pagos.users as u", "u.id", "t.user_id");
 
         // $data = $data->join("documentos as do", "do.expediente_id", "expedientes.id");
         // $data = $data->join("tipo_documentos as td", "td.id", "do.tipo_documento_id");
@@ -165,9 +166,9 @@ class DocenteController extends Controller
             foreach ($request->estado as $key => $value) {
                 if (isset($value)) {
                     // dd($key);
-                    $documento = TPDocumento::where([["tipo_documento_id",$key],["expediente_id",$request->id],["activo",'1']])->first();
+                    $documento = TPDocumento::where([["tipo_documento_id", $key], ["expediente_id", $request->id], ["activo", '1']])->first();
                     $documento->estado = $value;
-                    $documento->observacion = isset($request->observacion[$key])?$request->observacion[$key]:"";
+                    $documento->observacion = isset($request->observacion[$key]) ? $request->observacion[$key] : "";
                     // $documento->activo = "1";
                     // $documento->tipo_documento_id = $idTipoDocumento;
                     // $documento->expediente_id = $expediente->id;
@@ -314,9 +315,9 @@ class DocenteController extends Controller
                 }
             }
             $docente = TPDocente::find($request->id);
-            if($request->contrato == "No"){
+            if ($request->contrato == "No") {
                 $docente->contrato = '0';
-            } else{
+            } else {
                 $docente->contrato = '1';
             }
             $docente->save();
@@ -331,32 +332,54 @@ class DocenteController extends Controller
         }
         return $response;
     }
+
     public function updateHorasDocente(Request $request, $id)
     {
-        // dd($request);
         DB::beginTransaction();
+
         try {
-            TPHorasDocente::where("docente_id", $id)->delete();
-            // $puntaje = 0;
-            // $apto = '0';
-            foreach ($request->mes as $key => $value) {
-                foreach ($value as $k => $val) {
-                    $data = new TPHorasDocente;
-                    $data->cantidad = $request->cantidad[$key][$k];
-                    $data->mes_id = $val;
-                    $data->tipo_pago_id = $request->tipo[$key][$k];
-                    $data->docente_id = $request->id;
-                    $data->save();
+            // Obtener los IDs de horas enviados y filtrarlos
+            $idsEnviados = array_filter(array_merge(...$request->ids ?? []));
+            $horasExistentes = TPHorasDocente::where("docente_id", $id)->get();
+
+            // Eliminar las horas que no están en los IDs enviados
+            foreach ($horasExistentes as $hora) {
+                if (!in_array($hora->id, $idsEnviados)) {
+                    TPExpedienteDetalles::where('hora_docente_id', $hora->id)->delete();
+                    $hora->delete();
                 }
             }
+
+            foreach ($request->mes as $key => $mesArray) {
+                foreach ($mesArray as $k => $mesId) {
+                    if (isset($request->cantidad[$key][$k]) && isset($request->tipo[$key][$k])) {
+                        $horaExistente = $horasExistentes->firstWhere('id', $request->ids[$key][$k] ?? null);
+                        if ($horaExistente) {
+                            $horaExistente->cantidad = $request->cantidad[$key][$k];
+                            $horaExistente->tipo_pago_id = $request->tipo[$key][$k];
+                            $horaExistente->save();
+                        } else {
+                            $nuevaHora = new TPHorasDocente;
+                            $nuevaHora->cantidad = $request->cantidad[$key][$k];
+                            $nuevaHora->mes_id = $mesId;
+                            $nuevaHora->tipo_pago_id = $request->tipo[$key][$k];
+                            $nuevaHora->docente_id = $id;
+                            $nuevaHora->save();
+                        }
+                    }
+                }
+            }
+
             DB::commit();
-            $response["message"] = 'Guardado';
+            $response["message"] = 'Guardado correctamente';
             $response["status"] = true;
         } catch (\Exception $e) {
             DB::rollback();
-            $response["message"] =  'Error al Guardar, intentelo nuevamante.';
-            $response["status"] =  false;
+            $response["message"] = 'Error al guardar, inténtelo nuevamente.';
+            $response["status"] = false;
+            dd($e);
         }
+
         return $response;
     }
     public function getPeriodos()
@@ -373,7 +396,7 @@ class DocenteController extends Controller
     {
         $response = DB::connection('mysql2')->table('expedientes as e')
             ->join("tramites as t", "t.expediente_id", "e.id")
-            ->join("cepreuna2022.users as u", "u.id", "t.user_id")
+            ->join("tramite_pagos.users as u", "u.id", "t.user_id")
             ->select("t.user_id", "u.name as user_names")
             ->distinct()
             ->get();
