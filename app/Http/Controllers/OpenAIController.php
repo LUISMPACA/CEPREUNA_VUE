@@ -383,7 +383,7 @@ class OpenAIController extends Controller
         if ($estu) {
             $matricula =Matricula::select('id','habilitado as validado', 'habilitado_estado as habilitado','grupo_aulas_id')->where("estudiantes_id", $estu->id)->first();
             $auxiliar = DB::table('auxiliar_grupos as ag')->join('auxiliares as a', 'a.id', '=', 'ag.auxiliares_id')->join('users as u', 'u.id', '=', 'a.users_id')->where('ag.grupo_aulas_id', $matricula->grupo_aulas_id)->select('a.telefono as celular', 'u.name','u.paterno','u.materno')->first(); 
-            $accesos_panel = 'accesos a su panel usuarios: '. $estu->usuario .' contraseña: '. $estu->password;    
+            $accesos_panel = 'accesos a su panel, usuarios o correo institucional: '. $estu->usuario .' contraseña: '. $estu->password;    
         }
         if (isset($auxiliar))
             $response["auxiliar"] = $auxiliar;
