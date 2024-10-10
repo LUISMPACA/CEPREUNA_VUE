@@ -1088,6 +1088,35 @@ Route::group(['middleware' => ['auth']], function () {
             });
         });
 
+
+        
+        // ****************************
+        // *  Devoluciones
+        // ****************************
+
+        Route::group(['prefix' => 'devolucion'], function () {
+            Route::get('/devoluciones', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@index');
+            Route::get('/docentes/expedientes/lista/data', 'Intranet\RecursosHumanos\Pagos\DocenteController@lista');
+            Route::get('/get-documentos-expediente-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getDocumentosExpedienteDocente');
+            Route::post('/docentes/evaluar-docente', 'Intranet\RecursosHumanos\Pagos\DocenteController@evaluarDocente');
+
+            Route::get('/docentes/habilitacion', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@index');
+            Route::post('/docentes/habilitacion/guardar', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@store');
+            Route::get('/docentes/habilitacion/lista/data', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@lista');
+            Route::post('/docentes/habilitacion/deshabilitar', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@deshabilitar');
+
+            Route::get('/docentes/horas-mes', 'Intranet\RecursosHumanos\Pagos\DocenteController@indexHorasMes');
+            Route::get('/docentes/horas-mes/lista/data', 'Intranet\RecursosHumanos\Pagos\DocenteController@listaHorasMes');
+            Route::get('/get-periodos', 'Intranet\RecursosHumanos\Pagos\DocenteController@getPeriodos');
+            Route::get('/get-mes-hora-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getMesHorasPeriodo');
+            Route::post('/docentes/horas-mes', 'Intranet\RecursosHumanos\Pagos\DocenteController@storeHorasDocente');
+            Route::put('/docentes/horas-mes/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@updateHorasDocente');
+            Route::get('/get-periodos-filter', 'Intranet\RecursosHumanos\Pagos\DocenteController@getPeriodosFilter');
+            Route::get('/get-responsables', 'Intranet\RecursosHumanos\Pagos\DocenteController@getResponsables');
+            Route::get('/expedientes-excel', 'Intranet\RecursosHumanos\Pagos\DocenteController@rptExpedientesExcel');            
+        });
+
+
         // ****************************
         // *  Libro de Reclamaciones
         // ****************************

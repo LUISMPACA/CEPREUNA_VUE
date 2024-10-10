@@ -229,6 +229,9 @@ Vue.component("i-expediente-pago-docente", require("./components/intranet/recurs
 Vue.component("i-habilitacion-pago-docente", require("./components/intranet/recursosHumanos/pagos/docentes/HabilitacionDocenteComponent.vue").default);
 Vue.component("i-lista-docente-horas-mes", require("./components/intranet/recursosHumanos/pagos/docentes/HorasMesDocenteComponent.vue").default);
 Vue.component("i-recursos-humanos-cron-accesos", require("./components/intranet/recursosHumanos/CronAccesosComponent.vue").default);
+//Devoluciones
+Vue.component("i-lista-devoluciones", require("./components/intranet/recursosHumanos/devoluciones/DevolucionesComponent.vue").default);
+
 //Libro de Reclamaciones
 Vue.component("i-libro-reclamaciones", require("./components/intranet/libroReclamaciones/LibroReclamacionesComponent.vue").default);
 //Administrar - nosotros
