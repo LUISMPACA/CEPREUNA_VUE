@@ -1095,8 +1095,8 @@ Route::group(['middleware' => ['auth']], function () {
         // ****************************
 
         Route::group(['prefix' => 'devolucion'], function () {
-            Route::get('/devoluciones', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@index');
-            Route::get('/docentes/expedientes/lista/data', 'Intranet\RecursosHumanos\Pagos\DocenteController@lista');
+            Route::resource('/devoluciones', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController');
+            Route::get('/devoluciones/lista/data', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@lista');
             Route::get('/get-documentos-expediente-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getDocumentosExpedienteDocente');
             Route::post('/docentes/evaluar-docente', 'Intranet\RecursosHumanos\Pagos\DocenteController@evaluarDocente');
 

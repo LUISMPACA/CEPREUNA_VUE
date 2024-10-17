@@ -485,7 +485,7 @@
                     </li> -->
                     <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/horas-mes') }}"><span class="c-sidebar-nav-icon"></span> Horas por mes </a>
                     </li>
-                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/expedientes') }}"><span class="c-sidebar-nav-icon"></span> Devoluciones </a>
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/devolucion/devoluciones') }}"><span class="c-sidebar-nav-icon"></span> Devoluciones </a>
                     </li> 
                 </ul>
             </li>
