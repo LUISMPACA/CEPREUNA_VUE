@@ -183,7 +183,7 @@ export default {
         nombres: "",
         nro_documento: "",
         fecha: "",
-        nro_registro: "1",
+        nro_registro: "",
         procede: "0",
         tokens: [],
       },
@@ -201,7 +201,6 @@ export default {
           nombres: "Nombres",
           nro_documento: "Nro Documento",
           fecha: "Fecha",
-          tipo_usuario: "Tipo Usuario",
           nro_registro: "Nro Registro",
           procede: "Estado Procedido",
           pagos_id: "Pagos",
@@ -225,12 +224,12 @@ export default {
       this.errors = {};
       this.titulo = "Nueva Fecha de Inscripción";
 
-      this.fields.estado = "1";
-      this.fields.inicio = "";
-      this.fields.fin = "";
-      this.fields.tipo_inscripcion = "1";
-      this.fields.tipo_usuario = "1";
-      this.fields.observacion = "";
+      this.fields.nombres = "";
+      this.fields.nro_documento = "";
+      this.fields.fecha = "";
+      this.fields.nro_registro = "";
+      this.fields.procede = "";
+      this.fields.tokens = [];
 
       $("#ModalFormulario1").modal("show");
     },
@@ -252,6 +251,19 @@ export default {
     },
     submit: function () {
       this.errors = {};
+      // Crear el array de tokens como parte de los campos que se van a enviar
+      let tokens = [];
+      this.resultPago.pago.map(function (pago) {
+          tokens.push(typeof pago.token !== "undefined" ? pago.token : "");
+      });
+
+      // Agregar el array de tokens al objeto fields (o puedes crear otro objeto)
+      if (tokens.length == 0) {
+          this.fields.tokens = [""];  // Si no hay tokens, enviar un array vacío
+      } else {
+          this.fields.tokens = tokens;  // Si hay tokens, los agregamos al objeto fields
+      }
+
       if (this.edit == 0)
         axios
           .post("devoluciones", this.fields)
@@ -301,6 +313,9 @@ export default {
       } else {
         this.statusDocumento = true;
       }
+    },
+    dateFormat: function(date) {
+      return moment(date, "YYYY-MM-DD").format("DD-MM-YYYY");
     },
   },
   mounted() { }
