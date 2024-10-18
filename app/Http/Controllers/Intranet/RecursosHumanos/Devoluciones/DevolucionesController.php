@@ -57,6 +57,7 @@ class DevolucionesController extends Controller
 
     public function store(Request $request)
     {
+        //return $request;
         // Inicializar variables
         $tokens = $request->tokens;
         $pagoExistente = true;
@@ -131,7 +132,6 @@ class DevolucionesController extends Controller
                 }
     
                 //aqui llenar la tabla de devolciones
-
                 Devoluciones::create([
                     'nombres' => $request->nombres,  // Asumiendo que 'nombres' viene en la request
                     'nro_documento' => $request->nro_documento,  // Documento del usuario
