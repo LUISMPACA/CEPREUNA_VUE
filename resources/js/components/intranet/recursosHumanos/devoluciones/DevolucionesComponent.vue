@@ -14,13 +14,13 @@
                         <v-server-table ref="table" :columns="columns" :options="options" url="/intranet/devolucion/devoluciones/lista/data">
                             <div slot="procede" slot-scope="props">
                                 <div v-if="props.row.procede == '0'">
-                                  No
+                                    No
                                 </div>
                                 <div v-else-if="props.row.procede == '1'">
-                                  Si
+                                    Si
                                 </div>
                                 <div v-else>
-                                  En Tramite
+                                    En Tramite
                                 </div>
                             </div>
                             <div slot="actions" slot-scope="props">
@@ -30,12 +30,21 @@
                                 </button>
                                 <!-- <a href="#" @click="editar(props.row.id)"><i class="fa  fa-trash big-icon text-danger" aria-hidden="true"></i></a> -->
                             </div>
+                            <div slot="secuencia" slot-scope="props">
+                                {{ props.row.secuencia }}
+                            </div>
+                            <div slot="monto_pago" slot-scope="props">
+                                {{ props.row.monto_pago }}
+                            </div>
+                            <div slot="fecha_pago" slot-scope="props">
+                                {{ dateFormat(props.row.fecha_pago) }}
+                            </div>
                         </v-server-table>
                     </div>
                 </div>
             </div>
         </div>
-        <form @submit.prevent="submit">
+        <form @submit.prevent="submit" v-on:keyup.enter="submit">
             <div class="modal fade" id="ModalDevolucion" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -96,7 +105,7 @@
                                 </div>
 
                                 <div class="row form-group">
-                                    <label class="col-12">Estado Procedido</label>
+                                    <label class="col-12">Estado</label>
                                     <div class="col-md-4">
                                         <div class="radio">
                                             <label>
@@ -125,12 +134,13 @@
                                         {{ errors.procede[0] }}
                                     </div>
                                 </div>
-                                <h5>Validación</h5>
+
+                                <h5 v-if="false">Validación</h5>
                                 <div v-if="errors && errors.tokens" class="text-danger">
                                     {{ errors.tokens[0] }}
                                 </div>
                                 <div class="row">
-                                    <w-pago :documento="fields.nro_documento" @result="resultPago = $event"></w-pago>
+                                    <w-pago v-if="validacion" :documento="fields.nro_documento" @result="resultPago = $event"></w-pago>
                                     <br />
                                     <div class="container" style="margin: 14px;">
                                         <div class="row">
@@ -183,6 +193,7 @@ export default {
         return {
             ///table//
             edit: 0,
+            validacion: true,
             id: 0,
             titulo: "",
             fields: {
@@ -190,6 +201,7 @@ export default {
                 nro_documento: "",
                 fecha: "",
                 nro_registro: "",
+                secuencia: "",
                 procede: "0",
                 tokens: []
             },
@@ -200,7 +212,7 @@ export default {
             disabledProvincia: true,
             disabledDistrito: true,
             distrito: "",
-            columns: ["id", "nombres", "nro_documento", "fecha", "nro_registro", "procede", "pagos_id", "actions"],
+            columns: ["id", "nombres", "nro_documento", "fecha", "nro_registro", "procede", "secuencia", "monto_pago", "fecha_pago", "actions"],
             options: {
                 headings: {
                     id: "id",
@@ -209,13 +221,13 @@ export default {
                     fecha: "Fecha",
                     nro_registro: "Nro Solicitud",
                     procede: "Estado Procedido",
+                    secuencia: "Secuencia",
                     pagos_id: "Pagos",
                     actions: "Acciones"
                 },
-                sortable: ["id", "fecha", "nro_registro", "procede"]
-                // filterable: ['correlativo','num_mat','paterno'],
-                // customFilters: ['correlativo','num_mat']
-                // filterByColumn:true
+                sortable: ["id", "fecha", "nro_registro", "procede"],
+                filterable: ["nombres", "nro_registro", "procede", "secuencia", "monto_pago", "fecha_pago"],
+                filterByColumn: true
             },
             resultPago: {
                 pago: []
@@ -225,10 +237,14 @@ export default {
     },
 
     methods: {
+        dateFormat: function(date) {
+            return moment(date, "YYYY-MM-DD").format("DD-MM-YYYY");
+        },
         nuevo: function() {
+            this.validacion = true;
             this.edit = 0;
             this.errors = {};
-            this.titulo = "Nueva Fecha de Inscripción";
+            this.titulo = "Nuevo Registro";
 
             this.fields.nombres = "";
             this.fields.nro_documento = "";
@@ -239,18 +255,48 @@ export default {
 
             $("#ModalDevolucion").modal("show");
         },
+        validateForm() {
+            this.errors = {};
+
+            if (!this.fields.nombres) {
+                this.errors.nombres = ["El nombre es requerido"];
+            }
+
+            if (!this.fields.nro_documento) {
+                this.errors.nro_documento = ["El número de documento es requerido"];
+            } else if (!/^\d+$/.test(this.fields.nro_documento)) {
+                this.errors.nro_documento = ["El número de documento debe contener solo dígitos"];
+            }
+
+            if (!this.fields.fecha) {
+                this.errors.fecha = ["La fecha es requerida"];
+            }
+
+            if (!this.fields.nro_registro) {
+                this.errors.nro_registro = ["El número de registro es requerido"];
+            }
+
+            if (!this.fields.procede) {
+                this.errors.procede = ["El estado de procedimiento es requerido"];
+            }
+
+            return Object.keys(this.errors).length === 0;
+        },
         editar: function(id) {
+            this.validacion = false;
             this.edit = 1;
             this.id = id;
             this.errors = {};
-            this.titulo = "Editar Fecha de Inscripción";
-            axios.get("inscripciones/" + id + "/edit").then(response => {
-                this.fields.estado = response.data.estado;
-                this.fields.inicio = response.data.inicio;
-                this.fields.fin = response.data.fin;
-                this.fields.tipo_inscripcion = response.data.tipo_inscripcion;
-                this.fields.tipo_usuario = response.data.tipo_usuario;
-                this.fields.observacion = response.data.observacion;
+            this.titulo = "Editar Datos de Tramite";
+            axios.get(`/intranet/devolucion/devoluciones/${id}/edit`).then(response => {
+                // console.log(response.data);
+                const data = response.data;
+                this.fields.nombres = data.nombres;
+                this.fields.nro_documento = data.nro_documento;
+                this.fields.fecha = data.fecha;
+                this.fields.nro_registro = data.nro_registro;
+                this.fields.procede = data.procede.toString();
+                this.validateForm();
             });
 
             $("#ModalDevolucion").modal("show");
@@ -269,53 +315,53 @@ export default {
             } else {
                 this.fields.tokens = tokens; // Si hay tokens, los agregamos al objeto fields
             }
-
-            if (this.edit == 0)
-                axios
-                    .post("devoluciones", this.fields)
-                    .then(response => {
-                        // $(".loader").hide();
-                        if (response.data.status) {
-                            this.$refs.table.refresh();
-                            toastr.success(response.data.message);
-                            $("#ModalDevolucion").modal("hide");
-                            //forzar
-                            $(".modal-backdrop").remove();
-                            $("body").removeClass("modal-open");
-                            $("body").css("padding-right", "");
-                            // window.location.replace(response.data.url);
-                        } else {
-                            toastr.warning(response.data.message, "Aviso");
-                        }
-                    })
-                    .catch(error => {
-                        // $(".loader").hide();
-                        if (error.response.status === 422) {
-                            this.errors = error.response.data.errors || {};
-                        }
-                    });
-            else {
-                axios
-                    .put("inscripciones/" + this.id, this.fields)
-                    .then(response => {
-                        // $(".loader").hide();
-                        if (response.data.status) {
-                            this.$refs.table.refresh();
-                            toastr.success(response.data.message);
-                            $("#ModalDevolucion").modal("hide");
-                            // window.location.replace(response.data.url);
-                        } else {
-                            toastr.warning(response.data.message, "Aviso");
-                        }
-                    })
-                    .catch(error => {
-                        // $(".loader").hide();
-                        if (error.response.status === 422) {
-                            this.errors = error.response.data.errors || {};
-                        }
-                    });
+            if (this.validateForm()) {
+                if (this.edit == 0)
+                    axios
+                        .post("devoluciones", this.fields)
+                        .then(response => {
+                            // $(".loader").hide();
+                            if (response.data.status) {
+                                this.$refs.table.refresh();
+                                toastr.success(response.data.message);
+                                $("#ModalDevolucion").modal("hide");
+                                //forzar
+                                $(".modal-backdrop").remove();
+                                $("body").removeClass("modal-open");
+                                $("body").css("padding-right", "");
+                                // window.location.replace(response.data.url);
+                            } else {
+                                toastr.warning(response.data.message, "Aviso");
+                            }
+                        })
+                        .catch(error => {
+                            // $(".loader").hide();
+                            if (error.response.status === 422) {
+                                this.errors = error.response.data.errors || {};
+                            }
+                        });
+                else {
+                    axios
+                        .put("devoluciones/" + this.id, this.fields)
+                        .then(response => {
+                            // $(".loader").hide();
+                            if (response.data.status) {
+                                this.$refs.table.refresh();
+                                toastr.success(response.data.message);
+                                $("#ModalDevolucion").modal("hide");
+                                // window.location.replace(response.data.url);
+                            } else {
+                                toastr.warning(response.data.message, "Aviso");
+                            }
+                        })
+                        .catch(error => {
+                            // $(".loader").hide();
+                            if (error.response.status === 422) {
+                                this.errors = error.response.data.errors || {};
+                            }
+                        });
+                }
             }
-            // console.log("hols");
         },
         changeDocumento: function() {
             if (this.fields.nro_documento.length == 0) {

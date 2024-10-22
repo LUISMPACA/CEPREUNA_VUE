@@ -178,7 +178,7 @@ Route::get('web/login/google/callback', 'Auth\Login\LoginGoogleController@handle
 // Route::get('estudiante/login/google', 'Auth\Login\LoginEstudianteController@redirectToProvider');
 // Route::get('estudiante/login/google/callback', 'Auth\Login\LoginEstudianteController@handleProviderCallback');
 // rutas panel docente
-Route::get('comunicado/mostrar/{mostrar}', 'Intranet\ComunicadoController@mostrar');
+// Route::get('comunicado/mostrar/{mostrar}', 'Intranet\ComunicadoController@mostrar');
 Route::post('asistencia/docente/externo/image', 'Intranet\Auxiliar\AsistenciaDocenteController@saveImageExterno');
 
 Route::group(['prefix' => 'estudiante', 'middleware' => 'redirect_app'], function () {
@@ -977,10 +977,10 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('colegios/lista/data', 'Intranet\Configuracion\ColegioController@lista');
         });
 
-        Route::group(['prefix' => 'aplicativo'], function () {
-            Route::resource('/comunicado', 'Intranet\Aplicativo\ComunicadoController');
-            Route::get('comunicado/lista/data', 'Intranet\Aplicativo\ComunicadoController@lista');
-        });
+        // Route::group(['prefix' => 'aplicativo'], function () {
+        //     Route::resource('/comunicado', 'Intranet\Aplicativo\ComunicadoController');
+        //     Route::get('comunicado/lista/data', 'Intranet\Aplicativo\ComunicadoController@lista');
+        // });
 
 
         // ****************************
@@ -1089,7 +1089,7 @@ Route::group(['middleware' => ['auth']], function () {
         });
 
 
-        
+
         // ****************************
         // *  Devoluciones
         // ****************************
@@ -1097,6 +1097,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::group(['prefix' => 'devolucion'], function () {
             Route::resource('/devoluciones', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController');
             Route::get('/devoluciones/lista/data', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@lista');
+            Route::get('/devoluciones/{id}', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@edit');
             Route::get('/get-documentos-expediente-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getDocumentosExpedienteDocente');
             Route::post('/docentes/evaluar-docente', 'Intranet\RecursosHumanos\Pagos\DocenteController@evaluarDocente');
 
@@ -1113,7 +1114,7 @@ Route::group(['middleware' => ['auth']], function () {
             Route::put('/docentes/horas-mes/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@updateHorasDocente');
             Route::get('/get-periodos-filter', 'Intranet\RecursosHumanos\Pagos\DocenteController@getPeriodosFilter');
             Route::get('/get-responsables', 'Intranet\RecursosHumanos\Pagos\DocenteController@getResponsables');
-            Route::get('/expedientes-excel', 'Intranet\RecursosHumanos\Pagos\DocenteController@rptExpedientesExcel');            
+            Route::get('/expedientes-excel', 'Intranet\RecursosHumanos\Pagos\DocenteController@rptExpedientesExcel');
         });
 
 

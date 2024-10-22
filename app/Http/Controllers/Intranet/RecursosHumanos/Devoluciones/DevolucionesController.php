@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Validator;
 
 class DevolucionesController extends Controller
 {
@@ -30,6 +31,7 @@ class DevolucionesController extends Controller
 
     public function index()
     {
+
         $permissions = [];
         if (auth()->user()->hasRole('Super Admin')) {
             foreach (Permission::get() as $key => $value) {
@@ -50,13 +52,66 @@ class DevolucionesController extends Controller
     public function lista(Request $request)
     {
         $table = new EloquentVueTables;
-        $data = $table->get(new Devoluciones(), ['*']);
+        $query = Devoluciones::leftJoin('pagos', 'devoluciones.pagos_id', '=', 'pagos.id')
+            ->select('devoluciones.*', 'pagos.secuencia as secuencia', 'pagos.monto as monto_pago', 'pagos.fecha as fecha_pago');
+
+        $data = $table->get($query, [
+            'devoluciones.id',
+            'devoluciones.nombres',
+            'devoluciones.nro_documento',
+            'devoluciones.fecha',
+            'devoluciones.nro_registro',
+            'devoluciones.procede',
+            'pagos.secuencia as secuencia',
+            'pagos.monto as monto_pago',
+            'pagos.fecha as fecha_pago'
+        ]);
         $response = $table->finish($data);
         return response()->json($response);
+    }
+    public function edit(Request $request, $id)
+    {
+        $devolucion = Devoluciones::find($id);
+        return ($devolucion);
+        if (!$devolucion) {
+            return response()->json(['error' => 'Registro no encontrado'], 404);
+        }
+
+        return response()->json($devolucion);
     }
 
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'nombres' => 'required|string|max:255',
+            'nro_documento' => 'required|numeric|digits_between:7,15',
+            'fecha' => 'required|date',
+            'nro_registro' => 'required|string|max:50',
+            'procede' => 'required|in:0,1,2',
+            'tokens' => 'required|array',
+            'tokens.*' => 'string'
+        ], [
+            'nombres.required' => 'El campo nombres es obligatorio.',
+            'nombres.max' => 'El campo nombres no debe exceder los 255 caracteres.',
+            'nro_documento.required' => 'El número de documento es obligatorio.',
+            'nro_documento.numeric' => 'El número de documento debe contener solo dígitos.',
+            'nro_documento.digits_between' => 'El número de documento debe tener entre 7 y 15 dígitos.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.date' => 'El formato de fecha no es válido.',
+            'nro_registro.required' => 'El número de registro es obligatorio.',
+            'nro_registro.max' => 'El número de registro no debe exceder los 50 caracteres.',
+            'procede.required' => 'El campo procede es obligatorio.',
+            'procede.in' => 'El valor de procede debe ser 0, 1 o 2.',
+            'tokens.required' => 'Se requieren tokens de pago.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error de validación',
+                'errors' => $validator->errors()
+            ], 422);
+        }
         //return $request;
         // Inicializar variables
         $tokens = $request->tokens;
@@ -64,24 +119,25 @@ class DevolucionesController extends Controller
         $documentoValidado = true;
         $sumaPagoDB = 0;
         $comisionBanco = 0;
-    
+
         // Verificar si existen tokens
         if (!empty($tokens)) {
             foreach ($tokens as $token) {
                 // Validar el pago en la base de datos
                 $validarPago = Pago::where('token', $token)->first();
                 $comisionBanco++;
-    
+
                 // Si no se encuentra el pago, marcar como inexistente
                 if (!$validarPago) {
                     $pagoExistente = false;
                     break;
                 }
-    
+
+
                 // Verificar que el estado del pago sea válido (estado '1')
                 if ($validarPago->estado == '1') {
                     $sumaPagoDB += $validarPago->monto;
-    
+
                     // Validar el pago con el número de documento del estudiante
                     $validarDocumento = BancoPago::where([
                         ['secuencia', $validarPago->secuencia],
@@ -89,7 +145,7 @@ class DevolucionesController extends Controller
                         ['fch_pag', $validarPago->fecha],
                         ['num_doc', str_pad($request->nro_documento, 15, '0', STR_PAD_LEFT)],
                     ])->first();
-    
+
                     if (!$validarDocumento) {
                         $documentoValidado = false;
                         break;
@@ -102,10 +158,10 @@ class DevolucionesController extends Controller
         } else {
             $pagoExistente = false;
         }
-    
+
         // Definir el monto total a pagar
         $totalPagar = round(11, 2);
-    
+
         // Si no existe el pago o hubo algún error de validación
         if (!$pagoExistente) {
             return response()->json([
@@ -113,7 +169,7 @@ class DevolucionesController extends Controller
                 "status" => false,
             ]);
         }
-    
+
         // Validar que el documento sea correcto y que el monto cubra el total a pagar
         if ($documentoValidado) {
             // Usar transacción para guardar los cambios de manera atómica
@@ -121,16 +177,16 @@ class DevolucionesController extends Controller
             try {
                 foreach ($tokens as $token) {
                     $pago = Pago::where('token', $token)->first();
-    
+
                     if ($pago) {
                         // Actualizar estado del pago a '2'
                         $pago->estado = '2';
                         $pago->save();
-    
+
                         // Aquí puedes guardar los detalles del pago en la misma u otra tabla si es necesario
                     }
                 }
-    
+
                 //aqui llenar la tabla de devolciones
                 Devoluciones::create([
                     'nombres' => $request->nombres,  // Asumiendo que 'nombres' viene en la request
@@ -142,7 +198,7 @@ class DevolucionesController extends Controller
                 ]);
 
                 DB::commit(); // Confirmar transacción
-    
+
                 return response()->json([
                     "message" => 'Registro de devolución de pago satifactorio.',
                     "status" => true,
@@ -156,7 +212,7 @@ class DevolucionesController extends Controller
                 ]);
             }
         }
-    
+
         // Si el documento no fue validado correctamente
         if (!$documentoValidado) {
             return response()->json([
@@ -164,12 +220,68 @@ class DevolucionesController extends Controller
                 "status" => false,
             ]);
         }
-    
+
         // Si el monto total no es suficiente
         // return response()->json([
         //     "message" => '* El monto total de pago no es válido, ingrese nuevamente el pago correspondiente.',
         //     "status" => false,
         // ]);
     }
-    
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'nombres' => 'required|string|max:255',
+            'nro_documento' => 'required|numeric|digits_between:7,15',
+            'fecha' => 'required|date',
+            'nro_registro' => 'required|string|max:50',
+            'procede' => 'required|in:0,1,2',
+        ], [
+            'nombres.required' => 'El campo nombres es obligatorio.',
+            'nombres.max' => 'El campo nombres no debe exceder los 255 caracteres.',
+            'nro_documento.required' => 'El número de documento es obligatorio.',
+            'nro_documento.numeric' => 'El número de documento debe contener solo dígitos.',
+            'nro_documento.digits_between' => 'El número de documento debe tener entre 7 y 15 dígitos.',
+            'fecha.required' => 'La fecha es obligatoria.',
+            'fecha.date' => 'El formato de fecha no es válido.',
+            'nro_registro.required' => 'El número de registro es obligatorio.',
+            'nro_registro.max' => 'El número de registro no debe exceder los 50 caracteres.',
+            'procede.required' => 'El campo procede es obligatorio.',
+            'procede.in' => 'El valor de procede debe ser 0, 1 o 2.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error de validación',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        try {
+            // Buscar la devolución por ID
+            $devolucion = Devoluciones::findOrFail($id);
+
+            // Actualizar los campos
+            $devolucion->update([
+                'nombres' => $request->nombres,
+                'nro_documento' => $request->nro_documento,
+                'fecha' => $request->fecha,
+                'nro_registro' => $request->nro_registro,
+                'procede' => $request->procede,
+            ]);
+
+            // Respuesta exitosa
+            return response()->json([
+                'status' => true,
+                'message' => 'Devolución actualizada con éxito',
+                'data' => $devolucion
+            ], 200);
+        } catch (\Exception $e) {
+            // Manejar cualquier error
+            return response()->json([
+                'status' => false,
+                'message' => 'Error al actualizar la devolución',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
