@@ -283,7 +283,7 @@ class OpenAIController extends Controller
 
         // Construir y retornar la solicitud
         return [
-            "model" => "llama-13b-chat",
+            "model" => "llama3.1-70b",
             "messages" => $messages,
             "max_tokens" => 200,
             "stream" => false
