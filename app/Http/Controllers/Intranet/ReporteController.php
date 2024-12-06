@@ -998,36 +998,6 @@ class ReporteController extends Controller
             DB::raw("(SELECT CONCAT(tarifa_estudiantes4.monto,'|',tarifa_estudiantes4.pagado,'|',tarifa_estudiantes4.mora)
             FROM tarifa_estudiantes AS tarifa_estudiantes4
             WHERE tarifa_estudiantes4.nro_cuota = 4 AND tarifa_estudiantes4.estudiantes_id = estudiantes.id) AS cuarta_mensualidad")
-
-            // DB::raw("(SELECT SUM(monto)
-            //     FROM inscripcion_pagos ip
-            //     WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '2'
-            //     GROUP BY inscripciones_id) AS mensualidad_total"),
-
-            // DB::raw("(SELECT if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*1, if(tipo_colegios.id = 1,250,200)*1),
-            //     SUM(monto),if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2), if(tipo_colegios.id = 1,250,200)))
-            //     FROM inscripcion_pagos ip
-            //     WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '2'
-            //     GROUP BY inscripciones_id) AS primera_mensualidad"),
-
-            // DB::raw("(SELECT if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*2, if(tipo_colegios.id = 1,250,200)*2) ,
-            //     if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*1, if(tipo_colegios.id = 1,250,200)*1) , 0.0000,
-            //     ABS(SUM(monto) - if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*1, if(tipo_colegios.id = 1,250,200)*1))),
-            //     if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2), if(tipo_colegios.id = 1,250,200)))
-            //     FROM inscripcion_pagos ip WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '2' GROUP BY inscripciones_id) AS segunda_mensualidad"),
-
-            // DB::raw("(SELECT if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*3, if(tipo_colegios.id = 1,250,200)*3) ,
-            //     if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*2, if(tipo_colegios.id = 1,250,200)*2) , 0.0000,
-            //     ABS(SUM(monto) - if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*2, if(tipo_colegios.id = 1,250,200)*2))),
-            //     if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2), if(tipo_colegios.id = 1,250,200)))
-            //     FROM inscripcion_pagos ip WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '2' GROUP BY inscripciones_id) AS tercera_mensualidad"),
-
-            // DB::raw("(SELECT if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*4, if(tipo_colegios.id = 1,250,200)*4) ,
-            //     if(SUM(monto) < if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*3, if(tipo_colegios.id = 1,250,200)*3) , 0.0000,
-            //     ABS(SUM(monto) - if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2)*3, if(tipo_colegios.id = 1,250,200)*3))),
-            //     if(inscripciones.tipo_estudiante != '1',if(tipo_colegios.id = 1,250/2,200/2), if(tipo_colegios.id = 1,250,200)))
-            //     FROM inscripcion_pagos ip WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '2' GROUP BY inscripciones_id) AS cuarta_mensualidad"),
-            // DB::raw("(SELECT SUM(monto) FROM inscripcion_pagos ip WHERE ip.inscripciones_id = inscripciones.id AND ip.concepto_pagos_id = '3' GROUP BY inscripciones_id) AS moras")
         );
 
         $data = $data->join("estudiantes", "estudiantes.id", "inscripciones.estudiantes_id");
@@ -1069,12 +1039,7 @@ class ReporteController extends Controller
                 $data = $data->where(DB::raw("(select tw4.monto - tw4.pagado from tarifa_estudiantes as tw4 where tw4.estudiantes_id = estudiantes.id and tw4.nro_cuota = 4)"), "!=", "0");
             }
         }
-        // $data = $data->where(DB::raw("select tw1.monto - tw1.pagado from tarifa_estudiantes as tw1 where tw1.estudiantes_id = estudiantes.id and tw1.nro_cuota = 1"),$);
 
-        // $data = $data->groupBy("asistencia_docentes.docentes_id", "asistencia_docentes.carga_academicas_id");
-        // $data = $data->whereHas('docente', function (Builder $q) {
-        //     $q->orderBy('paterno','asc');
-        // });
         $data = $data->groupBy("estudiantes.id");
         if (isset($request->estado)) {
             $data = $data->where('inscripciones.estado', $request->estado);
@@ -1106,6 +1071,8 @@ class ReporteController extends Controller
             "turnos.denominacion AS turno",
             "grupos.denominacion AS grupo",
             "s.denominacion as sede",
+            DB::raw('(SELECT COUNT(*) from asistencia_estudiante_detalles as aed 
+                 where aed.estudiantes_id = estudiantes.id and aed.estado != "3") as asistencia'),
             DB::raw("if(inscripciones.tipo_estudiante = '1','Normal',if(inscripciones.tipo_estudiante = '2','Hijo de trabajador',if(inscripciones.tipo_estudiante = '3','Descuento Trabajador UNA',
                 if(inscripciones.tipo_estudiante = '4','Hermanos',if(inscripciones.tipo_estudiante = '5','Resolución Rectoral','Servicio Militar'))))) AS descuento"),
             "tipo_colegios.denominacion AS tipo_colegio",
@@ -1224,6 +1191,7 @@ class ReporteController extends Controller
             $response = $table->finish($data);
         }
         // $response = $table->finish($data);
+        // dd($response);
         return response()->json($response);
     }
 
@@ -2197,7 +2165,24 @@ class ReporteController extends Controller
 
         $sheet->getStyle('F1:G1')->applyFromArray($headerStyle);
         $datos = [
-            'ID', 'Nro Documento', 'Paterno', 'Materno', 'Nombres', 'Sede', 'Area', 'Turno', 'Grupo', 'Descuento', 'Tipo Colegio', 'Estado', 'Pago Total', 'Pago Matricula', 'Primera Mensualidad', 'Segunda Mensualidad', 'Tercera Mensualidad', 'Cuarta Mensualidad',
+            'ID',
+            'Nro Documento',
+            'Paterno',
+            'Materno',
+            'Nombres',
+            'Sede',
+            'Area',
+            'Turno',
+            'Grupo',
+            'Descuento',
+            'Tipo Colegio',
+            'Estado',
+            'Pago Total',
+            'Pago Matricula',
+            'Primera Mensualidad',
+            'Segunda Mensualidad',
+            'Tercera Mensualidad',
+            'Cuarta Mensualidad',
         ];
         $columnaInicial = 'A';
         $filaInicial = 3;

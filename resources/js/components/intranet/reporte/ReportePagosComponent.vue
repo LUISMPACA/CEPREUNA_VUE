@@ -155,7 +155,7 @@ import $ from "jquery";
 // import toastr from "toastr";
 
 export default {
-    props: ["permissions","ruta_rpt_pagos"],
+    props: ["permissions", "ruta_rpt_pagos"],
     data() {
         return {
             url: "",
@@ -196,7 +196,8 @@ export default {
                     primera_mensualidad: "Primera Mensualidad",
                     segunda_mensualidad: "Segunda Mensualidad",
                     tercera_mensualidad: "Tercera Mensualidad",
-                    cuarta_mensualidad: "Cuarta Mensualidad"
+                    cuarta_mensualidad: "Cuarta Mensualidad",
+                    asistencia: "Asistencias"
                 },
                 sortable: [],
                 filterable: ["nro_documento", "paterno", "materno", "nombres"],
@@ -239,6 +240,7 @@ export default {
                     label: "Grupo",
                     field: "grupo"
                 },
+
                 {
                     label: "Descuento",
                     field: "descuento"
@@ -274,6 +276,11 @@ export default {
                 {
                     label: "Cuarta Mensualidad",
                     field: "cuarta_mensualidad"
+                },
+                {
+                    label: "Asistencias",
+                    field: "asistencia"
+                    // dataFormat: this.formatApto
                 }
             ],
             json_data: [],
@@ -305,7 +312,22 @@ export default {
             }
             return "Particular";
         },
+        // getDataExcel: function() {
+        //     axios
+        //         .get("/intranet/reporte/pagos/lista-excel", {
+        //             params: {
+        //                 all: true,
+        //                 estado: this.estado
+        //             }
+        //         })
+        //         .then(response => {
+        //             // this.url = "docentes/pdf/"+response.data;
+        //             this.json_data = response.data;
+        //             // console.log(response.data);
+        //         });
+        // },
         getDataExcel: function() {
+            console.log("Solicitando datos..."); // Debug
             axios
                 .get("/intranet/reporte/pagos/lista-excel", {
                     params: {
@@ -314,9 +336,11 @@ export default {
                     }
                 })
                 .then(response => {
-                    // this.url = "docentes/pdf/"+response.data;
+                    // console.log("Datos recibidos:", response.data); // Debug
                     this.json_data = response.data;
-                    // console.log(response.data);
+                })
+                .catch(error => {
+                    console.error("Error al obtener datos:", error); // Debug
                 });
         },
         exportarPDF: function() {
@@ -350,6 +374,7 @@ export default {
         }
     },
     mounted() {
+        console.log("Componente montado - llamando a getDataExcel");
         this.getDataExcel();
     }
 };
