@@ -379,7 +379,7 @@ class IndexController extends Controller
     public function getGrupoAulaAuxiliar(Request $request)
     {
 
-        if (auth()->user()->hasRole('Super Admin|Administrador|Coordinador Auxiliar|Computo')) {
+        if (auth()->user()->hasRole('Super Admin|Administrador|Coordinador Auxiliar|Coordinador Auxiliar 2|Computo')) {
             $response = GrupoAula::select("grupo_aulas.*", DB::raw("CONCAT(s.denominacion,' ',g.denominacion) as grupo"))
                 ->join("grupos as g", "g.id", "grupo_aulas.grupos_id");
         } else {

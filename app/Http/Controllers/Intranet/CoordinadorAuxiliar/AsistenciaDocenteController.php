@@ -29,6 +29,17 @@ class AsistenciaDocenteController extends Controller
     {
         $response["fecha"] = date("Y-m-d");
         // $response["fecha"] = "2021-01-25";
+        $permissions = [];
+        if (auth()->user()->hasRole('Super Admin')) {
+            foreach (Permission::get() as $key => $value) {
+                array_push($permissions, $value->name);
+            }
+        } else {
+            foreach (Auth::user()->getAllPermissions() as $key => $value) {
+                array_push($permissions, $value->name);
+            }
+        }
+        $response['permisos'] = json_encode($permissions);
         return view("intranet.coordinadorAuxiliar.asistencia.docente", $response);
     }
     public function store(Request $request)
