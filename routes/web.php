@@ -25,6 +25,10 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
+Route::get('/resultados-simulacro', function () {
+    return view('web.estudiante.simulacroResultado');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
