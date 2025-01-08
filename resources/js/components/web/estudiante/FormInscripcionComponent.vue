@@ -483,7 +483,7 @@
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
         </div>
         <div class="row">
-            <!-- <div class="col-md-6 col-xs-12">
+            <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -494,7 +494,7 @@
                     </div>
                     <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opción apersonarce con la Resolución Rectoral, DNI y ficha de inscipción al CEPREUNA.</p>
                 </div>
-            </div> -->
+            </div>
             <!-- <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
@@ -509,7 +509,7 @@
                     </p>
                 </div>
             </div> -->
-            <div class="col-md-4 col-xs-12" v-if="fields.tipo_descuento == '4'">
+            <!-- <div class="col-md-4 col-xs-12" v-if="fields.tipo_descuento == '4'">
                 <div class="form-group">
                     <label for="nro_documento_hermano">Número de Documento del Hermano Inscrito</label>
                     <input type="text" class="form-control" name="nro_documento_hermano" id="nro_documento_hermano" v-model="fields.nro_documento_hermano" />
@@ -517,7 +517,7 @@
                         {{ errors.nro_documento_hermano[0] }}
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
         
         <p class="text-info" v-if="montoPagar != 0 && statusDocumento && !statusDescuento && statusColegio && fields.modalidad">
