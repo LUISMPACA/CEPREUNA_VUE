@@ -1319,7 +1319,7 @@ class EstudianteController extends Controller
 
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), '', '', 45, 55, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
 
-            $pdf::Image('images/firma4.png', 25, 228, 58, 58, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/firma4.png', 25, 225, 58, 58, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), 156, 49, 44, 52, 'PNG', '', '', true, 150, '', false, false, 1, false, false, false);
         } else {
             $pdf::SetFont('helvetica', '', 15);
