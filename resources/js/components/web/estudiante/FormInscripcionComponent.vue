@@ -703,8 +703,8 @@ export default {
             //     { id: 2, denominacion: "Presencial" }
             // ],
             modalidades: [],
-            selectFileDni: "Selecione",
-            selectFileCertificado: "Selecione",
+            selectFileDni: "Seleccione",
+            selectFileCertificado: "Seleccione",
             showEstadoUniversidad: false,
             showEstadoDiscapacidad: false,
             vacantes: []
