@@ -127,7 +127,7 @@ export default {
 
             this.errors = {};
             axios
-                .post("../validar-pago", formData)
+                .post("/validar-pago", formData)
                 .then(response => {
                     this.errorPago = null;
                     if (response.data.status) {

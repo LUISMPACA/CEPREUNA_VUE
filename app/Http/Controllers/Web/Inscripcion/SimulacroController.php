@@ -378,7 +378,7 @@ class SimulacroController extends Controller
             // $y = $pdf->SetY(-15);
             $pdf->Line(10, 283, 200, 283);
             $pdf->SetFont('helvetica', '', 8);
-            $pdf->Cell(0, 10, 'CEPREUNA ABRIL 2024 - JULIO 2024 - Fecha y Hora de Registro: ' . $InscripcionSimulacro->Fecha, "t", false, 'L', 0, '', 0, false, 'T', 'M');
+            $pdf->Cell(0, 10, 'CEPREUNA SETIEMBRE 2024 - DICIEMBRE 2024 - Fecha y Hora de Registro: ' . $InscripcionSimulacro->Fecha, "t", false, 'L', 0, '', 0, false, 'T', 'M');
         });
         $pdf::SetTitle('Solicitud');
         $pdf::AddPage();
@@ -399,7 +399,7 @@ class SimulacroController extends Controller
         $pdf::SetFont('helvetica', 'b', 12);
         $pdf::Cell(0, 5, "Centro de Estudios Pre Universitario", 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', '', 9);
-        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN : DOMINGO 21 DE JULIO DEL 2024', 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN : SÁBADO 21 DE DICIEMBRE DEL 2024', 0, 1, 'C', 0, '', 0);
 
 
         $pdf::ln();
@@ -408,7 +408,7 @@ class SimulacroController extends Controller
         $pdf::Cell(0, 5, 'FICHA DE ' .  'INSCRIPCIÓN', 0, 1, 'C', 0, '', 0);
         $pdf::SetFont('helvetica', 'b', 14);
 
-        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN PRESENCIAL ABRIL - JULIO 2024 ', 0, 1, 'C', 0, '', 0);
+        $pdf::Cell(0, 5, 'SIMULACRO DE EXAMEN PRESENCIAL SETIEMBRE - DICIEMBRE 2024 ', 0, 1, 'C', 0, '', 0);
         $pdf::ln();
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(130, 6, 'DATOS DEL POSTULANTE', 1, 1, 'C', 0, '', 0);
@@ -652,7 +652,7 @@ class SimulacroController extends Controller
         </table>
         <table>
         <tr>
-            <th style="text-align:justify;">El que suscribe declara bajo juramento que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen CEPREUNA ciclo ABRIL - JULIO 2024" es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta, excluye mi participación en el simulacro; en consecuencia, ratifico la veracidad de los datos en la presente declaración jurada. </th>
+            <th style="text-align:justify;">El que suscribe declara bajo juramento que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen CEPREUNA ciclo SETIEMBRE - DICIEMBRE 2024" es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta, excluye mi participación en el simulacro; en consecuencia, ratifico la veracidad de los datos en la presente declaración jurada. </th>
         </tr>
         </table>
         ';

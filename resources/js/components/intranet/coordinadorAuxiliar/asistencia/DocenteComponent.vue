@@ -379,7 +379,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer" v-if="permissions.includes('validar asistencia docente')">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-success" @click="guardar">Guardar</button>
                     </div>
@@ -416,7 +416,7 @@ import $ from "jquery";
 import toastr from "toastr";
 
 export default {
-    props: ["fechaHoy"],
+    props: ["fechaHoy","permissions"],
     data() {
         return {
             id: 0,

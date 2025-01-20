@@ -205,7 +205,7 @@
                             <p>
                                 Que, a la fecha de inscripción.
                             </p>
-                            <p>Que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen de Admisión CEPREUNA ciclo ABRIL - JULIO 2024" es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta, excluye mi participación en el simulacro; en consecuencia, ratifico la veracidad de los datos en la presente declaración jurada. </p>
+                            <p>Que la información proporcionada durante el proceso de inscripción y registro para participar del "Simulacro de Examen de Admisión CEPREUNA ciclo SETIEMBRE - DICIEMBRE 2024" es precisa, completa y veraz. Asumo plena responsabilidad por los datos proporcionados y soy consciente de que cualquier falsedad, omisión o información incorrecta, excluye mi participación en el simulacro; en consecuencia, ratifico la veracidad de los datos en la presente declaración jurada. </p>
                             <p>
                                 Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
                             </p>

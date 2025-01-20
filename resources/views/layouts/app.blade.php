@@ -149,6 +149,20 @@
                 </ul>
             </li>
             @endcan
+            @can('ver menu administracion temporal')
+            <li class="c-sidebar-nav-item c-sidebar-nav-dropdown"><a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle">
+                    <svg class="c-sidebar-nav-icon">
+                        <use xlink:href="{{ asset('coreui/vendors/@coreui/icons/svg/free.svg#cil-education') }}">
+                        </use>
+                    </svg> Administración</a>
+                <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/administracion/horario') }}"><span class="c-sidebar-nav-icon"></span> Horario</a>
+                    </li>
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/administracion/propuesta-horario') }}"><span class="c-sidebar-nav-icon"></span> Propuesta Horario</a>
+                    </li>
+                </ul>
+            </li>
+            @endcan
             @can('ver menu matriculas')
             <li class="c-sidebar-nav-item c-sidebar-nav-dropdown"><a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle">
                     <svg class="c-sidebar-nav-icon">
@@ -465,20 +479,21 @@
                         <use xlink:href="{{ asset('coreui/vendors/@coreui/icons/svg/free.svg#cil-lan') }}"></use>
                     </svg> Pagos</a>
                 <ul class="c-sidebar-nav-dropdown-items">
-                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/habilitacion') }}"><span class="c-sidebar-nav-icon"></span> Habilitacion Docentes </a>
+                    <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/habilitacion') }}"><span class="c-sidebar-nav-icon"></span> Habilitacion Docentes </a>
                     </li>
                     <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/expedientes') }}"><span class="c-sidebar-nav-icon"></span> Expedientes Docentes </a>
-                    </li>
+                    </li> -->
                     <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/pagos/docentes/horas-mes') }}"><span class="c-sidebar-nav-icon"></span> Horas por mes </a>
                     </li>
-
+                    <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/devolucion/devoluciones') }}"><span class="c-sidebar-nav-icon"></span> Devoluciones </a>
+                    </li> 
                 </ul>
             </li>
-            <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/cron-correo') }}">
+            <!-- <li class="c-sidebar-nav-item"><a class="c-sidebar-nav-link" href="{{ url('intranet/recursos-humanos/cron-correo') }}">
                     <svg class="c-sidebar-nav-icon">
                         <use xlink:href="{{ asset('coreui/vendors/@coreui/icons/svg/free.svg#cil-lan') }}"></use>
                     </svg> Enviar Accesos</a>
-            </li>
+            </li> -->
             @endcan
             @endcan
             @can('menu libro reclamaciones')

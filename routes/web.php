@@ -25,6 +25,10 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
+Route::get('/resultados-simulacro', function () {
+    return view('web.estudiante.simulacroResultado');
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -130,6 +134,19 @@ Route::get('/urlget_e', function () {
 //     }
 // });
 
+/**Asistente**/
+Route::get('/asistente', function () {
+    //return view('web/asistente/login'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+    return view('web/asistente/chatSinDni');
+});
+
+Route::get('/asistentedni', function () {
+    //return view('web/asistente/chatSinDni'); // 'chat' es el nombre del archivo Blade sin la extensión .blade.php
+});
+
+Route::post('asistente', 'OpenAIController@login')->name('loginAsistente');
+
+
 
 Route::get('dga/estudiantes/pdf-constancia/{id}', 'Web\Inscripcion\EstudianteController@pdfConstancia');
 Route::get('dga/estudiantes/foto/{id}', 'Web\Inscripcion\EstudianteController@getFotografia');
@@ -165,7 +182,7 @@ Route::get('web/login/google/callback', 'Auth\Login\LoginGoogleController@handle
 // Route::get('estudiante/login/google', 'Auth\Login\LoginEstudianteController@redirectToProvider');
 // Route::get('estudiante/login/google/callback', 'Auth\Login\LoginEstudianteController@handleProviderCallback');
 // rutas panel docente
-Route::get('comunicado/mostrar/{mostrar}', 'Intranet\ComunicadoController@mostrar');
+// Route::get('comunicado/mostrar/{mostrar}', 'Intranet\ComunicadoController@mostrar');
 Route::post('asistencia/docente/externo/image', 'Intranet\Auxiliar\AsistenciaDocenteController@saveImageExterno');
 
 Route::group(['prefix' => 'estudiante', 'middleware' => 'redirect_app'], function () {
@@ -644,6 +661,11 @@ Route::group(['prefix' => 'inscripciones'], function () {
     Route::get('validacion', 'Web\Inscripcion\SimulacroController@showLogin');
     Route::post('validacion', 'Web\Inscripcion\SimulacroController@login')->name('loginSimulacro');
     /**/
+    /*Disponibilidad*/
+    Route::resource('/disponibilidades', 'Web\Inscripcion\DisponibilidadController');
+    Route::get('disponibilidad', 'Web\Inscripcion\DisponibilidadController@showLogin');
+    Route::post('disponibilidad', 'Web\Inscripcion\DisponibilidadController@login')->name('logindisponibilidad');
+    /**/
     Route::get('/get-paises', 'Web\Inscripcion\IndexController@getPaises');
     Route::get('/get-departamentos', 'Web\Inscripcion\IndexController@getDepartamentos');
     Route::get('/get-provincias', 'Web\Inscripcion\IndexController@getProvincias');
@@ -959,10 +981,10 @@ Route::group(['middleware' => ['auth']], function () {
             Route::get('colegios/lista/data', 'Intranet\Configuracion\ColegioController@lista');
         });
 
-        Route::group(['prefix' => 'aplicativo'], function () {
-            Route::resource('/comunicado', 'Intranet\Aplicativo\ComunicadoController');
-            Route::get('comunicado/lista/data', 'Intranet\Aplicativo\ComunicadoController@lista');
-        });
+        // Route::group(['prefix' => 'aplicativo'], function () {
+        //     Route::resource('/comunicado', 'Intranet\Aplicativo\ComunicadoController');
+        //     Route::get('comunicado/lista/data', 'Intranet\Aplicativo\ComunicadoController@lista');
+        // });
 
 
         // ****************************
@@ -1069,6 +1091,36 @@ Route::group(['middleware' => ['auth']], function () {
                 Artisan::call('accesos_rh:task');
             });
         });
+
+
+
+        // ****************************
+        // *  Devoluciones
+        // ****************************
+
+        Route::group(['prefix' => 'devolucion'], function () {
+            Route::resource('/devoluciones', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController');
+            Route::get('/devoluciones/lista/data', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@lista');
+            Route::get('/devoluciones/{id}', 'Intranet\RecursosHumanos\Devoluciones\DevolucionesController@edit');
+            Route::get('/get-documentos-expediente-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getDocumentosExpedienteDocente');
+            Route::post('/docentes/evaluar-docente', 'Intranet\RecursosHumanos\Pagos\DocenteController@evaluarDocente');
+
+            Route::get('/docentes/habilitacion', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@index');
+            Route::post('/docentes/habilitacion/guardar', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@store');
+            Route::get('/docentes/habilitacion/lista/data', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@lista');
+            Route::post('/docentes/habilitacion/deshabilitar', 'Intranet\RecursosHumanos\Pagos\HabilitacionDocenteController@deshabilitar');
+
+            Route::get('/docentes/horas-mes', 'Intranet\RecursosHumanos\Pagos\DocenteController@indexHorasMes');
+            Route::get('/docentes/horas-mes/lista/data', 'Intranet\RecursosHumanos\Pagos\DocenteController@listaHorasMes');
+            Route::get('/get-periodos', 'Intranet\RecursosHumanos\Pagos\DocenteController@getPeriodos');
+            Route::get('/get-mes-hora-docente/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@getMesHorasPeriodo');
+            Route::post('/docentes/horas-mes', 'Intranet\RecursosHumanos\Pagos\DocenteController@storeHorasDocente');
+            Route::put('/docentes/horas-mes/{id}', 'Intranet\RecursosHumanos\Pagos\DocenteController@updateHorasDocente');
+            Route::get('/get-periodos-filter', 'Intranet\RecursosHumanos\Pagos\DocenteController@getPeriodosFilter');
+            Route::get('/get-responsables', 'Intranet\RecursosHumanos\Pagos\DocenteController@getResponsables');
+            Route::get('/expedientes-excel', 'Intranet\RecursosHumanos\Pagos\DocenteController@rptExpedientesExcel');
+        });
+
 
         // ****************************
         // *  Libro de Reclamaciones

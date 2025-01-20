@@ -79,6 +79,11 @@ class CuadernilloController extends Controller
         //         ->join('cursos as cu', 'cu.id', 'cd.cursos_id')
         //         ->where('users_id', Auth::user()->id);
         // }
+
+        if ($request->semana) {
+            $data = $data->where('cuadernillos.semana', $request->semana);
+        }
+
         if (isset($request->area)) {
             $data = $data->where('a.id', $request->area);
         }

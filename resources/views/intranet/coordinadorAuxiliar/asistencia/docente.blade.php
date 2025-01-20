@@ -3,7 +3,7 @@
 
 @section('content')
 
-<i-coordinador-auxiliar-asistencia-docente fecha-hoy="{{$fecha}}"></i-coordinador-auxiliar-asistencia-docente>
+<i-coordinador-auxiliar-asistencia-docente fecha-hoy="{{$fecha}}" :permissions="{{ $permisos }}"></i-coordinador-auxiliar-asistencia-docente>
 
 @endsection
 

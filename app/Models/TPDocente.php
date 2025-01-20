@@ -18,4 +18,8 @@ class TPDocente extends Model
     {
         return $this->hasMany('App\Models\TPExpediente', 'docente_id');
     }
+    public function horasDocente()
+    {
+        return $this->hasMany(TPHorasDocente::class, 'docente_id');
+    }
 }

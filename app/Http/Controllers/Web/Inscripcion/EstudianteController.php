@@ -1071,16 +1071,17 @@ class EstudianteController extends Controller
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(180, 6, 'DECLARACIÓN JURADA ELECTRÓNICA', 1, 1, 'C', 0, '', 0);
 
-        $pdf::SetFont('helvetica', '', 9);
+        $pdf::SetFont('helvetica', '', 8);
         if ($inscripcion->modalidad == '1') {
 
             $html = '<p style="text-align:justify">Que, a la fecha de inscripción:
             </p>
             <ul>
-                <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
-                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la UNAP (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
-                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
-                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+                <li>He culminado el quinto de secundaria o estar cursando el quinto de secundaria.</li>
+                <li>Tengo certificado de estudios o constancia de logros de aprendizaje.</li>
+                <li>No he logrado una vacante en los procesos de admisión a la Universidad Nacional del Altiplano Puno del CEPREUNA 2024-I, EXTRAORDINARIO 2024, GENERAL 2024-I, CEPREUNA 2024-II y GENERAL 2024-II.</li>
+                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico y para el examen de admisión realizar un pago adicional que determine la Dirección de Admisión.</li>
+                <li>Cumpliré con los pagos de las cuotas en las fechas establecidas en el presente ciclo.</li>
              </ul>
         <p style="text-align:justify">Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
             </p>';
@@ -1089,10 +1090,11 @@ class EstudianteController extends Controller
             Que, a la fecha de inscripción:
         </p>
         <ul>
-            <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
-            <li>No haber logrado una vacante en los procesos de exámenes de admisión a la UNAP (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
-            <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
-            <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+                <li>He culminado el quinto de secundaria o estar cursando el quinto de secundaria.</li>
+                <li>Tengo certificado de estudios o constancia de logros de aprendizaje.</li>
+                <li>No haber logrado una vacante en los procesos de admisión a la Universidad Nacional del Altiplano Puno del CEPREUNA 2024-I, EXTRAORDINARIO 2024, GENERAL 2024-I, CEPREUNA 2024-II y GENERAL 2024-II.</li>
+                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico y para el examen de admisión realizar un pago adicional que determine la Dirección de Admisión.</li>
+                <li>Cumpliré con los pagos de las cuotas en las fechas establecidas en el presente ciclo.</li>
         </ul><p style="text-align:justify">Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
             </p>';
         }
@@ -1317,7 +1319,7 @@ class EstudianteController extends Controller
 
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), '', '', 45, 55, '', '', 'T', false, 300, '', false, false, 1, false, false, false);
 
-            $pdf::Image('images/firma3cc.png', 33, 228, 45, 45, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
+            $pdf::Image('images/firma4.png', 25, 218, 58, 58, 'PNG', '', '', false, 150, '', false, false, 0, false, false, false);
             // $pdf::Image(Storage::disk('fotos')->path($estudiante->foto), 156, 49, 44, 52, 'PNG', '', '', true, 150, '', false, false, 1, false, false, false);
         } else {
             $pdf::SetFont('helvetica', '', 15);
