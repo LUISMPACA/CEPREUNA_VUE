@@ -68,7 +68,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="nro_documento">Número de Documento</label>
-                    <input type="text" class="form-control" name="nro_documento" id="nro_documento" @blur="callWebService" @input="changeDocumento" v-model="fields.nro_documento" />
+                    <input type="number" class="form-control" name="nro_documento" id="nro_documento" @blur="callWebService" @input="changeDocumento" v-model="fields.nro_documento" />
                     <div v-if="errors && errors.nro_documento" class="text-danger">
                         {{ errors.nro_documento[0] }}
                     </div>
@@ -454,7 +454,7 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="nro_documento_apoderado">Número de Documento</label>
-                    <input type="text" class="form-control" name="nro_documento_apoderado" id="nro_documento_apoderado" v-model="fields.nro_documento_apoderado" />
+                    <input type="number" class="form-control" name="nro_documento_apoderado" id="nro_documento_apoderado" v-model="fields.nro_documento_apoderado" />
                     <div v-if="errors && errors.nro_documento_apoderado" class="text-danger">
                         {{ errors.nro_documento_apoderado[0] }}
                     </div>
@@ -576,9 +576,9 @@
                                 <b>ciclo virtual</b> actual de CEPREUNA, declaro que será mi responsabilidad el acceso.</li>
                                 <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP.</li>
                                 <!-- <li>Haber culminado el quinto de secundaria satisfactoriamente y contar con el certificado de estudios visado por la UGEL o DREP. o ser un estudiante que esté en proceso de finalizar la educación secundaria (Quinto de secundaria).</li> -->
-                                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la Universidad Nacional del Altiplano (Extraordinario 2023-2024, CEPREUNA 2023-I, CEPREUNA 2023-II, GENERAL 2023-I, GENERAL 2023-II, CEPREUNA 2024-I y GENERAL 2024-I) y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
-                                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico.</li>
-                                <li>No tengo deuda pendiente en el CEPREUNA de ciclos anteriores.</li>
+                                <li>No haber logrado una vacante en los procesos de exámenes de admisión a la Universidad Nacional del Altiplano Puno CEPREUNA 2024-II, GENERAL 2024-II, EXTRAORDINARIO 2025, CEPREUNA 2025-I, y GENERAL 2025-I y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li>
+                                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico y, para el examen de admisión, realizaré un pago adicional que determine la Dirección de Admisión.</li>
+                                <li>Cumpliré con el pago de 4 cuotas en las fechas establecidas en el presente ciclo que corresponde a las 16 semanas académicas.</li>
                                 </ul> 
                             </p>
                             <p>
@@ -600,11 +600,11 @@
                                 Que, a la fecha de inscripción:
                             </p>
                             <ul>
-                                <li>He culminado el quinto de secundaria o estar cursando el quinto de secundaria.</li>
+                                <li>He culminado el quinto de secundaria satisfactoriamente.</li>
                                 <li>Tengo certificado de estudios o constancia de logros de aprendizaje. </li>
-                                <li>No he logrado una vacante en los procesos de admisión a la Universidad Nacional del Altiplano Puno del CEPREUNA 2024-I, EXTRAORDINARIO 2024, GENERAL 2024-I, CEPREUNA 2024-II y GENERAL 2024-II.</li> 
-                                <li>Si es que tengo una segunda carrera en la UNAP haber culminado satisfactoriamente un año académico y para el examen de admisión realizar un pago adicional que determine la Dirección de Admisión.</li>
-                                <li>Cumpliré con los pagos de las cuotas en las fechas establecidas en el presente ciclo.</li>
+                                <li>No he logrado una vacante en los procesos de admisión a la Universidad Nacional del Altiplano Puno CEPREUNA 2024-II, GENERAL 2024-II, EXTRAORDINARIO 2025, CEPREUNA 2025-I, y GENERAL 2025-I y otros que determine la Dirección de Admisión en su reglamento para procesos de admisión.</li> 
+                                <li>Si es que tengo una segunda carrera en la UNAP, he culminado satisfactoriamente un año académico y, para el examen de admisión, realizaré un pago adicional que determine la Dirección de Admisión.</li>
+                                <li>Cumpliré con el pago de 4 cuotas en las fechas establecidas en el presente ciclo que corresponde a las 16 semanas académicas.</li>
                             </ul>
                             <p>
                                 Autorizo la verificación de lo declarado. En caso de falsedad declaro asumir toda la responsabilidad administrativa.
