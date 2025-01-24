@@ -991,7 +991,7 @@ class EstudianteController extends Controller
         if ($inscripcion->estado == '1') {
             $pdf::ln();
             $pdf::SetFont('helvetica', 'b', 10);
-            $pdf::Cell(190, 6, 'DETALLES DE VOUCHER', 1, 1, 'C', 0, '', 0);
+            $pdf::Cell(180, 6, 'DETALLES DE VOUCHER', 1, 1, 'C', 0, '', 0);
 
             $total = 0;
             $comision = 0;
@@ -1023,7 +1023,7 @@ class EstudianteController extends Controller
 
             $pdf::ln();
             $pdf::SetFont('helvetica', 'b', 10);
-            $pdf::Cell(190, 6, 'DETALLES DE PAGO', 1, 1, 'C', 0, '', 0);
+            $pdf::Cell(180, 6, 'DETALLES DE PAGO', 1, 1, 'C', 0, '', 0);
 
             $total = 0;
             foreach ($inscripcionPagos as $inscripcionPago) {
