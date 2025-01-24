@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRespuestaEstudianteVocacionalsTable extends Migration
+class CreateRespuestaEstudianteVocacionalDetallesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateRespuestaEstudianteVocacionalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('respuesta_estudiante_vocacionals', function (Blueprint $table) {
+        Schema::create('respuesta_estudiante_vocacional_detalles', function (Blueprint $table) {
             $table->id();
             $table->char("nro_documento",30);
             $table->smallInteger('puntaje');
@@ -21,8 +21,9 @@ class CreateRespuestaEstudianteVocacionalsTable extends Migration
 
             $table->unsignedBigInteger('preguntas_id');
             $table->foreign('preguntas_id')->references('id')->on('preguntas_vocacionales');
-            $table->unsignedBigInteger('estudiantes_id');
-            $table->foreign('estudiantes_id')->references('id')->on('estudiantes');
+
+            $table->unsignedBigInteger('respuesta_id');
+            $table->foreign('respuesta_id')->references('id')->on('respuesta_estudiante_vocacional');
             $table->timestamps();
         });
     }
@@ -34,6 +35,6 @@ class CreateRespuestaEstudianteVocacionalsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('respuesta_estudiante_vocacionals');
+        Schema::dropIfExists('respuesta_estudiante_vocacional_detalles');
     }
 }
