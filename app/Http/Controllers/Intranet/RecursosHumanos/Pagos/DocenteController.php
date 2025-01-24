@@ -332,7 +332,61 @@ class DocenteController extends Controller
         }
         return $response;
     }
+    // public function updateHorasDocente(Request $request, $id)
+    // {
 
+    //     DB::beginTransaction();
+    //     try {
+    //         $horas = TPHorasDocente::where("docente_id", $id)->get();
+    //         $mesesEnviados = [];
+    //         // return $id;
+    //         // $puntaje = 0;
+    //         // $apto = '0';
+    //         foreach ($request->mes as $key => $value) {
+    //             foreach ($value as $k => $val) {
+    //                 $mesesEnviados[] = $val;
+    //                 $data = $horas->firstWhere('mes_id', $val);
+    //                 // return $data;
+    //                 // $data = new TPHorasDocente;
+    //                 // $data->cantidad = $request->cantidad[$key][$k];
+    //                 // return $request->id;
+    //                 // $data->mes_id = $val;
+    //                 // $data->tipo_pago_id = $request->tipo[$key][$k];
+    //                 // $data->docente_id = $request->id;
+    //                 // $data->save();
+
+    //                 if ($data) {
+    //                     // Si existe, actualizamos el registro
+    //                     $data->cantidad = $request->cantidad[$key][$k];
+    //                     $data->tipo_pago_id = $request->tipo[$key][$k];
+    //                     $data->save();
+    //                 } else {
+    //                     // Si no existe, creamos uno nuevo
+    //                     $data = new TPHorasDocente;
+    //                     $data->cantidad = $request->cantidad[$key][$k];
+    //                     $data->mes_id = $val;
+    //                     $data->tipo_pago_id = $request->tipo[$key][$k];
+    //                     $data->docente_id = $id; // Usar el id pasado como parámetro
+    //                     $data->save();
+    //                 }
+    //             }
+    //         }
+    //         foreach ($horas as $hora) {
+    //             if (!in_array($hora->mes_id, $mesesEnviados)) {
+    //                 $hora->delete();
+    //             }
+    //         }
+    //         DB::commit();
+    //         $response["message"] = 'Guardado';
+    //         $response["status"] = true;
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         // dd($e);
+    //         $response["message"] =  'Error al Guardar, intentelo nuevamante.';
+    //         $response["status"] =  false;
+    //     }
+    //     return $response;
+    // }
     public function updateHorasDocente(Request $request, $id)
     {
         DB::beginTransaction();

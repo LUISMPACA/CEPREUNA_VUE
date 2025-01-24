@@ -22,11 +22,11 @@
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
                         <label for="ruc">Ruc</label>
-                        <input type="number" class="form-control"  name="ruc" id="ruc" v-model="fields.ruc" @input="maxLengthRuc" />
-                        <div class="invalid-tooltip d-inline position-relative" v-if="fields.ruc.length!==11" >
+                        <input type="number" class="form-control" name="ruc" id="ruc" v-model="fields.ruc" @input="maxLengthRuc" />
+                        <div class="invalid-tooltip d-inline position-relative" v-if="fields.ruc.length !== 11">
                             Por favor ingrese 11 digitos
                         </div>
-                        <div class="valid-tooltip d-inline position-relative border border-success" v-else >
+                        <div class="valid-tooltip d-inline position-relative border border-success" v-else>
                             Correcto!
                         </div>
                         <div v-if="errors && errors.ruc" class="text-danger">{{ errors.ruc[0] }}</div>
@@ -96,7 +96,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="codigo">Código docente Unap</label>
+                        <label for="codigo">Código docente UNAP / Código administravivo UNAP</label>
                         <input type="codigo" class="form-control" name="codigo" id="codigo" v-model="fields.codigo" :disabled="fields.condicion == 1" />
                         <div v-if="errors && errors.codigo" class="text-danger">{{ errors.codigo[0] }}</div>
                     </div>
@@ -116,7 +116,7 @@
             <div class="row">
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="departamento">Departamento de residencia</label>
+                        <label for="departamento">Departamento de residencia actual</label>
 
                         <v-select
                             :disabled="disabledDepartamento"
@@ -133,7 +133,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="provincia">Provincia de residencia habitual</label>
+                        <label for="provincia">Provincia de residencia actual</label>
 
                         <v-select
                             :disabled="disabledProvincia"
@@ -150,7 +150,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="distrito">Distrito de residencia habitual</label>
+                        <label for="distrito">Distrito de residencia actual</label>
 
                         <v-select :disabled="disabledDistrito" :options="distritos" label="distrito" v-model="distrito" @input="changeDistrito"></v-select>
                         <div v-if="errors && errors.ubigeo" class="text-danger">
@@ -162,7 +162,7 @@
             <div class="row">
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="direccion">Dirección de residencia habitual</label>
+                        <label for="direccion">Dirección de residencia actual</label>
                         <input type="text" class="form-control" name="direccion" id="direccion" v-model="fields.direccion" />
                         <div v-if="errors && errors.direccion" class="text-danger">{{ errors.direccion[0] }}</div>
                     </div>
@@ -177,16 +177,16 @@
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
                         <label for="celular">Celular</label>
-                        <div class="input-group mb-3">
+                        <div class="input-group ">
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon1">+51</span>
                             </div>
-                            <input type="number" class="form-control" maxlength="9" minlength="9" name="celular" id="celular" v-model="fields.celular" @input="maxLengthCel" required/>  
+                            <input type="number" class="form-control" maxlength="9" minlength="9" name="celular" id="celular" v-model="fields.celular" @input="maxLengthCel" required />
                         </div>
-                        <div class="invalid-tooltip d-inline position-relative"  v-if="fields.celular.length!==9" >
+                        <div class="invalid-tooltip d-inline position-relative" v-if="fields.celular.length !== 9">
                             Por favor ingrese 9 digitos
                         </div>
-                        <div class="valid-tooltip d-inline position-relative" v-else >
+                        <div class="valid-tooltip d-inline position-relative" v-else>
                             Correcto!
                         </div>
 
@@ -199,7 +199,7 @@
                 <div class="col-md-6 col-xs-12">
                     <div class="form-group">
                         <label for="tipo_trabajador">Nombre de su Banco</label>
-                        <select v-model="fields.nombre_banco" id="tipo_trabajador" class="form-control" >
+                        <select v-model="fields.nombre_banco" id="tipo_trabajador" class="form-control">
                             <option disabled value=""></option>
                             <option value="Banco de Crédito del Perú - BCP">Banco de Crédito del Perú - BCP</option>
                             <option value="Banco BBVA">Banco BBVA</option>
@@ -207,26 +207,25 @@
                             <option value="Banco Scotiabank">Banco Scotiabank </option>
                             <option value="Banco Pichincha">Banco Pichincha</option>
                         </select>
-                        
-                        <div class="invalid-tooltip d-inline position-relative" v-if="!fields.nombre_banco" >
+
+                        <div class="invalid-tooltip d-inline position-relative" v-if="!fields.nombre_banco">
                             Por favor seleccione un banco que este vinculado a su RUC
                         </div>
-                        <div class="valid-tooltip d-inline position-relative border border-success" v-else >
+                        <div class="valid-tooltip d-inline position-relative border border-success" v-else>
                             Correcto!
                         </div>
-                        
+
                         <div v-if="errors && errors.nombre_banco" class="text-danger">{{ errors.nombre_banco[0] }}</div>
                     </div>
-
                 </div>
                 <div class="col-md-6 col-xs-12">
                     <div class="form-group">
-                        <label for="cci">Código de Cuenta Interbancaria (CCI)</label >
-                        <input type="number" class="form-control" name="cci" id="cci" v-model="fields.cci" @input="maxLengthCci" required/>
-                        <div class="invalid-tooltip d-inline position-relative" v-if="fields.cci.length!==20" >
+                        <label for="cci">Código de Cuenta Interbancaria (CCI)</label>
+                        <input type="number" class="form-control" name="cci" id="cci" v-model="fields.cci" @input="maxLengthCci" required />
+                        <div class="invalid-tooltip d-inline position-relative" v-if="fields.cci.length !== 20">
                             Por favor ingrese 20 digitos
                         </div>
-                        <div class="valid-tooltip d-inline position-relative border border-success" v-else >
+                        <div class="valid-tooltip d-inline position-relative border border-success" v-else>
                             Correcto!
                         </div>
                         <div v-if="errors && errors.cci" class="text-danger">{{ errors.cci[0] }}</div>
@@ -242,14 +241,14 @@
             <h5 class="text-success">2. Formación Académica</h5>
             <br />
 
-            <h6>Título Profesional y Grados Académico <span class="text-muted font-weight-light">En caso de no tener título, agregar un grado académico</span></h6>
+            <h6>Título Profesional y Grados Académico <span class="text-muted font-weight-light">Seleccione una carrera profesional relacionada con su área de estudios.</span></h6>
             <div class="card">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 col-xs-12">
                             <div class="form-group">
                                 <label for="grado"></label>
-                                <p class="font-weight-bold">Titulo Profesional</p>
+                                <p class="font-weight-bold">Profesión</p>
                             </div>
                         </div>
                         <div class="col-md-8 col-xs-12">
@@ -261,7 +260,9 @@
                         </div>
                         <div class="col-md-12 col-xs-12">
                             <div class="row form-group">
-                                <label class="col-md-12 col-xs-12 control-label">Subir Archivo (solo formato .pdf | tamaño máximo 1M): </label>
+                                <label class="col-md-12 col-xs-12 control-label"
+                                    >Subir constancia SUNEDU de Registro Nacional de Grados Académicos y Titulos Profesionales y/o resolución directoral DREP (solo formato .pdf | tamaño máximo 1M):
+                                </label>
                                 <div class="col-md-12 col-xs-12 ">
                                     <div class="input-group">
                                         <div class="custom-file">
@@ -315,9 +316,9 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-link" @click="addGrado"><i class="fa fa-plus"></i> Agregar Grados</button>
+            <!-- <button type="button" class="btn btn-link" @click="addGrado"><i class="fa fa-plus"></i> Agregar Grados</button> -->
             <br />
-            <h6>Experiencia Laboral en CepreUna</h6>
+            <h6>Experiencia Laboral en CEPREUNA</h6>
             <div class="card">
                 <div class="card-body">
                     <div class="row">
@@ -328,7 +329,7 @@
                                 <div v-if="errors && errors.experiencia" class="text-danger">{{ errors.experiencia[0] }}</div>
                             </div>
                         </div>
-                        <div class="col-md-8 col-xs-12">
+                        <!-- <div class="col-md-8 col-xs-12">
                             <div class="row form-group">
                                 <label class="col-md-12 col-xs-12 control-label">Subir Archivo (solo formato .pdf | tamaño máximo 3M): </label>
                                 <div class="col-md-12 col-xs-12 ">
@@ -341,13 +342,34 @@
                                     <div v-if="errors && errors.file_experiencia" class="text-danger">{{ errors.file_experiencia[0] }}</div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
             <br />
             <h6>ACTUALIZACIONES Y CAPACITACIONES (últimos tres años)</h6>
-            <div class="card" v-for="(input, index) in inputsCapacitacion" :key="index">
+            <div class="form-group">
+                <label for="condicion">¿Tiene experiencia en didáctica, metodología y/o pedagogía?</label>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" v-model="fields.exp_didactica" name="exp_didactica" id="" value="SI" required />
+                                Sí
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" v-model="fields.exp_didactica" name="exp_didactica" id="" value="NO" required />
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="card" v-for="(input, index) in inputsCapacitacion" :key="index">
                 <div class="card-header py-1">
                     <button type="button" class="close" aria-label="Close" @click="removeCapacitacion(index)">
                         <span aria-hidden="true">&times;</span>
@@ -436,7 +458,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-link" @click="addProduccion"><i class="fa fa-plus"></i> Agregar</button>
+            <button type="button" class="btn btn-link" @click="addProduccion"><i class="fa fa-plus"></i> Agregar</button> -->
 
             <hr />
             <h5 class="text-success">3. Disponibilidad</h5>
@@ -465,7 +487,7 @@
                 </div>
                 <div class="col-md-4 col-xs-12">
                     <div class="form-group">
-                        <label for="modalidad">¿Enseño ciclos pasados?</label>
+                        <label for="modalidad">¿Enseño en ciclos pasados?</label>
                         <select v-model="fields.dicto" id="modalidad" class="form-control">
                             <option disabled value=""></option>
                             <option value="1">Si</option>
@@ -681,9 +703,8 @@
                         <div class="form-check">
                             <label class="form-check-label">
                                 <input type="checkbox" v-model="terminos" class="form-check-input" name="condiciones" id="condiciones0" value="checkedValue" />
-                                ACEPTO que los datos consignados en el presente formulario son VERDADEROS y tienen caracter de
-                                DECLARACION JURADA, los mismos que estan sujetos a Fiscalizacion Posterior. En
-                                caso se acreditase falsedad o fraude, me someto a las sanciones de Ley.
+                                ACEPTO que los datos consignados en el presente formulario son VERDADEROS y tienen caracter de DECLARACION JURADA, los mismos que estan sujetos a Fiscalizacion
+                                Posterior. En caso se acreditase falsedad o fraude, me someto a las sanciones de Ley.
                             </label>
                         </div>
                     </div>
@@ -745,7 +766,6 @@
                     </div>
                 </div>
             </div>
-
         </form>
     </div>
 </template>
@@ -760,7 +780,20 @@ export default {
     components: { VueRecaptcha },
     data() {
         return {
-            fields: { condicion: 1, sede: [], prioridad: "", cursos: [], disponibilidad: [], capacitacion_tipo: [], capacitacion_titulo: [], capacitacion_file: [],ruc:"",celular:"",cci:"" },
+            fields: {
+                condicion: 1,
+                sede: [],
+                prioridad: "",
+                cursos: [],
+                disponibilidad: [],
+                capacitacion_tipo: [],
+                capacitacion_titulo: [],
+                capacitacion_file: [],
+                ruc: "",
+                celular: "",
+                cci: "",
+                exp_didactica: ""
+            },
             errors: {},
             // codigoDisable:"false",
             tipoDocumentos: [],
@@ -815,11 +848,11 @@ export default {
                 pleaseTickRecaptchaMessage: ""
             },
 
-            selectAdjuntoGrado: "Selecione",
-            selectAdjuntoExperiencia: "Selecione",
-            selectAdjuntoTitulo: "Selecione",
+            selectAdjuntoGrado: "Seleccione",
+            selectAdjuntoExperiencia: "Seleccione",
+            selectAdjuntoTitulo: "Seleccione",
             // selectAdjuntoCapacitacion:[],
-            selectAdjunto: "Selecione",
+            selectAdjunto: "Seleccione",
             horarioArea: "",
             horarioTurno: ""
         };
@@ -837,7 +870,7 @@ export default {
     },
     methods: {
         callWebService() {
-           /* const dniObservados = [
+            /* const dniObservados = [
             '45755695', '42178926', '40115241', '71658411', '01534962',
             '73592666', '74291812', '73385117', '46439707', '71658411',
             '02288624', '29373702', '74951231', '02300341', '02291983',
@@ -855,17 +888,17 @@ export default {
                 );
             }*/
         },
-        maxLengthRuc(){
+        maxLengthRuc() {
             if (this.fields.ruc.length > 11) {
                 this.fields.ruc = this.fields.ruc.slice(0, 11);
             }
         },
-        maxLengthCel(){
+        maxLengthCel() {
             if (this.fields.celular.length > 9) {
                 this.fields.celular = this.fields.celular.slice(0, 9);
             }
         },
-        maxLengthCci(){
+        maxLengthCci() {
             if (this.fields.cci.length > 20) {
                 this.fields.cci = this.fields.cci.slice(0, 20);
             }
@@ -914,25 +947,38 @@ export default {
             } else {
                 $(".loader").show();
                 this.errors = {};
-                var disponible = [];
-                var dias = [];
+                let dias = [].concat(this.lu, this.ma, this.mi, this.ju, this.vi);
+                let disponible = dias.filter(val => val !== "" && val !== undefined && val !== null);
+                console.log("Días seleccionados:", dias);
+                console.log("Disponibilidad filtrada:", disponible);
 
-                dias = dias.concat(this.lu);
-                dias = dias.concat(this.ma);
-                dias = dias.concat(this.mi);
-                dias = dias.concat(this.ju);
-                dias = dias.concat(this.vi);
+                // Validar disponibilidad
+                if (disponible.length === 0) {
+                    alert("Debes seleccionar al menos una disponibilidad.");
+                    $(".loader").hide();
+                    return;
+                }
+                // var disponible = [];
+                // var dias = [];
 
-                console.log(dias);
-                dias.forEach(function(val, key) {
-                    // console.log(val);
-                    if (val != "") {
-                        disponible.push(val);
-                    }
-                });
+                // dias = dias.concat(this.lu);
+                // dias = dias.concat(this.ma);
+                // dias = dias.concat(this.mi);
+                // dias = dias.concat(this.ju);
+                // dias = dias.concat(this.vi);
+
+                // console.log(dias);
+                // dias.forEach(function(val, key) {
+                //     // console.log(val);
+                //     if (val != "") {
+                //         disponible.push(val);
+                //     }
+                // });
                 this.fields.disponibilidad = disponible;
+                console.log("Disponibilidad final:", this.fields.disponibilidad);
                 let formData = new FormData();
                 // formData.append('tipo_documento', this.tipo_documento);
+                formData.append("exp_didactica", this.fields.exp_didactica);
                 formData.append("tipo_documento", typeof this.fields.tipo_documento !== "undefined" ? this.fields.tipo_documento : "");
                 formData.append("nro_documento", typeof this.fields.nro_documento !== "undefined" ? this.fields.nro_documento : "");
                 formData.append("ruc", typeof this.fields.ruc !== "undefined" ? this.fields.ruc : "");
@@ -990,6 +1036,9 @@ export default {
                     formData.append("disponibilidad[]", val);
                 });
                 // console.log(this.fields);
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, value);
+                }
                 axios
                     .post("docentes", formData)
                     .then(response => {
@@ -1073,6 +1122,8 @@ export default {
             axios.get("get-programas").then(
                 function(response) {
                     this.programas = response.data;
+                    this.programas = this.programas.filter(programa => programa.estado === "1");
+                    // console.log(this.programas);
                 }.bind(this)
             );
         },
@@ -1195,7 +1246,7 @@ export default {
         filesChangeGrado(e) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.selectAdjuntoGrado = "Selecione";
+                this.selectAdjuntoGrado = "Seleccione";
             } else {
                 this.selectAdjuntoGrado = file.name;
                 this.fields.file_grado = file;
@@ -1204,7 +1255,7 @@ export default {
         filesChangeTitulo(e) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.selectAdjuntoTitulo = "Selecione";
+                this.selectAdjuntoTitulo = "Seleccione";
             } else {
                 this.selectAdjuntoTitulo = file.name;
                 this.fields.file_titulo = file;
@@ -1213,7 +1264,7 @@ export default {
         filesChangeExperiencia(e) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.selectAdjuntoExperiencia = "Selecione";
+                this.selectAdjuntoExperiencia = "Seleccione";
             } else {
                 this.selectAdjuntoExperiencia = file.name;
                 this.fields.file_experiencia = file;
@@ -1222,7 +1273,7 @@ export default {
         filesChangeGrado(e, index) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.inputsGrado[index].texto = "Selecione";
+                this.inputsGrado[index].texto = "Seleccione";
             } else {
                 this.inputsGrado[index].texto = file.name;
                 this.inputsGrado[index].archivo = file;
@@ -1231,7 +1282,7 @@ export default {
         filesChangeCapacitacion(e, index) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.inputsCapacitacion[index].texto = "Selecione";
+                this.inputsCapacitacion[index].texto = "Seleccione";
             } else {
                 this.inputsCapacitacion[index].texto = file.name;
                 this.inputsCapacitacion[index].archivo = file;
@@ -1240,7 +1291,7 @@ export default {
         filesChangeProduccion(e, index) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.inputsProduccion[index].texto = "Selecione";
+                this.inputsProduccion[index].texto = "Seleccione";
             } else {
                 this.inputsProduccion[index].texto = file.name;
                 this.inputsProduccion[index].archivo = file;
@@ -1249,7 +1300,7 @@ export default {
         filesChange(e) {
             let file = e.target.files[0];
             if (file === undefined) {
-                this.selectAdjunto = "Selecione";
+                this.selectAdjunto = "Seleccione";
             } else {
                 this.selectAdjunto = file.name;
                 this.fields.file_experiencia = file;

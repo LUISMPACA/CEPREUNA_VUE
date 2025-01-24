@@ -115,7 +115,12 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="celular">Celular</label>
-                    <input type="text" class="form-control" name="celular" id="celular" v-model="fields.celular" :disabled="observacion" />
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">+51</span>
+                            </div>
+                    <input type="number" class="form-control" name="celular" id="celular" v-model="fields.celular" :disabled="observacion" @input="maxLengthCel" maxlength="9" minlength="9" />
+                    </div>
                     <div v-if="errors && errors.celular" class="text-danger">
                         {{ errors.celular[0] }}
                     </div>
@@ -458,7 +463,12 @@
             <div class="col-md-4 col-xs-12">
                 <div class="form-group">
                     <label for="apoderado celular">Celular</label>
-                    <input type="text" class="form-control" name="apoderado_celular" id="apoderado_celular" v-model="fields.apoderado_celular" />
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon1">+51</span>
+                            </div>
+                    <input type="number" class="form-control" name="apoderado_celular" id="apoderado_celular" v-model="fields.apoderado_celular" @input="maxLengthCelAp" maxlength="9" minlength="9" />
+                    </div>
                     <div v-if="errors && errors.apoderado_celular" class="text-danger">
                         {{ errors.apoderado_celular[0] }}
                     </div>
@@ -750,6 +760,16 @@ export default {
             //         {timeOut: 8000}
             //     );
             // }
+        },
+        maxLengthCel() {
+            if (this.fields.celular.length > 9) {
+                this.fields.celular = this.fields.celular.slice(0, 9);
+            }
+        },
+        maxLengthCelAp(){
+            if(this.fields.apoderado_celular.length > 9){
+                            this.fields.apoderado_celular = this.fields.apoderado_celular.slice(0, 9);
+                        }
         },
 
         filesChangeDni(e) {

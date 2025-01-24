@@ -23,8 +23,10 @@ use App\Models\AdjuntoCapacitaciones;
 use App\Models\AdjuntoProducciones;
 // use App\Models\CurriculaDetalle;
 use App\Models\ConfiguracionInscripciones;
+use App\Models\Experiencia;
 use DB;
 use PDF;
+use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Exp;
 
 class DocenteController extends Controller
 {
@@ -73,7 +75,8 @@ class DocenteController extends Controller
      */
     public function store(Request $request)
     {
-        //return $request;
+
+        // return $request;
         // dd();
         // var_dump($request->prioridad);
         // dd($request->tipo_trabajador);
@@ -101,7 +104,7 @@ class DocenteController extends Controller
             'grado_programa.*' => 'required',
             'grado_archivo.*' => 'max:2000|required',
 
-            'file_experiencia' => 'max:5000|required_with:experiencia',
+            // 'file_experiencia' => 'max:5000|required_with:experiencia',
             // 'file_experiencia'=> 'max:3000',
 
             'capacitacion_tipo.*' => 'required',
@@ -124,6 +127,7 @@ class DocenteController extends Controller
             'cci' => 'required|digits:20',
             //Dicto
             'dicto' => 'required',
+            // 'exp_didactica' => 'required',
 
         ], $messages = [
             'required' => '* El campo :attribute es obligatorio.',
@@ -205,6 +209,7 @@ class DocenteController extends Controller
                 $docente->nombre_banco = $request->nombre_banco;
                 $docente->cci = $request->cci;
                 $docente->dicto = $request->dicto;
+                $docente->exp_didactica = $request->exp_didactica;
                 $docente->save();
             } else {
                 $docente = new Docente;
@@ -228,6 +233,7 @@ class DocenteController extends Controller
                 $docente->nombre_banco = $request->nombre_banco;
                 $docente->cci = $request->cci;
                 $docente->dicto = $request->dicto;
+                $docente->exp_didactica = $request->exp_didactica;
                 $docente->save();
             }
 
@@ -428,12 +434,12 @@ class DocenteController extends Controller
             ->first();
         $formacion = AdjuntoGrado::with(["gradoAcademico", "programa"])->where("inscripcion_docentes_id", $inscripcion->id)->get();
         $docente = Docente::with(["tipoDocumento", "gradoAcademico", "programa", "ubigeo"])->find($inscripcion->docentes_id);
-        // dd($docente);
         $periodo = Periodo::find($inscripcion->periodos_id);
+        $exp = AdjuntoExperiencia::with("experiencia")->where("inscripcion_docentes_id", $id)->first();
         $sedes = Disponibilidades::with("sede")->select("sedes_id", "prioridad")->where("inscripcion_docentes_id", $id)
             ->groupBy("sedes_id", "prioridad")->get();
 
-
+        // dd($docente->exp_didactica);
         $areas = DB::table("inscripcion_cursos as ic")
             ->select(
                 "c.areas_id",
@@ -663,28 +669,46 @@ class DocenteController extends Controller
         // ********
         foreach ($formacion as $key => $value) {
             # code..
-            if ($value->grado_academicos_id == 2) {
-                $pdf::SetFont('helvetica', 'b', 8);
-                $pdf::Cell(30, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
-                $pdf::SetFont('helvetica', '', 8);
-                $pdf::Cell(40, 6, '', 0, 0, 'L', 0, '', 1);
+            // if ($value->grado_academicos_id == 2) {
+            // $pdf::SetFont('helvetica', 'b', 8);
+            // $pdf::Cell(30, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
+            $pdf::SetFont('helvetica', 'b', 8);
+            $pdf::Cell(40, 6, 'PROFESION: ', 0, 0, 'L', 0, '', 1);
+            $pdf::SetFont('helvetica', '', 8);
+            $pdf::Cell(70, 6, $value->programa->denominacion, 0, 0, 'L', 0, '', 1);
+            $pdf::SetFont('helvetica', 'b', 8);
+            $pdf::Cell(40, 6, '', 0, 1, 'L', 0, '', 1);
+            // } else {
+            // $pdf::SetFont('helvetica', '', 8);
+            // $pdf::Cell(30, 6, 'GRADO ACADÉMICO:', 0, 0, 'L', 0, '', 1);
+            // $pdf::SetFont('helvetica', 'b', 8);
+            // $pdf::Cell(40, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
 
-                $pdf::SetFont('helvetica', '', 8);
-                $pdf::Cell(30, 6, 'ESPECIALIDAD:', 0, 0, 'L', 0, '', 1);
-                $pdf::SetFont('helvetica', 'b', 8);
-                $pdf::Cell(40, 6, $value->programa->denominacion, 0, 1, 'L', 0, '', 1);
-            } else {
-                $pdf::SetFont('helvetica', '', 8);
-                $pdf::Cell(30, 6, 'GRADO ACADÉMICO:', 0, 0, 'L', 0, '', 1);
-                $pdf::SetFont('helvetica', 'b', 8);
-                $pdf::Cell(40, 6, $value->gradoAcademico->denominacion, 0, 0, 'L', 0, '', 1);
-
-                $pdf::SetFont('helvetica', '', 8);
-                $pdf::Cell(30, 6, 'ESPECIALIDAD:', 0, 0, 'L', 0, '', 1);
-                $pdf::SetFont('helvetica', 'b', 8);
-                $pdf::Cell(40, 6, $value->programa->denominacion, 0, 1, 'L', 0, '', 1);
-            }
+            // $pdf::SetFont('helvetica', '', 8);
+            // $pdf::Cell(30, 6, 'ESPECIALIDAD:', 0, 0, 'L', 0, '', 1);
+            // $pdf::SetFont('helvetica', 'b', 8);
+            // $pdf::Cell(40, 6, $value->programa->denominacion, 0, 1, 'L', 0, '', 1);
+            // }
         }
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(40, 6, 'Experiencia en CEPREUNA: ', 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', '', 8);
+        if ($exp != null) {
+            $pdf::Cell(30, 6, $exp->experiencia->denominacion, 0, 0, 'L', 0, '', 1);
+            $pdf::SetFont('helvetica', 'b', 8);
+            $pdf::Cell(40, 6, '', 0, 1, 'L', 0, '', 1);
+        } else {
+            $pdf::Cell(30, 6, 'ninguna', 0, 0, 'L', 0, '', 1);
+            $pdf::SetFont('helvetica', 'b', 8);
+            $pdf::Cell(40, 6, '', 0, 1, 'L', 0, '', 1);
+        }
+
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(60, 6, 'Experiencia en didáctica, metodología y/o pedagogía: ', 0, 0, 'L', 0, '', 1);
+        $pdf::Cell(30, 6, $docente->exp_didactica, 0, 0, 'L', 0, '', 1);
+        $pdf::SetFont('helvetica', 'b', 8);
+        $pdf::Cell(40, 6, '', 0, 1, 'L', 0, '', 1);
+
         // ***********************DATOS DE POSTULACION****************
         $pdf::SetFont('helvetica', 'b', 10);
         $pdf::Cell(190, 6, 'DATOS DE POSTULACIÓN', 1, 1, 'C', 0, '', 0);
@@ -706,8 +730,8 @@ class DocenteController extends Controller
         }
         $cursoPostulacion = "";
         foreach ($cursos as $key => $value) {
-            if($value->curso!=null)
-            $cursoPostulacion.=" | ".$value->curso->denominacion;
+            if ($value->curso != null)
+                $cursoPostulacion .= " | " . $value->curso->denominacion;
         }
         $pdf::SetFont('helvetica', '', 8);
         $pdf::Cell(60, 6, $sedesPostulacion, 0, 0, 'L', 0, '', 1);
