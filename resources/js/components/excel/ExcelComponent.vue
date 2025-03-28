@@ -7,7 +7,7 @@
 </template>
 
 <script>
-    import XLSX from 'xlsx/xlsx';
+    import * as XLSX from 'xlsx/xlsx';
     // window.$ = window.jQuery = require('jquery');
     export default {
         name: "vue-excel-xlsx",

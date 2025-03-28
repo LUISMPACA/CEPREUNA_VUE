@@ -485,15 +485,15 @@
             </div>
         </div>
         <hr />
-        <h5 class="text-secondary">4. Pago</h5>
+        <h5 class="text-secondary">4. Pagos</h5>
         <div v-if="errors && errors.tokens" class="text-danger">
             {{ errors.tokens[0] }}
         </div>
-        <div class="alert alert-warning" role="alert">
+        <!-- <div class="alert alert-warning" role="alert">
             <strong class="text-danger"><i class="fa fa-info-circle"></i> Marque solo si accede a algun tipo de descuento.</strong>
         </div>
         <div class="row">
-            <div class="col-md-6 col-xs-12">
+           <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -505,7 +505,7 @@
                     <p class="text-info w-text-info"><i class="fa fa-info-circle"></i> Al seleccionar esta opción apersonarce con la Resolución Rectoral, DNI y ficha de inscipción al CEPREUNA.</p>
                 </div>
             </div>
-            <!-- <div class="col-md-6 col-xs-12">
+           <div class="col-md-6 col-xs-12">
                 <div class="form-group">
                     <label for="tipo_descuento"></label>
                     <div class="form-check">
@@ -527,8 +527,8 @@
                         {{ errors.nro_documento_hermano[0] }}
                     </div>
                 </div>
-            </div> -->
-        </div>
+            </div>
+        </div> -->
         
         <p class="text-info" v-if="montoPagar != 0 && statusDocumento && !statusDescuento && statusColegio && fields.modalidad">
             <i class="fa fa-info-circle"></i> El monto total a pagar es de <b style="font-size:16px"> S/ {{ (montoPagar + 1).toFixed(2) }}</b
